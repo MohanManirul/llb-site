@@ -4,6 +4,7 @@ import {
     ArrowRightIcon,
     BuildingLibraryIcon,
     ClockIcon,
+    PencilSquareIcon,
     ScaleIcon,
     SparklesIcon,
 } from '@heroicons/react/24/outline';
@@ -76,6 +77,22 @@ export default function PublicHome() {
                     <div className="mt-6 h-px w-24 bg-brass/70" />
                 </div>
             </section>
+
+            <AppLink
+                href="/exam-prep"
+                className="group mt-6 flex items-center gap-4 rounded-card border border-hairline border-l-4 border-l-brass bg-white p-4 shadow-sm transition hover:shadow md:p-5"
+            >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-chip bg-brass-soft">
+                    <PencilSquareIcon className="h-5 w-5 text-brass-deep" />
+                </span>
+                <span className="min-w-0 flex-1">
+                    <span className="block font-semibold text-ink group-hover:text-brand">
+                        {t('prep.home_cta')}
+                    </span>
+                    <span className="block text-sm text-ink-muted">{t('prep.home_cta_desc')}</span>
+                </span>
+                <ArrowRightIcon className="h-5 w-5 shrink-0 text-gray-300 group-hover:text-brass-deep" />
+            </AppLink>
 
             <section className="mt-8">
                 <SectionTitle icon={<BuildingLibraryIcon className="h-4.5 w-4.5" />}>

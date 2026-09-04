@@ -52,6 +52,17 @@ class AcademicStructureSeederTest extends TestCase
         $this->assertSame(0, $program->subjects()->whereNotNull('program_level_id')->count());
     }
 
+    public function test_bjs_subjects_are_level_less_written_papers(): void
+    {
+        $this->seed(AcademicStructureSeeder::class);
+
+        $program = Program::where('slug', 'bjs')->first();
+
+        $this->assertSame(10, $program->subjects()->count());
+        $this->assertSame(0, $program->subjects()->whereNotNull('program_level_id')->count());
+        $this->assertSame(0, $program->subjects()->where('marks', '!=', 100)->count());
+    }
+
     public function test_reseeding_is_idempotent(): void
     {
         $this->seed(AcademicStructureSeeder::class);

@@ -4,7 +4,9 @@ use App\Http\Controllers\V1\PublicApi\CatalogController;
 use App\Http\Controllers\V1\PublicApi\MaterialController;
 use App\Http\Controllers\V1\PublicApi\MaterialFileController;
 use App\Http\Controllers\V1\PublicApi\NoticeController;
+use App\Http\Controllers\V1\PublicApi\PublicModelTestController;
 use App\Http\Controllers\V1\PublicApi\PulseController;
+use App\Http\Controllers\V1\PublicApi\QuestionArchiveController;
 use Illuminate\Support\Facades\Route;
 
 // The anonymous student-facing API. No auth, no session — see bootstrap/app.php
@@ -30,6 +32,19 @@ Route::get('materials/{studyMaterial:slug}/files/{file}/download', [MaterialFile
     ->middleware('throttle:downloads')
     ->scopeBindings()
     ->name('materials.files.download');
+
+Route::controller(QuestionArchiveController::class)
+    ->prefix('question-archive')
+    ->name('question-archive.')
+    ->group(function () {
+        Route::get('filters', 'filters')->name('filters');
+        Route::get('mcq', 'mcq')->name('mcq');
+        Route::get('written', 'written')->name('written');
+    });
+
+Route::get('model-tests', [PublicModelTestController::class, 'index'])->name('model-tests.index');
+Route::get('model-tests/{modelTest:slug}', [PublicModelTestController::class, 'show'])
+    ->name('model-tests.show');
 
 Route::get('notices', [NoticeController::class, 'index'])->name('notices.index');
 Route::get('notices/{notice:slug}', [NoticeController::class, 'show'])->name('notices.show');

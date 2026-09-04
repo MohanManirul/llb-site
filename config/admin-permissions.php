@@ -47,5 +47,23 @@ return [
         'edit notices',
         'delete notices',
         'publish notices',
+
+        // questions permissions
+        'view questions',
+        'create questions',
+        'edit questions',
+        'delete questions',
+        'publish questions',
+
+        // model tests permissions
+        'view model tests',
+        'create model tests',
+        'edit model tests',
+        'delete model tests',
+        'publish model tests',
+
+        // students permissions
+        'view students',
+        'edit students',
     ],
 ];

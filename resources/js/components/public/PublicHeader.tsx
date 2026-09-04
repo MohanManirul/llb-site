@@ -1,12 +1,14 @@
 import { FormEvent, useState } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
     Bars3Icon,
     BuildingLibraryIcon,
     ChevronDownIcon,
     MagnifyingGlassIcon,
+    UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Popover } from '@/components/ui';
+import useStudent from '@/hooks/useStudent';
 import useTranslation from '@/hooks/useTranslation';
 import { SITE_NAME_BN, SITE_NAME } from '@/config/site';
 import AppLink from './AppLink';
@@ -74,6 +76,13 @@ export default function PublicHeader() {
                         {t('nav.notices')}
                     </AppLink>
 
+                    <AppLink
+                        href="/exam-prep"
+                        className="rounded-control px-3 py-1.5 text-sm font-medium text-brand-accent hover:bg-gray-100"
+                    >
+                        {t('nav.exam_prep')}
+                    </AppLink>
+
                     <Popover
                         label={t('nav.programs')}
                         icon={<BuildingLibraryIcon className="h-4 w-4" />}
@@ -119,10 +128,84 @@ export default function PublicHeader() {
                 </AppLink>
 
                 <LanguageToggle />
+
+                <AccountMenu />
             </div>
 
             <MobileNavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
         </header>
+    );
+}
+
+function AccountMenu() {
+    const { t } = useTranslation();
+    const { student, loginHref, currentHref, logout } = useStudent();
+    const [loggingOut, setLoggingOut] = useState(false);
+
+    if (!student) {
+        return (
+            <Link
+                href={loginHref(currentHref())}
+                className="hidden items-center gap-1.5 rounded-control border border-hairline px-3 py-1.5 text-sm font-medium text-ink hover:bg-gray-100 sm:inline-flex"
+            >
+                <UserCircleIcon className="h-4 w-4" />
+                {t('nav.login')}
+            </Link>
+        );
+    }
+
+    const signOut = async () => {
+        setLoggingOut(true);
+
+        try {
+            await logout();
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
+    return (
+        <div className="hidden sm:block">
+            <Popover
+                label={student.name.split(' ')[0]}
+                icon={<UserCircleIcon className="h-4 w-4" />}
+                panelClassName="w-56 p-2"
+            >
+                {(close) => (
+                    <div className="flex flex-col">
+                        <AppLink
+                            href="/account/profile"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('nav.profile')}
+                        </AppLink>
+                        <AppLink
+                            href="/account/attempts"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('nav.my_attempts')}
+                        </AppLink>
+                        <AppLink
+                            href="/practice"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('nav.practice')}
+                        </AppLink>
+                        <button
+                            type="button"
+                            onClick={signOut}
+                            disabled={loggingOut}
+                            className="rounded-control px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                            {t('nav.logout')}
+                        </button>
+                    </div>
+                )}
+            </Popover>
+        </div>
     );
 }
 

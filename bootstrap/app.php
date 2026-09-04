@@ -44,6 +44,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/public-v1.php'));
 
             Route::middleware('web')
+                ->prefix('v1/student')
+                ->name('v1.student.')
+                ->group(base_path('routes/student-v1.php'));
+
+            Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
             // The staff side of the app: same `web` group as routes/web.php,
@@ -84,8 +89,28 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Where to send guests hitting an `auth` route, and where to send
         // already-authenticated users hitting a `guest` route.
-        $middleware->redirectGuestsTo('/admin/login');
-        $middleware->redirectUsersTo('/admin/dashboard');
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('admin', 'admin/*')) {
+                return '/admin/login';
+            }
+
+            $locale = in_array($request->route()?->parameter('locale'), config('llb.locales'), true)
+                ? $request->route()->parameter('locale')
+                : config('llb.fallback_locale');
+
+            return '/'.$locale.'/account/login?redirect='.urlencode('/'.$request->path());
+        });
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->is('admin', 'admin/*')) {
+                return '/admin/dashboard';
+            }
+
+            $locale = in_array($request->route()?->parameter('locale'), config('llb.locales'), true)
+                ? $request->route()->parameter('locale')
+                : config('llb.fallback_locale');
+
+            return '/'.$locale.'/exam-prep';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

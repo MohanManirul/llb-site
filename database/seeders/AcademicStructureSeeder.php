@@ -134,6 +134,20 @@ class AcademicStructureSeeder extends Seeder
                 ['name_en' => 'Bar Council Order and Legal Ethics', 'name_bn' => 'বার কাউন্সিল আদেশ ও পেশাগত আচরণ'],
             ],
         ],
+        'bjs' => [
+            '' => [
+                ['name_en' => 'General Bengali', 'name_bn' => 'সাধারণ বাংলা', 'marks' => 100],
+                ['name_en' => 'General English', 'name_bn' => 'সাধারণ ইংরেজি', 'marks' => 100],
+                ['name_en' => 'Bangladesh and International Affairs', 'name_bn' => 'বাংলাদেশ ও আন্তর্জাতিক বিষয়াবলি', 'marks' => 100],
+                ['name_en' => 'Mathematics and Everyday Science', 'name_bn' => 'গণিত ও দৈনন্দিন বিজ্ঞান', 'marks' => 100],
+                ['name_en' => 'Law relating to Civil Matters', 'name_bn' => 'দেওয়ানি বিষয়ক আইন', 'marks' => 100],
+                ['name_en' => 'Law relating to Criminal Matters', 'name_bn' => 'ফৌজদারি বিষয়ক আইন', 'marks' => 100],
+                ['name_en' => 'Family Law (Muslim and Hindu Law)', 'name_bn' => 'পারিবারিক আইন (মুসলিম ও হিন্দু আইন)', 'marks' => 100],
+                ['name_en' => 'Constitutional Law and Law of Evidence', 'name_bn' => 'সাংবিধানিক আইন ও সাক্ষ্য আইন', 'marks' => 100],
+                ['name_en' => 'Land, Contract and Property Laws', 'name_bn' => 'ভূমি, চুক্তি ও সম্পত্তি হস্তান্তর আইন', 'marks' => 100],
+                ['name_en' => 'Optional Law Subjects', 'name_bn' => 'ঐচ্ছিক আইন বিষয়াবলি', 'marks' => 100],
+            ],
+        ],
     ];
 
     public function run(): void
@@ -227,6 +241,7 @@ class AcademicStructureSeeder extends Seeder
                         'slug' => Slug::for(Subject::class, $subject['name_en'], fallbackPrefix: 'subject', suffixes: [$program->slug]),
                         'name_bn' => $subject['name_bn'],
                         'name_en' => $subject['name_en'],
+                        'marks' => $subject['marks'] ?? null,
                         'sort_order' => $index + 1,
                     ]);
 

@@ -9,11 +9,16 @@ use App\Http\Controllers\V1\Admin\ActivityLog\ActivityLogController;
 use App\Http\Controllers\V1\Admin\Auth\AuthController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardReportController;
+use App\Http\Controllers\V1\Admin\ModelTest\ModelTestController;
+use App\Http\Controllers\V1\Admin\ModelTest\ModelTestQuestionController;
 use App\Http\Controllers\V1\Admin\Notice\NoticeController;
 use App\Http\Controllers\V1\Admin\Notification\NotificationController;
 use App\Http\Controllers\V1\Admin\Profile\ProfileController;
+use App\Http\Controllers\V1\Admin\Question\QuestionController;
+use App\Http\Controllers\V1\Admin\Question\QuestionImportController;
 use App\Http\Controllers\V1\Admin\Report\AnalyticsReportController;
 use App\Http\Controllers\V1\Admin\Role\RoleController;
+use App\Http\Controllers\V1\Admin\Student\StudentController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\MaterialFileController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\StudyMaterialController;
 use App\Http\Controllers\V1\Admin\User\UserController;
@@ -115,6 +120,41 @@ Route::middleware('auth:sanctum')
         Route::patch('notices/{notice}/unpublish', [NoticeController::class, 'unpublish'])
             ->name('notices.unpublish');
         Route::apiResource('notices', NoticeController::class);
+
+        // Question bank — literal segments must stay above the apiResource.
+        Route::get('questions/filters', [QuestionController::class, 'filterOptions'])
+            ->name('questions.filters');
+        Route::get('questions/import/template', [QuestionImportController::class, 'template'])
+            ->name('questions.import.template');
+        Route::post('questions/import', [QuestionImportController::class, 'store'])
+            ->name('questions.import');
+        Route::patch('questions/{question}/publish', [QuestionController::class, 'publish'])
+            ->name('questions.publish');
+        Route::patch('questions/{question}/unpublish', [QuestionController::class, 'unpublish'])
+            ->name('questions.unpublish');
+        Route::apiResource('questions', QuestionController::class);
+
+        // Model tests — literal segments must stay above the apiResource.
+        Route::get('model-tests/filters', [ModelTestController::class, 'filterOptions'])
+            ->name('model-tests.filters');
+        Route::patch('model-tests/{modelTest}/publish', [ModelTestController::class, 'publish'])
+            ->name('model-tests.publish');
+        Route::patch('model-tests/{modelTest}/unpublish', [ModelTestController::class, 'unpublish'])
+            ->name('model-tests.unpublish');
+        Route::post('model-tests/{modelTest}/questions', [ModelTestQuestionController::class, 'store'])
+            ->name('model-tests.questions.store');
+        Route::patch('model-tests/{modelTest}/questions/reorder', [ModelTestQuestionController::class, 'reorder'])
+            ->name('model-tests.questions.reorder');
+        Route::delete('model-tests/{modelTest}/questions/{question}', [ModelTestQuestionController::class, 'destroy'])
+            ->name('model-tests.questions.destroy');
+        Route::apiResource('model-tests', ModelTestController::class)
+            ->parameters(['model-tests' => 'modelTest']);
+
+        // Students.
+        Route::patch('students/{student}/active', [StudentController::class, 'toggleActive'])
+            ->name('students.active');
+        Route::apiResource('students', StudentController::class)
+            ->only(['index', 'show']);
 
         // Select/autocomplete option lists — must stay above their apiResource.
         Route::get('activity-logs/filters', [ActivityLogController::class, 'filterOptions'])

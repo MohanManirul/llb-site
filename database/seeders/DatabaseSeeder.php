@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             $this->call([
                 DemoContentSeeder::class,
                 DemoAnalyticsSeeder::class,
+                DemoExamPrepSeeder::class,
             ]);
         }
     }

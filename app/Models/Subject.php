@@ -33,6 +33,14 @@ class Subject extends Model
     }
 
     /**
+     * @return HasMany<Question, $this>
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    /**
      * @return BelongsTo<Program, $this>
      */
     public function program(): BelongsTo

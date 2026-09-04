@@ -42,7 +42,26 @@ class HandleInertiaRequests extends Middleware
             'impersonation' => fn () => $this->impersonation($request),
             'locale' => fn () => app()->getLocale(),
             'programs' => fn () => $this->publicPrograms($request),
+            'student' => fn () => $this->studentUser($request),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function studentUser(Request $request): ?array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return null;
+        }
+
+        $student = $request->user('student');
+
+        if (! $student || ! $student->is_active) {
+            return null;
+        }
+
+        return $student->only('id', 'name', 'email', 'phone');
     }
 
     /**
@@ -63,6 +82,7 @@ class HandleInertiaRequests extends Middleware
             ->orderBy('id')
             ->get()
             ->map(fn (Program $program) => [
+                'id' => $program->id,
                 'slug' => $program->slug,
                 'name' => $program->translated('name'),
                 'short_name' => $program->translated('short_name', false),

@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\Admin\AcademicSessionPageController;
 use App\Http\Controllers\Admin\ActivityLogPageController;
+use App\Http\Controllers\Admin\ModelTestPageController;
 use App\Http\Controllers\Admin\NoticePageController;
 use App\Http\Controllers\Admin\ProgramPageController;
+use App\Http\Controllers\Admin\QuestionPageController;
 use App\Http\Controllers\Admin\RolePageController;
+use App\Http\Controllers\Admin\StudentPageController;
 use App\Http\Controllers\Admin\StudyMaterialPageController;
 use App\Http\Controllers\Admin\SubjectPageController;
 use App\Http\Controllers\Admin\UserPageController;
@@ -74,6 +77,27 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/create', 'create')->name('create');
             Route::get('/{studyMaterial}/edit', 'edit')->name('edit');
         });
+
+    Route::controller(QuestionPageController::class)
+        ->prefix('questions')
+        ->name('questions.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/import', 'import')->name('import');
+            Route::get('/{question}/edit', 'edit')->name('edit');
+        });
+
+    Route::controller(ModelTestPageController::class)
+        ->prefix('model-tests')
+        ->name('model-tests.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/{modelTest}/edit', 'edit')->name('edit');
+        });
+
+    Route::get('/students', [StudentPageController::class, 'index'])->name('students.index');
 
     Route::controller(NoticePageController::class)
         ->prefix('notices')

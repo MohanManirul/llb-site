@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\ModelTest;
 use App\Models\Notice;
 use App\Models\Program;
 use App\Models\StudyMaterial;
@@ -53,6 +54,41 @@ class PublicPageController extends Controller
             'meta' => [
                 'title_bn' => $meta->name_bn,
                 'title_en' => $meta->name_en,
+                'description_bn' => $meta->description_bn,
+                'description_en' => $meta->description_en,
+            ],
+        ]);
+    }
+
+    public function examPrep(): Response
+    {
+        return Inertia::render('public/exam-prep/index/page');
+    }
+
+    public function questions(): Response
+    {
+        return Inertia::render('public/questions/index/page');
+    }
+
+    public function modelTests(): Response
+    {
+        return Inertia::render('public/model-tests/index/page');
+    }
+
+    public function modelTest(string $locale, string $modelTest): Response
+    {
+        $meta = ModelTest::query()
+            ->publiclyVisible()
+            ->where('slug', $modelTest)
+            ->first(['slug', 'title_bn', 'title_en', 'description_bn', 'description_en']);
+
+        abort_unless($meta !== null, 404);
+
+        return Inertia::render('public/model-tests/show/page', [
+            'modelTestSlug' => $modelTest,
+            'meta' => [
+                'title_bn' => $meta->title_bn,
+                'title_en' => $meta->title_en,
                 'description_bn' => $meta->description_bn,
                 'description_en' => $meta->description_en,
             ],
