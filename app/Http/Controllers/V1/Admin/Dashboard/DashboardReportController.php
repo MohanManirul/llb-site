@@ -26,9 +26,7 @@ class DashboardReportController extends Controller
                 $user,
                 $request->dateFrom(),
                 $request->dateTo(),
-                canViewDashboard: $this->canViewCompanyDashboard($user),
-                canSeeClient: $this->canSeeProjectClient($user),
-                canViewFinance: $this->canViewDashboardFinance($user),
+                canViewDashboard: $this->canViewDashboard($user),
             ),
             'Dashboard report retrieved successfully.',
         );

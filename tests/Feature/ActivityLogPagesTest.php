@@ -41,7 +41,7 @@ class ActivityLogPagesTest extends TestCase
         // /settings forwards to the first section the user may open; with only
         // view activity logs granted, that is the activity log.
         // The role matters: TestCase::actingAs promotes a role-less user to
-        // super-admin, who would pass view companies and land there instead.
+        // super-admin, who would pass another section's permission and land there.
         $role = Role::findOrCreate('auditor', 'web');
         $role->syncPermissions(['view activity logs']);
 

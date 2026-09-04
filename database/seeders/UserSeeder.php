@@ -25,7 +25,6 @@ class UserSeeder extends Seeder
         'view activity logs',
         'delete activity logs',
         'view system monitoring',
-        'manage payments',
         'impersonate users',
     ];
 
@@ -35,36 +34,24 @@ class UserSeeder extends Seeder
             'email' => 'nusrat.jahan@stepuptech.com.bd',
             'phone' => '+8801713000201',
             'role' => self::ADMIN,
-            'company' => 'StepUp Technologies Ltd.',
-            'department' => 'Human Resources',
-            'designation' => 'Operations Manager',
         ],
         [
             'name' => 'Mahfuzur Rahman',
             'email' => 'mahfuzur.rahman@stepuptech.com.bd',
             'phone' => '+8801713000202',
             'role' => self::STAFF,
-            'company' => 'StepUp Technologies Ltd.',
-            'department' => 'Engineering',
-            'designation' => 'Senior Software Engineer',
         ],
         [
             'name' => 'Sharmin Akter',
             'email' => 'sharmin.akter@stepuptech.com.bd',
             'phone' => '+8801713000203',
             'role' => self::STAFF,
-            'company' => 'StepUp Technologies Ltd.',
-            'department' => 'Digital Marketing',
-            'designation' => 'Digital Marketing Manager',
         ],
         [
             'name' => 'Imran Hossain',
             'email' => 'imran.hossain@stepuplogistics.com.bd',
             'phone' => '+8801713000208',
             'role' => self::STAFF,
-            'company' => 'StepUp Logistics Ltd.',
-            'department' => 'Operations',
-            'designation' => 'Operations Manager',
         ],
     ];
 

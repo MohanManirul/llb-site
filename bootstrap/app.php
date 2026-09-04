@@ -28,16 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->name('v1.')
                 ->group(base_path('routes/admin-v1.php'));
 
-            Route::middleware('api')
-                ->prefix('v1')
-                ->name('v1.')
-                ->group(base_path('routes/client-v1.php'));
-
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
             // The staff side of the app: same `web` group as routes/web.php,
-            // mounted under /admin so it never collides with the client portal.
+            // mounted under /admin.
             Route::middleware('web')
                 ->prefix('admin')
                 ->group(base_path('routes/web-admin.php'));
@@ -55,7 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // below is unchanged. এর মানে auth:sanctum একই ডোমেইনের ব্রাউজার রিকোয়েস্টে session cookie দিয়েও পাস করবে, আর মোবাইল/এক্সটার্নাল ক্লায়েন্টে Bearer token দিয়ে। তাই একই middleware দুই ধরনের ক্লায়েন্ট সামলাচ্ছে — এটাই ডিজাইন, ভাঙার দরকার নেই।
         $middleware->statefulApi();
 
-        // Spatie route middleware: `role:super-admin`, `permission:clients.view`
+        // Spatie route middleware: `role:super-admin`, `permission:users.view`
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
@@ -69,14 +64,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Where to send guests hitting an `auth` route, and where to send
-        // already-authenticated users hitting a `guest` route. The client
-        // portal and the admin side each have their own pair.
-        $middleware->redirectGuestsTo(
-            fn (Request $request) => $request->is('admin', 'admin/*') ? '/admin/login' : '/login',
-        );
-        $middleware->redirectUsersTo(
-            fn (Request $request) => $request->is('admin', 'admin/*') ? '/admin/dashboard' : '/dashboard',
-        );
+        // already-authenticated users hitting a `guest` route.
+        $middleware->redirectGuestsTo('/admin/login');
+        $middleware->redirectUsersTo('/admin/dashboard');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

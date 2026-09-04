@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\CreatedBetween;
 use App\Notifications\AdminResetPassword;
 use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -18,7 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, Notifiable, Searchable;
+    use CreatedBetween, HasApiTokens, HasFactory, HasRoles, Notifiable, Searchable;
 
     protected string $guard_name = 'web';
 
@@ -30,37 +30,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function employees(): HasMany
-    {
-        return $this->hasMany(Employee::class);
-    }
-
-    /**
-     * @return array<int, int>
-     */
-    public function employeeIds(): array
-    {
-        return once(fn () => $this->employees()
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->all());
-    }
-
     public function effectiveRoleNames(): Collection
     {
-        $employeeIds = $this->employeeIds();
-
-        if ($employeeIds === []) {
-            return $this->getRoleNames();
-        }
-
-        $leadsATeam = Team::ledByEmployees($employeeIds)->exists();
-
-        return $this->getRoleNames()
-            ->push('employee')
-            ->when($leadsATeam, fn (Collection $names) => $names->push('team-leader'))
-            ->unique()
-            ->values();
+        return $this->getRoleNames();
     }
 
     public function getImageUrlAttribute(): ?string

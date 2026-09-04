@@ -1,12 +1,7 @@
 import type { ComponentType, SVGProps } from 'react';
 import {
     HomeIcon,
-    UserGroupIcon,
-    IdentificationIcon,
-    BriefcaseIcon,
     Cog6ToothIcon,
-    RectangleStackIcon,
-    BuildingOffice2Icon,
     ShieldCheckIcon,
     UsersIcon,
     ClockIcon,
@@ -34,57 +29,15 @@ export const navItems: NavItem[] = [
         icon: HomeIcon,
         href: '/dashboard',
     },
-    {
-        label: 'Employees',
-        icon: BriefcaseIcon,
-        href: '/employees',
-        permission: 'view employees',
-    },
-    {
-        label: 'Teams',
-        icon: UserGroupIcon,
-        href: '/teams',
-        permission: 'view teams',
-    },
-    {
-        label: 'Clients',
-        icon: IdentificationIcon,
-        href: '/clients',
-        permission: 'view clients',
-    },
-    {
-        label: 'Projects',
-        icon: RectangleStackIcon,
-        href: '/projects',
-    },
 ];
 
 export const settingsItem: NavItem = {
     label: 'Settings',
     icon: Cog6ToothIcon,
     href: '/settings',
-    rolesExcept: ['client'],
 };
 
 export const settingsSections: NavItem[] = [
-    {
-        label: 'Companies',
-        icon: BuildingOffice2Icon,
-        href: '/companies',
-        permission: 'view companies',
-    },
-    {
-        label: 'Departments',
-        icon: IdentificationIcon,
-        href: '/departments',
-        permission: 'view departments',
-    },
-    {
-        label: 'Designation',
-        icon: BriefcaseIcon,
-        href: '/designations',
-        permission: 'view designations',
-    },
     {
         label: 'Roles',
         icon: ShieldCheckIcon,

@@ -245,7 +245,7 @@ const features: Feature[] = [
     {
         icon: ShieldCheckIcon,
         title: 'Roles & permissions',
-        body: 'Fine-grained access for admins, agents and clients out of the box.',
+        body: 'Fine-grained access for admins, managers and staff out of the box.',
     },
     {
         icon: BoltIcon,

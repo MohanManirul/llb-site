@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1\Admin\Notification;
 use App\Facades\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Notification\NotificationResource;
-use App\Models\Client;
 use App\Models\User;
 use App\Services\Notification\NotificationService;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +20,7 @@ class NotificationController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        /** @var User|Client $user */
+        /** @var User $user */
         $user = $request->user();
 
         $limit = (int) $request->integer('limit', 15);
@@ -47,7 +46,7 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request): JsonResponse
     {
-        /** @var User|Client $user */
+        /** @var User $user */
         $user = $request->user();
 
         $this->notificationService->markAllAsRead($user);

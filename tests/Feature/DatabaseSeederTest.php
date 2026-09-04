@@ -2,15 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Company;
-use App\Models\Department;
-use App\Models\Designation;
-use App\Models\Employee;
 use App\Models\User;
-use Database\Seeders\CompanySeeder;
 use Database\Seeders\DatabaseSeeder;
-use Database\Seeders\DepartmentSeeder;
-use Database\Seeders\DesignationSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -37,16 +30,8 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seedAsProduction();
 
-        $this->assertSame(count(CompanySeeder::COMPANIES), Company::query()->count());
-        $this->assertSame(
-            count(CompanySeeder::COMPANIES) * count(DepartmentSeeder::NAMES),
-            Department::query()->count(),
-        );
-        $this->assertSame(count(DesignationSeeder::NAMES), Designation::query()->count());
-
         // The staff roster plus the admin account, and nothing else.
         $this->assertSame(count(UserSeeder::PEOPLE) + 1, User::query()->count());
-        $this->assertSame(count(UserSeeder::PEOPLE), Employee::query()->count());
     }
 
     public function test_the_roles_it_creates_are_the_ones_the_app_expects(): void
@@ -68,25 +53,15 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seedAsProduction();
 
-        $company = Company::query()->first();
-        $company->update(['address' => 'Moved, Gulshan 2, Dhaka']);
+        $user = User::query()->firstWhere('email', 'admin@gmail.com');
+        $user->update(['name' => 'Renamed By Hand']);
 
-        $counts = [
-            User::query()->count(),
-            Company::query()->count(),
-            Department::query()->count(),
-            Employee::query()->count(),
-        ];
+        $counts = [User::query()->count()];
 
         $this->seedAsProduction();
 
-        $this->assertSame($counts, [
-            User::query()->count(),
-            Company::query()->count(),
-            Department::query()->count(),
-            Employee::query()->count(),
-        ]);
+        $this->assertSame($counts, [User::query()->count()]);
 
-        $this->assertSame('Moved, Gulshan 2, Dhaka', $company->fresh()->address);
+        $this->assertSame('Renamed By Hand', $user->fresh()->name);
     }
 }

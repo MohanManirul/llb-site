@@ -1,14 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityLogPageController;
-use App\Http\Controllers\Admin\ClientPageController;
-use App\Http\Controllers\Admin\CompanyPageController;
-use App\Http\Controllers\Admin\DepartmentPageController;
-use App\Http\Controllers\Admin\DesignationPageController;
-use App\Http\Controllers\Admin\EmployeePageController;
-use App\Http\Controllers\Admin\ProjectPageController;
 use App\Http\Controllers\Admin\RolePageController;
-use App\Http\Controllers\Admin\TeamPageController;
 use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ImpersonationController;
@@ -68,9 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Settings — forwards to the first section the user may open.
     Route::get('/settings', function () {
         $sections = [
-            'view companies' => '/admin/companies',
-            'view departments' => '/admin/departments',
-            'view designations' => '/admin/designations',
             'view activity logs' => '/admin/activity-logs',
         ];
 
@@ -83,52 +73,6 @@ Route::middleware('auth:sanctum')->group(function () {
         abort(403);
     })->name('settings.index');
 
-    // Single list pages — create and edit happen in a modal.
-    Route::get('/companies', [CompanyPageController::class, 'index'])->name('companies.index');
-
-    Route::get('/departments', [DepartmentPageController::class, 'index'])->name('departments.index');
-
-    Route::get('/designations', [DesignationPageController::class, 'index'])->name('designations.index');
-
+    // Single list page — create and edit happen in a modal.
     Route::get('/activity-logs', [ActivityLogPageController::class, 'index'])->name('activity-logs.index');
-
-    Route::controller(EmployeePageController::class)
-        ->prefix('employees')
-        ->name('employees.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::get('/{employee}/edit', 'edit')->name('edit');
-        });
-
-    Route::controller(TeamPageController::class)
-        ->prefix('teams')
-        ->name('teams.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::get('/{team}/edit', 'edit')->name('edit');
-            Route::get('/{team}', 'show')->name('show');
-        });
-
-    Route::controller(ClientPageController::class)
-        ->prefix('clients')
-        ->name('clients.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::get('/{client}/edit', 'edit')->name('edit');
-        });
-
-    // Show carries no permission — the API scopes what each role may load.
-    Route::controller(ProjectPageController::class)
-        ->prefix('projects')
-        ->name('projects.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::get('/{project}/edit', 'edit')->name('edit');
-            Route::get('/{project}/reports', 'reports')->name('reports');
-            Route::get('/{project}', 'show')->name('show');
-        });
 });

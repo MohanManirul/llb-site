@@ -4,11 +4,8 @@ namespace App\Http\Controllers\V1\Admin\Access;
 
 use App\Facades\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\Admin\Access\GrantLoginRequest;
 use App\Http\Requests\V1\Admin\Access\StoreStaffRequest;
-use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\User\UserResource;
-use App\Models\Client;
 use App\Services\Access\AccessService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -20,7 +17,7 @@ class AccessController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:manage access', only: [
-                'grantClientLogin', 'revokeClientLogin', 'storeStaff', 'permissions',
+                'storeStaff', 'permissions',
             ]),
         ];
     }
@@ -28,28 +25,6 @@ class AccessController extends Controller implements HasMiddleware
     public function __construct(
         private readonly AccessService $accessService,
     ) {}
-
-    public function grantClientLogin(GrantLoginRequest $request, Client $client): JsonResponse
-    {
-        $client = $this->accessService->grantClientLogin($client, $request->validated('password'));
-
-        activity()->performedOn($client)->log('Client login access granted.');
-
-        return ApiResponse::respondWithResource(
-            new ClientResource($client),
-            "Login access granted to client {$client->name}.",
-            201,
-        );
-    }
-
-    public function revokeClientLogin(Client $client): JsonResponse
-    {
-        activity()->performedOn($client)->log('Client login access revoked.');
-
-        $this->accessService->revokeClientLogin($client);
-
-        return ApiResponse::respondSuccess("Login access revoked for client {$client->name}.");
-    }
 
     public function storeStaff(StoreStaffRequest $request): JsonResponse
     {

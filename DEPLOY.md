@@ -31,17 +31,15 @@ Both are load-bearing, and `docker-compose.local.yml` and
 
 - **The queue** is on `QUEUE_CONNECTION=database` in every environment — never
   `sync`. Cache and sessions are on the database too; there is no Redis. What
-  rides on it today: the password-reset mail for both guards
-  (`AdminResetPassword` and `ClientResetPassword` both `implements ShouldQueue`)
-  and the client CSV import (`ImportClientsChunkJob`). With `database` and no
+  rides on it today: the staff password-reset mail
+  (`AdminResetPassword` `implements ShouldQueue`). With `database` and no
   worker those would be written to the `jobs` table and never run — "forgot
   password" would appear to succeed and send nothing — so the worker is not
   optional.
-- **The scheduler** runs `payment:create-reminders` once a day
-  (`routes/console.php`). That is what raises upcoming- and overdue-payment
-  reminders; without it a due date passes and no client is chased. There are two
-  ways to run it — see [The scheduler](#the-scheduler) below, and pick one, not
-  both.
+- **The scheduler** runs whatever `routes/console.php` schedules. Nothing is
+  scheduled there today, so it is idle — keep it wired up anyway, since the
+  first task added expects it. There are two ways to run it — see
+  [The scheduler](#the-scheduler) below, and pick one, not both.
 
 One trap when adding either as a Coolify application: give it the
 `pgrep -f queue:work` healthcheck that `docker-compose.staging.yml` uses. The
@@ -129,9 +127,9 @@ Other application settings that matter:
 
 ## The scheduler
 
-`routes/console.php` runs `payment:create-reminders` once a day. It is what
-raises the upcoming- and overdue-payment notifications clients are chased with
-— without it a due date passes with nobody told.
+`routes/console.php` carries no scheduled tasks at the moment, so the scheduler
+has nothing to fire. Leave it configured regardless: the first task added starts
+running without a deploy change.
 
 Nothing in the web container runs it. Production needs one of:
 
@@ -141,8 +139,8 @@ Nothing in the web container runs it. Production needs one of:
   which is what `docker-compose.local.yml` does locally.
 
 Pick one, not both. `withoutOverlapping()` does hold across hosts — the lock
-lives in the database cache — so a duplicate scheduler would not double-run the
-reminders, but it would double every task added later that forgets the guard.
+lives in the database cache — but a duplicate scheduler would double every task
+that forgets the guard.
 
 ## Rollback
 

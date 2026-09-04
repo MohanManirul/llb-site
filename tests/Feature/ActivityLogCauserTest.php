@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\ActivityLog;
-use App\Models\Company;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -25,14 +24,14 @@ class ActivityLogCauserTest extends TestCase
 
     public function test_it_writes_the_subject_type_and_description(): void
     {
-        $company = Company::create(['name' => 'Acme Corp', 'code' => 'ACME', 'is_active' => true]);
+        $subject = User::factory()->create();
 
-        $log = activity()->performedOn($company)->type('crm')->log('Company created');
+        $log = activity()->performedOn($subject)->type('crm')->log('User created');
 
         $this->assertSame('crm', $log->type);
-        $this->assertSame('Company created', $log->description);
-        $this->assertSame(Company::class, $log->subject_type);
-        $this->assertSame($company->id, $log->subject_id);
+        $this->assertSame('User created', $log->description);
+        $this->assertSame(User::class, $log->subject_type);
+        $this->assertSame($subject->id, $log->subject_id);
     }
 
     public function test_it_defaults_the_type_to_admin(): void

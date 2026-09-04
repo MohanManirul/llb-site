@@ -39,10 +39,6 @@ export default function NotificationBell() {
             } else {
                 flash.success(item.message);
             }
-
-            if (item.kind === 'client_import') {
-                window.dispatchEvent(new CustomEvent('client-import:finished'));
-            }
         });
 
         incoming.forEach((item) => seen.current!.add(item.id));

@@ -7,7 +7,6 @@ use App\Notifications\Channels\DatabaseChannel;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Notifications\Channels\DatabaseChannel as BaseDatabaseChannel;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

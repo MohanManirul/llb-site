@@ -29,8 +29,7 @@ Node, npm — is installed on the host; the container is the toolchain. The `que
 `app`, `nginx`, `queue`, `scheduler`, `vite`, `pgsql`, `mailpit`. There is no Redis —
 cache, sessions and the queue all run on the database.
 
-Seeding gives you a super-admin: **`admin@gmail.com` / `password`**. `DemoDataSeeder` is
-*not* wired into `DatabaseSeeder`; run it by name when you want demo rows.
+Seeding gives you a super-admin: **`admin@gmail.com` / `password`**.
 
 **Do not run `npm install` on the host.** The `vite` container installs its own
 `node_modules` on first boot, and it has to: the bundler ships per-platform native
@@ -59,7 +58,7 @@ Everything runs through the container.
 
 ```bash
 docker compose exec app php artisan test                      # the whole suite
-docker compose exec app php artisan test --filter=Payment     # one area
+docker compose exec app php artisan test --filter=User        # one area
 docker compose exec app php artisan test --filter=test_it_searches_by_name
 docker compose exec app ./vendor/bin/pint                     # formatter, Laravel preset
 docker compose exec app npx tsc --noEmit                      # the TypeScript check
@@ -76,29 +75,24 @@ Postgres.
 
 **Pages are render-only.** The `web` routes never fetch data. They render a React page
 through a thin page controller that passes an id and nothing else — see
-`ProjectPageController` (`['projectId' => $project]`). The page then loads its own data from
+`UserPageController` (`['userId' => $user]`). The page then loads its own data from
 `/v1/*` through `resources/js/lib/api-client.ts`, whose `baseURL` is `/v1`, so callers
-write `api.get('/projects')`.
+write `api.get('/users')`.
 
-The one thing that may travel beside the id is a cheap authorisation flag
-(`ProjectPageController::reports` passes `canSubmitReports`). Ids and auth flags — never
-domain data.
+Ids and request-derived values only — never domain data.
 
 **Flow:** Route → Controller (request/response only) → FormRequest (validation) → Service
-(business logic) → Model → Resource (formatting). Multi-step domain operations live in
-`app/Actions/`, triggered from `app/Observers/`.
+(business logic) → Model → Resource (formatting).
 
 Routes are mounted from the `using:` closure in `bootstrap/app.php`:
 
 | File | Prefix | Middleware |
 |---|---|---|
 | `routes/admin-v1.php` | `/v1` (names `v1.*`) | `api` |
-| `routes/client-v1.php` | `/v1` (names `v1.*`) | `api` |
 | `routes/web.php` | — | `web` |
 | `routes/web-admin.php` | `/admin` | `web` |
 
-There is no unversioned `/api/*`. Controllers live under `app/Http/Controllers/V1/`, split
-into `Admin/` for the staff API and `Client/` for the portal's own endpoints.
+There is no unversioned `/api/*`. Controllers live under `app/Http/Controllers/V1/Admin/`.
 
 Frontend is TypeScript throughout — type new props, state and payloads rather than
 reaching for `any`, and import shared inputs from the `@/components/ui` barrel.

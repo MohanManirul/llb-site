@@ -11,7 +11,6 @@
     --ink-3: #86959f;
     --g-id: #6a4fbf;
     --g-org: #0d7a70;
-    --g-prj: #9d6212;
     --mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
     --sans: system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
   }
@@ -27,7 +26,6 @@
       --ink-3: #71838f;
       --g-id: #ab98f7;
       --g-org: #4ec6b5;
-      --g-prj: #dda43f;
     }
   }
   :root[data-theme="dark"] {
@@ -41,7 +39,6 @@
     --ink-3: #71838f;
     --g-id: #ab98f7;
     --g-org: #4ec6b5;
-    --g-prj: #dda43f;
   }
 
   * { box-sizing: border-box; }
@@ -334,13 +331,10 @@
 <script>
 const GROUPS = {
   id:  { label: "Identity & access", css: "--g-id" },
-  org: { label: "Organisation",      css: "--g-org" },
-  prj: { label: "Projects & sales",  css: "--g-prj" },
 };
 
 const TABLES = {
   USERS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["email","string","UK"],["phone","string"],["image","string"],["password","string"]] },
-  CLIENTS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["email","string","UK"],["phone","string","UK"],["password","string"],["is_active","bool"],["deleted_at","timestamp"]] },
   ROLES: { g: "id", cols: [["id","bigint","PK"],["name","string"],["guard_name","string"]] },
   PERMISSIONS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["guard_name","string"]] },
   MODEL_HAS_ROLES: { g: "id", cols: [["role_id","bigint","FK"],["model_type","string"],["model_id","bigint"]] },
@@ -350,21 +344,8 @@ const TABLES = {
   NOTIFICATIONS: { g: "id", cols: [["id","uuid","PK"],["notifiable_type","string"],["notifiable_id","bigint"],["data","text"],["read_at","timestamp"]] },
   ACTIVITY_LOGS: { g: "id", cols: [["id","bigint","PK"],["type","string"],["subject_type","string"],["subject_id","bigint"],["causer_type","string"],["causer_id","bigint"],["description","text"]] },
   PASSWORD_RESET_TOKENS: { g: "id", cols: [["email","string","PK"],["token","string"]] },
-  CLIENT_PASSWORD_RESET_TOKENS: { g: "id", cols: [["email","string","PK"],["token","string"]] },
 
-  COMPANIES: { g: "org", cols: [["id","bigint","PK"],["name","string","UK"],["email","string","UK"],["is_active","bool"],["deleted_at","timestamp"]] },
-  DEPARTMENTS: { g: "org", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["name","string"],["is_active","bool"],["deleted_at","timestamp"]] },
-  DESIGNATIONS: { g: "org", cols: [["id","bigint","PK"],["name","string","UK"],["is_active","bool"]] },
-  EMPLOYEES: { g: "org", cols: [["id","bigint","PK"],["user_id","bigint","FK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["designation_id","bigint","FK"],["is_active","bool"],["joining_date","date"],["resignation_date","date"],["deleted_at","timestamp"]] },
-  TEAMS: { g: "org", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["name","string"],["is_active","bool"],["deleted_at","timestamp"]] },
-  TEAM_MEMBERS: { g: "org", cols: [["id","bigint","PK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["role","enum"]] },
 
-  PROJECTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["client_id","bigint","FK"],["team_id","bigint","FK"],["assigned_employee_id","bigint","FK"],["project_name","string","UK"],["start_date","date"],["end_date","date"],["package_amount","decimal"],["amount_paid","decimal"],["amount_due","decimal"],["project_type","enum"],["sales_target","decimal"],["target_deadline","date"],["achieved_sales","decimal"],["health_status","enum"],["business_status","enum"],["deleted_at","timestamp"]] },
-  PROJECT_MILESTONES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["sequence","smallint"],["period_start","date"],["period_end","date"],["target_amount","decimal"],["achieved_amount","decimal"],["status","enum"]] },
-  SALES_REPORTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["week_start","date"],["week_end","date"],["total_sales","decimal"],["total_order_quantity","int"],["total_amount_spent","decimal"]] },
-  PROJECT_SALES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["project_milestone_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["sale_date","date"],["amount","decimal"],["reference","string"]] },
-  PROJECT_ASSIGNMENTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["assigned_at","timestamp"],["unassigned_at","timestamp"],["reason","enum"]] },
-  PROJECT_NOTES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["user_id","bigint","FK"],["note","text"]] },
 };
 
 const RELS = [
@@ -373,46 +354,13 @@ const RELS = [
   ["USERS","PERSONAL_ACCESS_TOKENS","1","N","tokens (morph)"],
   ["USERS","NOTIFICATIONS","1","N","receives (morph)"],
   ["USERS","ACTIVITY_LOGS","1","N","causes (morph)"],
-  ["CLIENTS","PERSONAL_ACCESS_TOKENS","1","N","tokens (morph)"],
-  ["CLIENTS","NOTIFICATIONS","1","N","receives (morph)"],
   ["ROLES","MODEL_HAS_ROLES","1","N","assigned to"],
   ["ROLES","ROLE_HAS_PERMISSIONS","1","N","grants"],
   ["PERMISSIONS","MODEL_HAS_PERMISSIONS","1","N","assigned to"],
   ["PERMISSIONS","ROLE_HAS_PERMISSIONS","1","N","granted via"],
   ["USERS","PASSWORD_RESET_TOKENS","1","0..1","reset (super-admin only)"],
-  ["CLIENTS","CLIENT_PASSWORD_RESET_TOKENS","1","0..1","reset (own broker)"],
 
-  ["COMPANIES","DEPARTMENTS","1","N","has"],
-  ["COMPANIES","TEAMS","1","N","has"],
-  ["COMPANIES","EMPLOYEES","1","N","employs"],
-  ["COMPANIES","PROJECTS","1","N","owns"],
-  ["DEPARTMENTS","TEAMS","1","N","has"],
-  ["DEPARTMENTS","EMPLOYEES","1","N","has"],
-  ["DEPARTMENTS","PROJECTS","1","N","scopes (from team)"],
-  ["DESIGNATIONS","EMPLOYEES","0..1","N","held by"],
-  ["USERS","EMPLOYEES","1","N","employed as (1 per company)"],
-  ["TEAMS","TEAM_MEMBERS","1","N","has"],
-  ["EMPLOYEES","TEAM_MEMBERS","1","N","member of (leader or member)"],
 
-  ["CLIENTS","PROJECTS","1","N","contracts"],
-  ["TEAMS","PROJECTS","1","N","handles"],
-  ["EMPLOYEES","PROJECTS","0..1","N","assigned marketer"],
-  ["PROJECTS","PROJECT_MILESTONES","1","N","split into monthly"],
-  ["PROJECTS","SALES_REPORTS","1","N","weekly entry"],
-  ["PROJECTS","PROJECT_SALES","1","N","has"],
-  ["PROJECTS","PROJECT_ASSIGNMENTS","1","N","ownership history"],
-  ["PROJECTS","PROJECT_NOTES","1","N","has"],
-  ["PROJECT_MILESTONES","PROJECT_SALES","0..1","N","attributes"],
-  ["TEAMS","PROJECT_ASSIGNMENTS","1","N","has"],
-  ["EMPLOYEES","PROJECT_ASSIGNMENTS","1","N","has"],
-  ["TEAMS","PROJECT_SALES","0..1","N","credited"],
-  ["EMPLOYEES","PROJECT_SALES","0..1","N","credited"],
-  ["USERS","PROJECT_NOTES","0..1","N","authors"],
-  ["COMPANIES","PROJECT_MILESTONES","1","N","scopes"],
-  ["COMPANIES","SALES_REPORTS","1","N","scopes"],
-  ["COMPANIES","PROJECT_SALES","1","N","scopes"],
-  ["COMPANIES","PROJECT_ASSIGNMENTS","1","N","scopes"],
-  ["COMPANIES","PROJECT_NOTES","1","N","scopes"],
 ];
 
 const names = Object.keys(TABLES);
@@ -654,6 +602,6 @@ window.addEventListener("hashchange", () => {
 });
 
 const start = decodeURIComponent(location.hash.slice(1));
-select(TABLES[start] ? start : "PROJECTS");
+select(TABLES[start] ? start : "USERS");
 applyFilter();
 </script>

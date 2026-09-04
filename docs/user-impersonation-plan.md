@@ -67,5 +67,4 @@ target doesn't hold it, the door back is shut. No limit of its own;
 
 ## Not in this round
 
-Client portal impersonation (clients already have `AccessController::grantClientLogin`),
-and mobile/token impersonation (a token outlives the session).
+Mobile/token impersonation (a token outlives the session).

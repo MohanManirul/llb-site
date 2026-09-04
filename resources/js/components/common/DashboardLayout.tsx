@@ -4,7 +4,6 @@ import SiteHeader from './SiteHeader';
 import ImpersonationBanner from './ImpersonationBanner';
 import { PageTitleProvider } from './PageTitle';
 import FlashMessages from './FlashMessages';
-import ReportImportWatcher from './ReportImportWatcher';
 
 interface DashboardLayoutProps {
     children?: ReactNode;
@@ -44,7 +43,6 @@ export default function DashboardLayout({ children, wide = false }: DashboardLay
             </div>
 
             <FlashMessages />
-            <ReportImportWatcher />
         </PageTitleProvider>
     );
 }

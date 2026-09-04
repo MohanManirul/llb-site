@@ -16,24 +16,20 @@ class ApiNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function notify(User $user, string $status = 'completed', int $imported = 5): void
+    private function notify(User $user, string $status = 'completed'): void
     {
-        $skipped = 10 - $imported;
-
         $user->notifications()->create([
             'id' => (string) Str::uuid(),
-            'type' => 'client-import',
+            'type' => 'general',
             'data' => [
-                'type' => 'client_import',
-                'file' => 'clients.csv',
-                'is_active' => $status,
-                'total_rows' => 10,
-                'imported_rows' => $imported,
-                'skipped_rows' => $skipped,
+                'type' => 'general',
+                'title' => 'Account notice',
+                'status' => $status,
+                'link' => '/admin/profile',
                 'message' => $status === 'completed'
-                    ? 'Clients CSV uploaded successfully.'
-                    : 'Clients CSV upload failed.',
-                'summary' => "clients.csv — {$imported} imported, {$skipped} skipped.",
+                    ? 'Your account was updated.'
+                    : 'The account update failed.',
+                'summary' => 'Profile details changed.',
             ],
         ]);
     }
@@ -56,17 +52,17 @@ class ApiNotificationTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'result.notifications')
             ->assertJsonPath('result.unread_count', 1)
-            ->assertJsonPath('result.notifications.0.kind', 'client_import')
-            ->assertJsonPath('result.notifications.0.title', 'Clients CSV upload')
-            ->assertJsonPath('result.notifications.0.link', '/admin/clients')
+            ->assertJsonPath('result.notifications.0.kind', 'general')
+            ->assertJsonPath('result.notifications.0.title', 'Account notice')
+            ->assertJsonPath('result.notifications.0.link', '/admin/profile')
             ->assertJsonPath('result.notifications.0.read', false)
             ->assertJsonPath(
                 'result.notifications.0.message',
-                'Clients CSV uploaded successfully.'
+                'Your account was updated.'
             )
             ->assertJsonPath(
                 'result.notifications.0.summary',
-                'clients.csv — 5 imported, 5 skipped.'
+                'Profile details changed.'
             );
     }
 
@@ -104,7 +100,7 @@ class ApiNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $this->notify($user);
-        $this->notify($user, 'failed', 0);
+        $this->notify($user, 'failed');
 
         $this->actingAs($user)
             ->patchJson('/v1/notifications/read-all')

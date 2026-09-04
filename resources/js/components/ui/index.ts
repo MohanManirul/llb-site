@@ -60,8 +60,6 @@ export type { DeleteButtonProps } from './DeleteButton';
 export { default as ImageUpload } from './ImageUpload';
 export type { ImageUploadProps } from './ImageUpload';
 
-export { default as SalesProgress } from './SalesProgress';
-export type { SalesProgressProps } from './SalesProgress';
 
 export { default as DataTable } from './DataTable';
 export type { DataTableProps, DataTablePagination } from './DataTable';

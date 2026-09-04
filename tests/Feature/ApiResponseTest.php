@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Facades\ApiResponse;
-use App\Http\Resources\Company\CompanyResource;
-use App\Models\Company;
+use App\Http\Resources\User\UserResource;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -70,33 +70,33 @@ class ApiResponseTest extends TestCase
 
     public function test_it_puts_a_single_resource_straight_into_the_result_key(): void
     {
-        $company = $this->makeCompany('Acme Corp');
+        $user = $this->makeUser('Acme Corp');
 
         $response = ApiResponse::respondWithResource(
-            new CompanyResource($company),
-            'Company retrieved successfully.',
+            new UserResource($user),
+            'User retrieved successfully.',
         );
 
         $payload = $response->getData(true);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertTrue($payload['success']);
-        $this->assertSame('Company retrieved successfully.', $payload['message']);
-        $this->assertSame($company->id, $payload['result']['id']);
+        $this->assertSame('User retrieved successfully.', $payload['message']);
+        $this->assertSame($user->id, $payload['result']['id']);
         $this->assertSame('Acme Corp', $payload['result']['name']);
     }
 
     public function test_a_resource_collection_carries_simple_pagination_links_and_meta(): void
     {
         foreach (['Acme Corp', 'Globex', 'Initech'] as $name) {
-            $this->makeCompany($name);
+            $this->makeUser($name);
         }
 
-        $paginator = Company::query()->orderBy('id')->simplePaginate(2);
+        $paginator = User::query()->orderBy('id')->simplePaginate(2);
 
         $response = ApiResponse::respondWithResourceCollection(
-            CompanyResource::collection($paginator),
-            'Companies retrieved successfully.',
+            UserResource::collection($paginator),
+            'Users retrieved successfully.',
         );
 
         $payload = $response->getData(true);
@@ -116,13 +116,11 @@ class ApiResponseTest extends TestCase
         $this->assertArrayNotHasKey('last_page', $payload['result']['meta']);
     }
 
-    private function makeCompany(string $name): Company
+    private function makeUser(string $name): User
     {
-        return Company::create([
+        return User::factory()->create([
             'name' => $name,
-            'code' => str_replace(' ', '', $name),
             'email' => str_replace(' ', '', strtolower($name)).'@example.com',
-            'is_active' => true,
         ]);
     }
 }

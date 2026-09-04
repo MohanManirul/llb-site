@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\ActivityLog;
-use App\Models\Company;
 use App\Models\User;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,15 +50,15 @@ class ApiActivityLogIndexTest extends TestCase
 
     public function test_it_searches_by_description(): void
     {
-        $this->makeLog('Project created');
-        $this->makeLog('Client deleted');
+        $this->makeLog('User created');
+        $this->makeLog('Role deleted');
 
         $response = $this->actingAs(User::factory()->create())
-            ->getJson('/v1/admin/activity-logs?search=Project')
+            ->getJson('/v1/admin/activity-logs?search=User')
             ->assertOk();
 
         $response->assertJsonCount(1, 'result.data');
-        $this->assertSame('Project created', $response->json('result.data.0.description'));
+        $this->assertSame('User created', $response->json('result.data.0.description'));
     }
 
     public function test_it_filters_by_type(): void
@@ -77,16 +76,16 @@ class ApiActivityLogIndexTest extends TestCase
 
     public function test_it_filters_by_subject_type(): void
     {
-        $company = Company::create(['name' => 'Acme Corp', 'code' => 'ACME', 'is_active' => true]);
-        activity()->performedOn($company)->log('With subject');
+        $subject = User::factory()->create();
+        activity()->performedOn($subject)->log('With subject');
         $this->makeLog('Without subject');
 
         $response = $this->actingAs(User::factory()->create())
-            ->getJson('/v1/admin/activity-logs?subject_type='.urlencode(Company::class))
+            ->getJson('/v1/admin/activity-logs?subject_type='.urlencode(User::class))
             ->assertOk();
 
         $response->assertJsonCount(1, 'result.data');
-        $this->assertSame('Company', $response->json('result.data.0.subject_type'));
+        $this->assertSame('User', $response->json('result.data.0.subject_type'));
     }
 
     public function test_it_filters_by_date_range_inclusively(): void
@@ -190,8 +189,8 @@ class ApiActivityLogIndexTest extends TestCase
 
     public function test_it_returns_filter_options(): void
     {
-        $company = Company::create(['name' => 'Filter Co', 'code' => 'FCO', 'is_active' => true]);
-        activity()->performedOn($company)->type('crm')->log('With subject');
+        $subject = User::factory()->create();
+        activity()->performedOn($subject)->type('crm')->log('With subject');
 
         $this->actingAs(User::factory()->create())
             ->getJson('/v1/admin/activity-logs/filters')

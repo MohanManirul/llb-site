@@ -161,8 +161,7 @@ session()->regenerate();   // optional — see the first bullet
 - **Never `invalidate()`.** It flushes the attribute bag, so `impersonator_id`
   disappears and the admin is trapped inside. `AuthController::logout` does
   exactly that (`AuthController.php:37`) — see §6.
-- **The `web` guard only.** The Users list holds only `web` users. The client
-  portal's `client-web` guard is out of scope this round (§13).
+- **The `web` guard only.** The Users list holds only `web` users.
 - **No Sanctum token.** Impersonation lives in the browser session only.
   Minting a token in the target's name would outlive the session — a permanent
   key nobody can take back.
@@ -222,8 +221,8 @@ own journey, and the target may not have permission to open it.
 
 No need to branch by role: `/admin/dashboard` opens for everyone, and the
 sidebar (`resources/js/config/sidebarNav.ts`, filtered in
-`Sidebar.tsx:26,41`) sifts itself by permission — so impersonating a
-team-leader shows that leader's menu.
+`Sidebar.tsx:26,41`) sifts itself by permission — so impersonating a user
+shows that user's own menu.
 
 ---
 
@@ -301,10 +300,10 @@ and from queues — the `runningInConsole()` guard inside `resolveCauser()`
 
 - `app/Models/ActivityLog.php` — an `impersonator()` relation, a plain
   `belongsTo(User::class)`. **Not `withTrashed()`**: `causer()` needs it
-  (line 17) because `Client`, `Employee`, `Company` and `Project` are
-  soft-deletable, but `User` is not. Which is precisely why `nullOnDelete()`
-  below is load-bearing — a deleted admin's row is gone for good, and a
-  restricting FK would block the delete outright.
+  (line 17) as a guard for soft-deletable subjects; no model uses `SoftDeletes`
+  today, and `User` never did. Which is precisely why `nullOnDelete()` below is
+  load-bearing — a deleted admin's row is gone for good, and a restricting FK
+  would block the delete outright.
 - `app/Services/ActivityLog/ActivityLogService.php:19` — currently
   `->with('causer')`; the new relation needs eager-loading beside it or the
   list issues a query per row.
@@ -356,9 +355,8 @@ others.
 In the Actions column of
 `resources/js/pages/admin/users/index/page.tsx` (lines 77-90), to the right of
 Edit. That column currently holds a single Edit `Link` and nothing else. There
-is no kebab-menu component in this repo, and
-`resources/js/pages/admin/clients/index/page.tsx:121-135` already
-demonstrates the pattern of two `size="sm"` Buttons in a row — follow that.
+is no kebab-menu component in this repo, so follow the existing pattern of two
+`size="sm"` Buttons in a row.
 
 - Gate: `usePermissions().can('impersonate users')`
   (`resources/js/hooks/usePermissions.ts:11`; `can()` returns `true` for
@@ -518,7 +516,6 @@ its `syncPermissions()` would replace whatever an admin granted by hand.
 
 | | Why |
 |---|---|
-| Client portal (`client-web`) impersonation | They are not in the Users list, and admins already have a separate mechanism for clients — `AccessController::grantClientLogin` (`app/Http/Controllers/V1/Admin/Access/AccessController.php:32`). Two guards can be authenticated in one session at once, so this is not a matter of changing a parameter; it is its own round |
 | Mobile / Sanctum token impersonation | §4 — a token outlives the session |
 | A marker in the browser tab title | the banner is enough |
 | Cancelling a running impersonation session remotely | there is no limit either (§4), so the only ways back right now are that browser's Return button or the session's 120 minutes running out. Assumed sufficient this round, because the permission is super-admin-only |

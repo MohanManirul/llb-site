@@ -14,17 +14,6 @@ class RoleResource extends JsonResource
     {
         $permissions = $this->permissions->pluck('name')->all();
 
-        $hasClientView = in_array('view project client', $permissions);
-        $hasContactView = in_array('view project contact', $permissions);
-
-        if ($hasClientView && $hasContactView) {
-            $permissions = array_filter(
-                $permissions,
-                fn ($p) => $p !== 'view project client' && $p !== 'view project contact'
-            );
-            $permissions[] = 'view project client info';
-        }
-
         return [
             'id' => $this->id,
             'name' => $this->name,

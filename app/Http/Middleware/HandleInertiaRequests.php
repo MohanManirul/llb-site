@@ -2,10 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Client;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -68,18 +66,10 @@ class HandleInertiaRequests extends Middleware
      */
     private function authUser(Request $request): ?array
     {
-        $account = $request->user() ?? Auth::guard('client-web')->user();
+        $account = $request->user();
 
         if (! $account) {
             return null;
-        }
-
-        if ($account instanceof Client) {
-            return [
-                ...$account->only('id', 'name', 'email'),
-                'roles' => ['client'],
-                'permissions' => [],
-            ];
         }
 
         return [
