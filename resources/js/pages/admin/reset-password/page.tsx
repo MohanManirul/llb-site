@@ -34,7 +34,7 @@ export default function ResetPassword({
 
     return (
         <>
-            <Head title="Reset password" />
+            <Head title="Reset Password" />
 
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
                 <div className="w-full max-w-sm">
@@ -43,10 +43,10 @@ export default function ResetPassword({
                         className="flex items-center justify-center gap-2 mb-6"
                     >
                         <span className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-[#002044] text-white font-bold">
-                            C
+                            L
                         </span>
                         <span className="text-xl font-bold tracking-wider uppercase text-[#002044]">
-                            CRM
+                            LLB
                         </span>
                     </Link>
 
@@ -55,7 +55,7 @@ export default function ResetPassword({
                         className="bg-white border border-gray-200 rounded-xl shadow-sm p-8"
                     >
                         <h1 className="text-xl font-semibold text-[#002044] mb-1">
-                            Reset password
+                            Reset Password
                         </h1>
                         <p className="text-sm text-gray-500 mb-6">
                             Choose a new password for your account.
@@ -70,7 +70,7 @@ export default function ResetPassword({
                                 error={errors.email}
                             />
                             <TextInput
-                                label="New password"
+                                label="New Password"
                                 type="password"
                                 value={data.password}
                                 onChange={(e) =>
@@ -80,7 +80,7 @@ export default function ResetPassword({
                                 autoFocus
                             />
                             <TextInput
-                                label="Confirm password"
+                                label="Confirm Password"
                                 type="password"
                                 value={data.password_confirmation}
                                 onChange={(e) =>
@@ -94,7 +94,7 @@ export default function ResetPassword({
                             disabled={processing}
                             className="mt-6 w-full"
                         >
-                            {processing ? 'Resetting…' : 'Reset password'}
+                            {processing ? 'Resetting…' : 'Reset Password'}
                         </Button>
                     </form>
                 </div>

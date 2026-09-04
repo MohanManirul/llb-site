@@ -3030,7 +3030,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🛠  Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+            "description": "🛠  Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong Password generating etc.",
             "homepage": "https://nette.org",
             "keywords": [
                 "array",
@@ -3040,7 +3040,7 @@
                 "json",
                 "nette",
                 "paginator",
-                "password",
+                "Password",
                 "slugify",
                 "string",
                 "unicode",
@@ -4341,7 +4341,7 @@
             "require-dev": {
                 "larastan/larastan": "^3.9",
                 "laravel/octane": "^2.0",
-                "laravel/passport": "^13.0",
+                "laravel/Passport": "^13.0",
                 "laravel/pint": "^1.0",
                 "orchestra/testbench": "^10.0|^11.0",
                 "pestphp/pest": "^3.0|^4.0",

@@ -7,7 +7,7 @@
 
 A button on every row of the Users list → confirm → the admin is **genuinely
 logged in as that user**. Exactly what `AuthController::login` does, with the
-rules below in place of the password check.
+rules below in place of the Password check.
 
 ```
 [Login as] → confirm → POST → check the rules → login($target) → /admin/dashboard
@@ -22,7 +22,7 @@ rules below in place of the password check.
 | | |
 |---|---|
 | **A new permission** `impersonate users`, `super-admin` only | Today every `admin` and every `staff` user holds `view users` and `edit users` — put the button on either and any staff member walks into anyone's account. Must be added to **both** `ADMIN_EXCLUDED` and `STAFF_EXCLUDED` |
-| **No impersonating a super-admin** | `Gate::before` passes them every gate — if an admin can become a super-admin, they are one. The rule goes in `ImpersonationService`, **not in a Policy** (Gate::before short-circuits policies). Along with: not yourself, no nesting, and nobody holding more permissions than you |
+| **No impersonating a super-admin** | `Gate::before` Passes them every gate — if an admin can become a super-admin, they are one. The rule goes in `ImpersonationService`, **not in a Policy** (Gate::before short-circuits policies). Along with: not yourself, no nesting, and nobody holding more permissions than you |
 | **The real name in the audit** | `resolveCauser()` will keep returning the target. Needs an `activity_logs.impersonator_id` column plus a log row on the way in and on the way out |
 
 Leaving everything open is safe **because** the permission is super-admin-only —
@@ -32,10 +32,10 @@ or a supervisor is given it, that decision has to be reopened.
 ## Two traps (miss either and the feature falls over)
 
 **Sanctum breaks it in 20 seconds.** `AuthenticateSession` compares the session's
-password hash; after the swap it no longer matches → session flush.
+Password hash; after the swap it no longer matches → session flush.
 NotificationBell polls the API every 20 seconds, so you're back on the login page
 within 20 seconds.
-→ `session()->forget('password_hash_web')` after the swap.
+→ `session()->forget('Password_hash_web')` after the swap.
 
 **Don't call `logout()` on the way back.** It rotates the *target's*
 `remember_token` — that person is kicked off every one of their devices. Call
@@ -67,5 +67,4 @@ target doesn't hold it, the door back is shut. No limit of its own;
 
 ## Not in this round
 
-Client portal impersonation (clients already have `AccessController::grantClientLogin`),
-and mobile/token impersonation (a token outlives the session).
+Mobile/token impersonation (a token outlives the session).

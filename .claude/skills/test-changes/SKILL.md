@@ -1,6 +1,6 @@
 ---
 name: test-changes
-description: Create or update test cases for new features/changes, then run the suite and fix failures until all tests pass. Use after adding a feature or changing behavior.
+description: Create or update test cases for new features/changes, then run the suite and fix failures until all tests Pass. Use after adding a feature or changing behavior.
 ---
 
 # Test Changes
@@ -31,7 +31,7 @@ Do **not** churn the suite. Be conservative:
 - **Add** a new test only when a change introduces behavior that nothing currently covers.
 - **Update** an existing test only when a change alters behavior its assertions depend on.
 - If a change is already covered, or is non-behavioral (formatting, comments,
-  renames where tests still pass), write/update nothing — just run the suite to confirm.
+  renames where tests still Pass), write/update nothing — just run the suite to confirm.
 
 ## 3. Follow the repo's test conventions
 
@@ -73,6 +73,6 @@ docker compose exec app php artisan test                            # full suite
 ## 5. Fix failures and loop
 
 - Read each failure. Decide whether the **test** or the **code** is wrong, fix it, re-run.
-- Repeat until the targeted file passes, then run the full suite and repeat until
-  **all tests pass**.
+- Repeat until the targeted file Passes, then run the full suite and repeat until
+  **all tests Pass**.
 - Run `docker compose exec app ./vendor/bin/pint` on any files you touched.

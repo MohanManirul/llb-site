@@ -41,7 +41,7 @@ function parsePayload(payload: unknown): OptionPage {
 
     const body = (payload ?? {}) as Record<string, unknown>;
 
-    for (const key of ['result', 'options', 'designations', 'data']) {
+    for (const key of ['result', 'options', 'data']) {
         const candidate = body[key];
 
         const list = asOptions(candidate);

@@ -9,9 +9,8 @@ One Laravel app serves both the Inertia pages and the versioned `/v1/*` JSON end
 mobile client uses the same API with Sanctum Bearer tokens.
 
 The API is versioned by URL prefix, mounted from the `using:` closure in `bootstrap/app.php`.
-Two files feed the one `/v1` mount (names `v1.*`): `routes/admin-v1.php` for the staff API
-and `routes/client-v1.php` for the portal's. The `web` side is `routes/web.php` plus
-`routes/web-admin.php` at `/admin`.
+One file feeds the `/v1` mount (names `v1.*`): `routes/admin-v1.php`. The `web` side is
+`routes/web.php` (the public welcome page) plus `routes/web-admin.php` at `/admin`.
 
 There is no unversioned `/api/*`, and **no `/v2`** — `route:list` returns zero routes under
 either prefix. When a v2 becomes necessary, mount it beside these; do not assume it exists.
@@ -27,8 +26,8 @@ you are following.
 | Frontend language | TypeScript (`.tsx`, `types.ts`) | ✅ **done** — all TypeScript, zero `.js`/`.jsx` in `resources/js` |
 | Page path | `js/pages/{feature}/page.tsx` | ✅ mostly — `js/pages/admin/{feature}/{index,create,edit}/page.tsx`, plus a per-feature `types.ts` |
 | Components | `js/components/ui` + `index.ts` barrel, `cn()` from `lib/utils` | `js/components/ui` **with** the `index.ts` barrel; still no `cn()`, no `clsx`/`tailwind-merge` |
-| API layer | per-feature `api.ts` | 🟡 both — `js/lib/api-client.ts` is the shared axios instance and 37 files import it directly. Only `payment/api.ts` and `projects/api.ts` are per-feature layers, and `projects/api.ts` wraps a single endpoint while the rest of that feature still calls the shared client. Follow the surrounding file, not the folder |
-| Controllers | `Http/Controllers/{Feature}/` | `Http/Controllers/V1/{Admin\|Client}/{Feature}/` |
+| API layer | per-feature `api.ts` | `js/lib/api-client.ts` is the shared axios instance and every page imports it directly. No per-feature `api.ts` layer survives — follow the surrounding file, not the folder |
+| Controllers | `Http/Controllers/{Feature}/` | `Http/Controllers/V1/Admin/{Feature}/` |
 | Services | `Services/{Feature}/Service.php` | ✅ **done** — 16 per-feature folders; only `Services/ApiResponseService.php` is still flat |
 | Comments | none | existing PHP is heavily commented, often in Bengali/Banglish |
 
@@ -60,8 +59,8 @@ use and the commands are not interchangeable.
 | Artisan | `php artisan <cmd>` | `docker compose exec app php artisan <cmd>` |
 
 ```bash
-php artisan test --filter=ApiCompanyIndexTest        # single class
-php artisan test --filter=test_it_searches_by_name   # single method
+php artisan test --filter=ApiActivityLogIndexTest       # single class
+php artisan test --filter=test_it_searches_by_name_or_email  # single method
 vendor/bin/pint                                      # formatter, Laravel preset
 ```
 
@@ -72,18 +71,15 @@ Mailpit dashboard `:8034`.
 ## Architecture
 
 **Pages are render-only.** The `web` routes never fetch page data — a thin page controller
-renders a React page and passes an id (`['projectId' => $project]`), at most alongside a
-cheap authorisation flag (`ProjectPageController::reports` passes `canSubmitReports`). The
+renders a React page and Passes an id (`['userId' => $user]`). The
 only other props are request-derived values the page cannot read for itself: the
-reset-password pages pass the `token` and `email` off the URL. Never domain data. The page
+reset-Password pages Pass the `token` and `email` off the URL. Never domain data. The page
 loads its own data from `/v1/*`
 via `resources/js/lib/api-client.ts` (its `baseURL` is `/v1`, so callers write
-`api.get('/projects')`). All logic lives in `app/Http/Controllers/V1/`, split into
-`Admin/` for the staff API and `Client/` for the portal's own endpoints.
+`api.get('/users')`). All logic lives in `app/Http/Controllers/V1/Admin/`.
 
 **Flow:** Route → Controller (request/response only) → FormRequest (validation) → Service
-(business logic) → Model → Resource (formatting). Multi-step domain operations live in
-`app/Actions/`, triggered from `app/Observers/`.
+(business logic) → Model → Resource (formatting).
 
 ## Database
 

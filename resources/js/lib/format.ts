@@ -5,15 +5,15 @@ const BD_TIMEZONE = 'Asia/Dhaka';
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 const BD_COUNTRY_CODE = '880';
 
-export const CURRENCY_SYMBOL = '৳';
-export const CURRENCY_PRECISION = 2;
-export const CURRENCY_GAP = '\u00A0';
-
-export function withCurrency(amount: string): string {
-    return CURRENCY_SYMBOL + CURRENCY_GAP + amount;
-}
-
 export type FormattableValue = string | number | Date | null | undefined;
+
+export type UiLocale = 'bn' | 'en';
+
+const LOCALE_TAG: Record<UiLocale, string> = { bn: 'bn-BD', en: LOCALE };
+
+const BENGALI_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+
+const BYTE_UNITS = ['B', 'KB', 'MB', 'GB'];
 
 function parse(value: FormattableValue): { date: Date; timeZone: string } | null {
     if (value === null || value === undefined || value === '') return null;
@@ -96,18 +96,6 @@ export function formatTimeAgo(value: FormattableValue): string {
     return `${Math.floor(months / 12)}y ago`;
 }
 
-export function formatMoney(value: FormattableValue): string {
-    const n = toNumber(value);
-    if (n === null) return BLANK;
-
-    return withCurrency(
-        n.toLocaleString(LOCALE, {
-            minimumFractionDigits: CURRENCY_PRECISION,
-            maximumFractionDigits: CURRENCY_PRECISION,
-        }),
-    );
-}
-
 export function formatPercent(value: FormattableValue): string {
     const n = toNumber(value);
     if (n === null) return BLANK;
@@ -122,11 +110,46 @@ export function formatNumber(value: FormattableValue): string {
     return n.toLocaleString(LOCALE);
 }
 
-export function formatQuantity(value: FormattableValue): string {
+export function toBengaliDigits(value: string): string {
+    return value.replace(/\d/g, (digit) => BENGALI_DIGITS[Number(digit)]);
+}
+
+export function formatNumberIn(locale: UiLocale, value: FormattableValue): string {
     const n = toNumber(value);
     if (n === null) return BLANK;
 
-    return `${n.toLocaleString(LOCALE)} Orders`;
+    return n.toLocaleString(LOCALE_TAG[locale]);
+}
+
+export function formatDateIn(locale: UiLocale, value: FormattableValue): string {
+    const parsed = parse(value);
+    if (!parsed) return BLANK;
+
+    return parsed.date.toLocaleDateString(LOCALE_TAG[locale], {
+        timeZone: parsed.timeZone,
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+}
+
+export function formatBytes(bytes: number | null | undefined, locale: UiLocale = 'en'): string {
+    const n = toNumber(bytes);
+    if (n === null || n < 0) return BLANK;
+
+    let size = n;
+    let unit = 0;
+
+    while (size >= 1024 && unit < BYTE_UNITS.length - 1) {
+        size /= 1024;
+        unit += 1;
+    }
+
+    const rounded = size.toLocaleString(LOCALE_TAG[locale], {
+        maximumFractionDigits: unit === 0 ? 0 : 1,
+    });
+
+    return `${rounded} ${BYTE_UNITS[unit]}`;
 }
 
 export function displayPhone(phone: string | null | undefined): string {

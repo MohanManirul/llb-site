@@ -5,7 +5,7 @@ export default function NotFound() {
 
     const { auth } = usePage().props;
 
-    const homeHref = '/dashboard' ;
+    const homeHref = auth?.user ? '/admin/dashboard' : '/admin/login';
 
     return (
         <>
@@ -30,7 +30,7 @@ export default function NotFound() {
                     href={homeHref}
                     className="mt-8 inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
                 >
-                    Back to {auth?.user ? 'dashboard' : 'home'}
+                    Back to {auth?.user ? 'dashboard' : 'sign in'}
                 </Link>
             </div>
         </>

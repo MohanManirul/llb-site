@@ -13,21 +13,6 @@ class UpdateRoleRequest extends FormRequest
         return true;
     }
 
-    protected function prepareForValidation(): void
-    {
-        $permissions = $this->get('permissions', []);
-
-        if (in_array('view project client info', $permissions)) {
-            $permissions = array_filter(
-                $permissions,
-                fn ($p) => $p !== 'view project client info'
-            );
-            $permissions[] = 'view project client';
-            $permissions[] = 'view project contact';
-            $this->merge(['permissions' => $permissions]);
-        }
-    }
-
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */

@@ -1,17 +1,22 @@
 import type { ComponentType, SVGProps } from 'react';
 import {
     HomeIcon,
-    UserGroupIcon,
-    IdentificationIcon,
-    BriefcaseIcon,
     Cog6ToothIcon,
-    RectangleStackIcon,
-    BuildingOffice2Icon,
     ShieldCheckIcon,
     UsersIcon,
     ClockIcon,
     ServerStackIcon,
     DocumentTextIcon,
+    AcademicCapIcon,
+    FolderOpenIcon,
+    MegaphoneIcon,
+    ChartBarIcon,
+    RectangleStackIcon,
+    CalendarDaysIcon,
+    BookmarkIcon,
+    QuestionMarkCircleIcon,
+    ClipboardDocumentCheckIcon,
+    UserGroupIcon,
 } from '@heroicons/react/24/outline';
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -35,27 +40,40 @@ export const navItems: NavItem[] = [
         href: '/dashboard',
     },
     {
-        label: 'Employees',
-        icon: BriefcaseIcon,
-        href: '/employees',
-        permission: 'view employees',
+        label: 'Study Materials',
+        icon: FolderOpenIcon,
+        href: '/study-materials',
+        permission: 'view study materials',
     },
     {
-        label: 'Teams',
+        label: 'Notices',
+        icon: MegaphoneIcon,
+        href: '/notices',
+        permission: 'view notices',
+    },
+    {
+        label: 'Question Bank',
+        icon: QuestionMarkCircleIcon,
+        href: '/questions',
+        permission: 'view questions',
+    },
+    {
+        label: 'Model Tests',
+        icon: ClipboardDocumentCheckIcon,
+        href: '/model-tests',
+        permission: 'view model tests',
+    },
+    {
+        label: 'Students',
         icon: UserGroupIcon,
-        href: '/teams',
-        permission: 'view teams',
+        href: '/students',
+        permission: 'view students',
     },
     {
-        label: 'Clients',
-        icon: IdentificationIcon,
-        href: '/clients',
-        permission: 'view clients',
-    },
-    {
-        label: 'Projects',
-        icon: RectangleStackIcon,
-        href: '/projects',
+        label: 'Reports',
+        icon: ChartBarIcon,
+        href: '/reports',
+        permission: 'view dashboard',
     },
 ];
 
@@ -63,27 +81,33 @@ export const settingsItem: NavItem = {
     label: 'Settings',
     icon: Cog6ToothIcon,
     href: '/settings',
-    rolesExcept: ['client'],
 };
 
 export const settingsSections: NavItem[] = [
     {
-        label: 'Companies',
-        icon: BuildingOffice2Icon,
-        href: '/companies',
-        permission: 'view companies',
-    },
-    {
-        label: 'Departments',
-        icon: IdentificationIcon,
-        href: '/departments',
-        permission: 'view departments',
-    },
-    {
-        label: 'Designation',
-        icon: BriefcaseIcon,
-        href: '/designations',
-        permission: 'view designations',
+        label: 'Academic Structure',
+        icon: AcademicCapIcon,
+        permission: 'view academic structure',
+        children: [
+            {
+                label: 'Programs',
+                icon: RectangleStackIcon,
+                href: '/academic/programs',
+                permission: 'view academic structure',
+            },
+            {
+                label: 'Sessions',
+                icon: CalendarDaysIcon,
+                href: '/academic/sessions',
+                permission: 'view academic structure',
+            },
+            {
+                label: 'Subjects',
+                icon: BookmarkIcon,
+                href: '/academic/subjects',
+                permission: 'view academic structure',
+            },
+        ],
     },
     {
         label: 'Roles',

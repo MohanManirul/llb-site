@@ -20,7 +20,7 @@ class UserController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:create employees|edit employees|view users', only: ['search']),
+            new Middleware('permission:view users', only: ['search']),
             new Middleware('permission:view users', only: ['index', 'show', 'roleOptions']),
             new Middleware('permission:create users', only: ['store']),
             new Middleware('permission:edit users', only: ['update']),
@@ -43,11 +43,7 @@ class UserController extends Controller implements HasMiddleware
     public function search(Request $request): JsonResponse
     {
         return ApiResponse::respondWithSuccess(
-            $this->userService->searchOptions(
-                $request->input('search'),
-                $request->integer('keep_user_id') ?: null,
-                $request->integer('company_id') ?: null,
-            ),
+            $this->userService->searchOptions($request->input('search')),
             'Users retrieved successfully.',
         );
     }
@@ -102,13 +98,6 @@ class UserController extends Controller implements HasMiddleware
 
     public function destroy(Request $request, User $user): JsonResponse
     {
-        if ($user->employees()->withTrashed()->exists()) {
-            return ApiResponse::respondError(
-                'This user is an employee. Delete the employee records first.',
-                422,
-            );
-        }
-
         if ($user->id === $request->user()->id) {
             return ApiResponse::respondError('You cannot delete your own account.', 422);
         }

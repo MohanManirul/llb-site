@@ -2,9 +2,9 @@
 
 > **This is the target, not a description of the repo.** Where it differs today:
 > `app/Helpers` holds a single `helpers.php`, not the three helper classes below; API
-> controllers live at `app/Http/Controllers/V1/{Admin,Client}/{Feature}/`, with the
-> web-side controllers — Inertia page renders plus the login and password form
-> handlers — under `app/Http/Controllers/{Admin,Client,Auth}/`. Follow
+> controllers live at `app/Http/Controllers/V1/Admin/{Feature}/`, with the
+> web-side controllers — Inertia page renders plus the login and Password form
+> handlers — under `app/Http/Controllers/{Admin,Auth}/`. Follow
 > this for **new** feature folders; follow the surrounding code when editing an
 > existing one. `CLAUDE.md` holds the target-vs-current table.
 
@@ -88,26 +88,22 @@ Feature Resource
 
 # Auth Guards
 
-Two audiences (staff in `users`, clients in `clients`), each with a session
-guard for browser pages and a token guard for the API. Defined in
-`config/auth.php`.
+One audience (staff in `users`) with a session guard for browser pages and a
+token guard for the API. Defined in `config/auth.php`.
 
 | Audience | Provider | Browser pages (session cookie) | API (Bearer token) |
 |---|---|---|---|
 | Staff | `users` | `web` | `sanctum` |
-| Clients | `clients` | `client-web` | `client` |
 
 Pick by **how the request authenticates**, not by who is calling:
 
-* `routes/web.php` and `routes/web-admin.php` render Inertia pages, so they use
-  the session guards — `auth:client-web` and `auth:sanctum` respectively.
+* `routes/web-admin.php` renders Inertia pages, so it uses the session guard.
   A page navigation sends a cookie, never an `Authorization` header, so a token
   guard rejects every one of those requests.
-* `routes/api.php` lists both, e.g. `auth:sanctum,client,client-web`, so one
-  endpoint serves the mobile app's token and the browser's cookie.
+* `statefulApi()` lets the same `auth:sanctum` endpoint serve the mobile app's
+  token and the browser's session cookie.
 
-The URL split follows the same line: staff live under `/admin` (mounted in
-`bootstrap/app.php`), the client portal on the base URL.
+Staff live under `/admin`, mounted in `bootstrap/app.php`.
 
 # Rules
 
@@ -131,13 +127,12 @@ write**. Count writes per method, not per file: a service whose `create`,
 one statement is already atomic.
 
 Count the writes you cannot see. A single `Model::create()` is a multi-write when
-an observer hangs off it — `Project::create()` fires `ProjectObserver::created`,
-which generates milestones and opens a `ProjectAssignment`. Without a
-transaction a failure in either leaves the parent row committed on its own.
+an observer hangs off it and that observer writes rows of its own. Without a
+transaction a failure in the observer leaves the parent row committed on its own.
 
-Nested `DB::transaction()` is fine. The `Actions/Project/*` classes open their
-own, and Laravel turns the inner one into a savepoint, so an action stays correct
-whether it is called on its own or from inside a wrapped service method.
+Nested `DB::transaction()` is fine. An `Actions/*` class opens its own, and
+Laravel turns the inner one into a savepoint, so an action stays correct whether
+it is called on its own or from inside a wrapped service method.
 
 Side effects that a rollback cannot undo stay out of the transaction body:
 
@@ -146,5 +141,5 @@ Side effects that a rollback cannot undo stay out of the transaction body:
 * Queued jobs are covered globally by `'after_commit' => true` in
   `config/queue.php` — a worker can otherwise pick up a job before its rows commit.
 * Filesystem writes happen outside the transaction and are compensated on failure
-  (see the orphan-file cleanup in `ClientService` / `UserService`), because a
+  (see the orphan-file cleanup in `UserService`), because a
   rollback will not delete an uploaded file.

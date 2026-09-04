@@ -1,5 +1,5 @@
 ---
-title: StepUp CRM — Entity Relationship Diagram (2026-08-12)
+title: AinPath — Entity Relationship Diagram
 ---
 erDiagram
 
@@ -10,17 +10,7 @@ erDiagram
         string email UK
         string phone
         string image
-        string password
-    }
-
-    CLIENTS {
-        bigint id PK
-        string name
-        string email UK
-        string phone UK
-        string password
-        bool is_active
-        timestamp deleted_at
+        string Password
     }
 
     ROLES {
@@ -77,142 +67,9 @@ erDiagram
         text description
     }
 
-    PASSWORD_RESET_TOKENS {
+    PassWORD_RESET_TOKENS {
         string email PK
         string token
-    }
-
-    CLIENT_PASSWORD_RESET_TOKENS {
-        string email PK
-        string token
-    }
-
-    %% ── Organisation ────────────────────────────────────────────────
-    COMPANIES {
-        bigint id PK
-        string name UK
-        string email UK
-        bool is_active
-        timestamp deleted_at
-    }
-
-    DEPARTMENTS {
-        bigint id PK
-        bigint company_id FK
-        string name
-        bool is_active
-        timestamp deleted_at
-    }
-
-    DESIGNATIONS {
-        bigint id PK
-        string name UK
-        bool is_active
-    }
-
-    EMPLOYEES {
-        bigint id PK
-        bigint user_id FK
-        bigint company_id FK
-        bigint department_id FK
-        bigint designation_id FK
-        bool is_active
-        date joining_date
-        date resignation_date
-        timestamp deleted_at
-    }
-
-    TEAMS {
-        bigint id PK
-        bigint company_id FK
-        bigint department_id FK
-        string name
-        bool is_active
-        timestamp deleted_at
-    }
-
-    TEAM_MEMBERS {
-        bigint id PK
-        bigint team_id FK
-        bigint employee_id FK
-        enum role
-    }
-
-    %% ── Projects & performance ──────────────────────────────────────
-    PROJECTS {
-        bigint id PK
-        bigint company_id FK
-        bigint department_id FK
-        bigint client_id FK
-        bigint team_id FK
-        bigint assigned_employee_id FK
-        string project_name UK
-        date start_date
-        date end_date
-        decimal package_amount
-        decimal amount_paid
-        decimal amount_due
-        enum project_type
-        decimal sales_target
-        date target_deadline
-        decimal achieved_sales
-        enum health_status
-        enum business_status
-        timestamp deleted_at
-    }
-
-    PROJECT_MILESTONES {
-        bigint id PK
-        bigint company_id FK
-        bigint project_id FK
-        smallint sequence
-        date period_start
-        date period_end
-        decimal target_amount
-        decimal achieved_amount
-        enum status
-    }
-
-    SALES_REPORTS {
-        bigint id PK
-        bigint company_id FK
-        bigint project_id FK
-        date week_start
-        date week_end
-        decimal total_sales
-        int total_order_quantity
-        decimal total_amount_spent
-    }
-
-    PROJECT_SALES {
-        bigint id PK
-        bigint company_id FK
-        bigint project_id FK
-        bigint project_milestone_id FK
-        bigint team_id FK
-        bigint employee_id FK
-        date sale_date
-        decimal amount
-        string reference
-    }
-
-    PROJECT_ASSIGNMENTS {
-        bigint id PK
-        bigint company_id FK
-        bigint project_id FK
-        bigint team_id FK
-        bigint employee_id FK
-        timestamp assigned_at
-        timestamp unassigned_at
-        enum reason
-    }
-
-    PROJECT_NOTES {
-        bigint id PK
-        bigint company_id FK
-        bigint project_id FK
-        bigint user_id FK
-        text note
     }
 
     %% ── Relationships: identity & access ────────────────────────────
@@ -221,46 +78,8 @@ erDiagram
     USERS   ||--o{ PERSONAL_ACCESS_TOKENS   : "tokens (morph)"
     USERS   ||--o{ NOTIFICATIONS            : "receives (morph)"
     USERS   ||--o{ ACTIVITY_LOGS            : "causes (morph)"
-    CLIENTS ||--o{ PERSONAL_ACCESS_TOKENS   : "tokens (morph)"
-    CLIENTS ||--o{ NOTIFICATIONS            : "receives (morph)"
     ROLES   ||--o{ MODEL_HAS_ROLES          : "assigned to"
     ROLES   ||--o{ ROLE_HAS_PERMISSIONS     : grants
     PERMISSIONS ||--o{ MODEL_HAS_PERMISSIONS : "assigned to"
     PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS  : "granted via"
-    USERS   ||--o| PASSWORD_RESET_TOKENS        : "reset (super-admin only)"
-    CLIENTS ||--o| CLIENT_PASSWORD_RESET_TOKENS : "reset (own broker)"
-
-    %% ── Relationships: organisation ─────────────────────────────────
-    COMPANIES   ||--o{ DEPARTMENTS : has
-    COMPANIES   ||--o{ TEAMS       : has
-    COMPANIES   ||--o{ EMPLOYEES   : employs
-    COMPANIES   ||--o{ PROJECTS    : owns
-    DEPARTMENTS ||--o{ TEAMS       : has
-    DEPARTMENTS ||--o{ EMPLOYEES   : has
-    DEPARTMENTS ||--o{ PROJECTS    : "scopes (from team)"
-    DESIGNATIONS |o--o{ EMPLOYEES  : "held by"
-    USERS       ||--o{ EMPLOYEES   : "employed as (1 per company)"
-    TEAMS       ||--o{ TEAM_MEMBERS : has
-    EMPLOYEES   ||--o{ TEAM_MEMBERS : "member of (leader or member)"
-
-    %% ── Relationships: projects ─────────────────────────────────────
-    CLIENTS   ||--o{ PROJECTS : "contracts"
-    TEAMS     ||--o{ PROJECTS : handles
-    EMPLOYEES |o--o{ PROJECTS : "assigned marketer"
-
-    PROJECTS  ||--o{ PROJECT_MILESTONES  : "split into monthly"
-    PROJECTS  ||--o{ SALES_REPORTS       : "weekly entry"
-    PROJECTS  ||--o{ PROJECT_SALES       : has
-    PROJECTS  ||--o{ PROJECT_ASSIGNMENTS : "ownership history"
-    PROJECTS  ||--o{ PROJECT_NOTES       : has
-    PROJECT_MILESTONES |o--o{ PROJECT_SALES : attributes
-    TEAMS     ||--o{ PROJECT_ASSIGNMENTS : has
-    EMPLOYEES ||--o{ PROJECT_ASSIGNMENTS : has
-    TEAMS     |o--o{ PROJECT_SALES : "credited"
-    EMPLOYEES |o--o{ PROJECT_SALES : "credited"
-    USERS     |o--o{ PROJECT_NOTES : authors
-    COMPANIES ||--o{ PROJECT_MILESTONES  : scopes
-    COMPANIES ||--o{ SALES_REPORTS       : scopes
-    COMPANIES ||--o{ PROJECT_SALES       : scopes
-    COMPANIES ||--o{ PROJECT_ASSIGNMENTS : scopes
-    COMPANIES ||--o{ PROJECT_NOTES       : scopes
+    USERS   ||--o| PassWORD_RESET_TOKENS : "reset (super-admin only)"

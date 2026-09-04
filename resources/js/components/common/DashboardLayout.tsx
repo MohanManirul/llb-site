@@ -4,7 +4,6 @@ import SiteHeader from './SiteHeader';
 import ImpersonationBanner from './ImpersonationBanner';
 import { PageTitleProvider } from './PageTitle';
 import FlashMessages from './FlashMessages';
-import ReportImportWatcher from './ReportImportWatcher';
 
 interface DashboardLayoutProps {
     children?: ReactNode;
@@ -16,14 +15,17 @@ export default function DashboardLayout({ children, wide = false }: DashboardLay
 
     return (
         <PageTitleProvider>
-            <div className="flex h-screen flex-col bg-canvas">
+            {/* The admin shell owns its own scroll container; the document
+                behind it must not add a second scrollbar. Scoped here rather
+                than on html/body, so public pages can scroll normally. */}
+            <div className="flex h-dvh flex-col overflow-hidden bg-canvas">
                 <ImpersonationBanner />
 
                 <SiteHeader
                     onToggleDrawer={() => setSidebarOpen((v) => !v)}
                 />
 
-                <div className="flex min-h-0 flex-1 overflow-hidden bg-shell">
+                <div className="flex min-h-0 flex-1 overflow-hidden bg-canvas">
                     <div className="flex min-h-0 flex-1 overflow-hidden rounded-t-2xl">
                         <Sidebar
                             open={sidebarOpen}
@@ -44,7 +46,6 @@ export default function DashboardLayout({ children, wide = false }: DashboardLay
             </div>
 
             <FlashMessages />
-            <ReportImportWatcher />
         </PageTitleProvider>
     );
 }

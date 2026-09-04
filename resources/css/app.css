@@ -3,30 +3,12 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-@font-face {
-    font-family: 'CurrencySign';
-    src:
-        local('Nirmala UI Bold'), local('NirmalaUI-Bold'),
-        local('Noto Sans Bengali Bold'), local('NotoSansBengali-Bold'),
-        local('Bangla Sangam MN Bold'), local('Bangla MN Bold'),
-        local('Mukti Narrow Bold'), local('Kalpurush');
-    unicode-range: U+09F3;
-    font-display: swap;
-}
-
 /*
  * Tailwind v4 removed the default `cursor: pointer` on buttons.
  * Restore it globally for all enabled buttons (and links acting as buttons),
  * so we don't have to add `cursor-pointer` to every element.
  */
 @layer base {
-    /* The app shell owns the only scroll container; the document must not add
-       a second scrollbar behind it. */
-    html,
-    body {
-        overflow: hidden;
-    }
-
     button:not(:disabled),
     [role='button']:not(:disabled) {
         cursor: pointer;
@@ -37,13 +19,27 @@
 
 @theme {
     --font-sans:
-        'CurrencySign', 'Inter', ui-sans-serif, system-ui, -apple-system,
-        'Segoe UI', sans-serif;
+        'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /*
+     * The public site runs on one face for both scripts. Hind Siliguri ships
+     * Latin glyphs too, so a mixed Bengali/English line (subject codes, exam
+     * years, "PDF") does not switch typeface mid-sentence. It also covers
+     * U+09F3, which the old CurrencySign @font-face existed for.
+     */
+    --font-bangla:
+        'Hind Siliguri', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
     /* ...existing tokens... */
     --color-brand: #002044;
     --color-brand-accent: #2c4dd4;
     --color-brand-muted: #b2c1cc;
+
+    --color-brass: #c19a3f;
+    --color-brass-deep: #96742a;
+    --color-brass-soft: #f4ead3;
+    --color-banyan: #2f6b3f;
+    --color-banyan-deep: #14351f;
 
     /*
      * Surfaces. The shell is a rounded sheet lifted off a brand-navy backdrop:

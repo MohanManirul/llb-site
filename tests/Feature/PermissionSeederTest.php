@@ -42,7 +42,7 @@ class PermissionSeederTest extends TestCase
         );
 
         $this->assertNotNull(
-            Permission::query()->firstWhere('name', 'view sales reports'),
+            Permission::query()->firstWhere('name', 'view roles'),
         );
     }
 
@@ -55,7 +55,7 @@ class PermissionSeederTest extends TestCase
         $this->seed(PermissionSeeder::class);
 
         $role = Role::findOrCreate('floor-lead', 'web');
-        $role->givePermissionTo('view sales reports', 'view payments');
+        $role->givePermissionTo('view users', 'view roles');
 
         $pivotsBefore = DB::table('role_has_permissions')->count();
 
@@ -63,7 +63,7 @@ class PermissionSeederTest extends TestCase
 
         $this->assertSame($pivotsBefore, DB::table('role_has_permissions')->count());
         $this->assertEqualsCanonicalizing(
-            ['view sales reports', 'view payments'],
+            ['view users', 'view roles'],
             $role->fresh()->permissions->pluck('name')->all(),
             'a role built by hand keeps exactly what it was given',
         );

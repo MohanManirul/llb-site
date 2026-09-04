@@ -11,16 +11,10 @@ use Spatie\Permission\Models\Role;
 
 final class RoleService
 {
-    private const GROUP_STRIP = ['view ', 'create ', 'edit ', 'delete ', 'manage '];
+    private const GROUP_STRIP = ['view ', 'create ', 'edit ', 'delete ', 'manage ', 'publish '];
 
     private const GROUP_ALIASES = [
         'impersonate users' => 'users',
-
-        'project notes' => 'project notes',
-
-        'project client info' => 'projects',
-        'project client' => 'projects',
-        'project contact' => 'projects',
     ];
 
     /**
@@ -77,7 +71,7 @@ final class RoleService
      */
     public function permissionGroups(): array
     {
-        $groups = Permission::orderBy('name')
+        return Permission::orderBy('name')
             ->pluck('name')
             ->groupBy(fn (string $name) => $this->groupNameFor($name))
             ->map(fn ($permissions, $module) => [
@@ -86,8 +80,6 @@ final class RoleService
             ])
             ->values()
             ->all();
-
-        return $this->mergeProjectClientPermissions($groups);
     }
 
     private function groupNameFor(string $permission): string
@@ -95,39 +87,5 @@ final class RoleService
         $group = Str::lower(str_replace(self::GROUP_STRIP, '', $permission));
 
         return self::GROUP_ALIASES[$group] ?? $group;
-    }
-
-    /**
-     * @param  array<int, array{module: string, permissions: array<int, string>}>  $groups
-     * @return array<int, array{module: string, permissions: array<int, string>}>
-     */
-    private function mergeProjectClientPermissions(array $groups): array
-    {
-        $projectsGroup = collect($groups)->firstWhere('module', 'projects');
-
-        if (! $projectsGroup) {
-            return $groups;
-        }
-
-        $projectPerms = collect($projectsGroup['permissions']);
-
-        if (! $projectPerms->contains('view project client') || ! $projectPerms->contains('view project contact')) {
-            return $groups;
-        }
-
-        $filteredPerms = $projectPerms
-            ->reject(fn ($p) => $p === 'view project client' || $p === 'view project contact')
-            ->push('view project client info')
-            ->unique()
-            ->values()
-            ->all();
-
-        return collect($groups)
-            ->map(fn ($group) => $group['module'] === 'projects'
-                ? ['module' => 'projects', 'permissions' => $filteredPerms]
-                : $group
-            )
-            ->values()
-            ->all();
     }
 }

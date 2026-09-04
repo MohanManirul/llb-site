@@ -29,13 +29,13 @@ final class Asset
         return "uploads/{$directory}/{$datePath}/{$unique}{$fileName}";
     }
 
-    public static function removeFile(?string $path): bool
+    public static function removeFile(?string $path, ?string $diskName = null): bool
     {
         if (! $path) {
             return false;
         }
 
-        $disk = Storage::disk(config('filesystems.default'));
+        $disk = Storage::disk($diskName ?? config('filesystems.default'));
 
         if (! $disk->exists($path)) {
             return false;

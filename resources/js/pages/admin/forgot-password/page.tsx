@@ -25,7 +25,7 @@ export default function ForgotPassword({
 
     return (
         <>
-            <Head title="Forgot password" />
+            <Head title="Forgot Password" />
 
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
                 <div className="w-full max-w-sm">
@@ -34,8 +34,8 @@ export default function ForgotPassword({
                         className="flex items-center justify-center gap-2 mb-6"
                     >
                         <img
-                            src="/assets/logos/boneek.png"
-                            alt="Boneek Logo"
+                            src="/llb.jpg"
+                            alt="LLB Logo Logo"
                             className="h-auto w-45"
                         />
                     </Link>
@@ -45,7 +45,7 @@ export default function ForgotPassword({
                         className="bg-white border border-gray-200 rounded-xl shadow-sm p-8"
                     >
                         <h1 className="text-xl font-semibold text-[#002044] mb-1">
-                            Forgot password
+                            Forgot Password
                         </h1>
                         <p className="text-sm text-gray-500 mb-6">
                             Enter your email and we&apos;ll send you a reset link.

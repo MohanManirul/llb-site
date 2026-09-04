@@ -7,8 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * `users.phone` is optional: a phone number describes the person, not the job,
- * so it lives here rather than on `employees` — and nothing may require it.
+ * `users.phone` is optional: a phone number describes the person, and nothing
+ * may require it.
  */
 class UserPhoneTest extends TestCase
 {

@@ -39,10 +39,6 @@ export default function NotificationBell() {
             } else {
                 flash.success(item.message);
             }
-
-            if (item.kind === 'client_import') {
-                window.dispatchEvent(new CustomEvent('client-import:finished'));
-            }
         });
 
         incoming.forEach((item) => seen.current!.add(item.id));
@@ -117,12 +113,12 @@ export default function NotificationBell() {
             <button
                 type="button"
                 onClick={toggle}
-                className="relative flex h-10 w-10 items-center justify-center rounded-chip border border-white/15 hover:bg-white/10"
+                className="relative flex h-10 w-10 items-center justify-center rounded-chip border border-hairline hover:bg-black/5"
             >
-                <BellIcon className="h-5 w-5 text-white/85" />
+                <BellIcon className="h-5 w-5 text-ink" />
 
                 {unread > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-shell bg-red-500 px-1 text-[10px] font-semibold leading-none text-white">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[10px] font-semibold leading-none text-white">
                         {unread > 9 ? '9+' : unread}
                     </span>
                 )}

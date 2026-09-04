@@ -1,24 +1,26 @@
 <?php
 
+use App\Http\Controllers\V1\Admin\Academic\AcademicSessionController;
+use App\Http\Controllers\V1\Admin\Academic\ProgramController;
+use App\Http\Controllers\V1\Admin\Academic\ProgramLevelController;
+use App\Http\Controllers\V1\Admin\Academic\SubjectController;
 use App\Http\Controllers\V1\Admin\Access\AccessController;
 use App\Http\Controllers\V1\Admin\ActivityLog\ActivityLogController;
 use App\Http\Controllers\V1\Admin\Auth\AuthController;
-use App\Http\Controllers\V1\Admin\Client\ClientController;
-use App\Http\Controllers\V1\Admin\Company\CompanyController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardReportController;
-use App\Http\Controllers\V1\Admin\Department\DepartmentController;
-use App\Http\Controllers\V1\Admin\Designation\DesignationController;
-use App\Http\Controllers\V1\Admin\Employees\EmployeeController;
+use App\Http\Controllers\V1\Admin\ModelTest\ModelTestController;
+use App\Http\Controllers\V1\Admin\ModelTest\ModelTestQuestionController;
+use App\Http\Controllers\V1\Admin\Notice\NoticeController;
 use App\Http\Controllers\V1\Admin\Notification\NotificationController;
 use App\Http\Controllers\V1\Admin\Profile\ProfileController;
-use App\Http\Controllers\V1\Admin\Projects\PaymentController;
-use App\Http\Controllers\V1\Admin\Projects\ProjectController;
-use App\Http\Controllers\V1\Admin\Projects\ProjectNoteController;
-use App\Http\Controllers\V1\Admin\Projects\ProjectSalesReportController;
+use App\Http\Controllers\V1\Admin\Question\QuestionController;
+use App\Http\Controllers\V1\Admin\Question\QuestionImportController;
+use App\Http\Controllers\V1\Admin\Report\AnalyticsReportController;
 use App\Http\Controllers\V1\Admin\Role\RoleController;
-use App\Http\Controllers\V1\Admin\Teams\MyTeamController;
-use App\Http\Controllers\V1\Admin\Teams\TeamController;
+use App\Http\Controllers\V1\Admin\Student\StudentController;
+use App\Http\Controllers\V1\Admin\StudyMaterial\MaterialFileController;
+use App\Http\Controllers\V1\Admin\StudyMaterial\StudyMaterialController;
 use App\Http\Controllers\V1\Admin\User\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,18 +40,20 @@ Route::middleware('auth:sanctum')
         });
 
         // User picker — must stay above apiResource('users').
+        Route::controller(AnalyticsReportController::class)
+            ->prefix('reports')
+            ->name('reports.')
+            ->group(function () {
+                Route::get('live', 'live')->name('live');
+                Route::get('downloads', 'downloads')->name('downloads');
+                Route::get('downloads/{studyMaterial}/files', 'materialFiles')->name('downloads.files');
+            });
+
         Route::get('users/search', [UserController::class, 'search'])
             ->name('users.search');
 
         // Login provisioning.
         Route::controller(AccessController::class)->group(function () {
-            Route::prefix('clients')
-                ->name('clients.login-access.')
-                ->group(function () {
-                    Route::post('{client}/login-access', 'grantClientLogin')->name('grant');
-                    Route::delete('{client}/login-access', 'revokeClientLogin')->name('revoke');
-                });
-
             Route::post('staff', 'storeStaff')->name('staff.store');
 
             Route::get('permissions', 'permissions')->name('permissions.index');
@@ -64,102 +68,105 @@ Route::middleware('auth:sanctum')
             ->name('roles.permission-groups');
         Route::apiResource('roles', RoleController::class);
 
+        // Academic structure — option lists must stay above their apiResource.
+        Route::get('programs/options', [ProgramController::class, 'options'])
+            ->name('programs.options');
+        Route::apiResource('programs', ProgramController::class);
+
+        Route::apiResource('program-levels', ProgramLevelController::class)
+            ->parameters(['program-levels' => 'programLevel'])
+            ->only(['store', 'update', 'destroy']);
+
+        Route::get('academic-sessions/options', [AcademicSessionController::class, 'options'])
+            ->name('academic-sessions.options');
+        Route::patch('academic-sessions/{academicSession}/current', [AcademicSessionController::class, 'markCurrent'])
+            ->name('academic-sessions.current');
+        Route::apiResource('academic-sessions', AcademicSessionController::class)
+            ->parameters(['academic-sessions' => 'academicSession']);
+
+        Route::get('subjects/options', [SubjectController::class, 'options'])
+            ->name('subjects.options');
+        Route::apiResource('subjects', SubjectController::class);
+
+        // Study materials — literal segments must stay above the apiResource.
+        Route::get('study-materials/filters', [StudyMaterialController::class, 'filterOptions'])
+            ->name('study-materials.filters');
+        Route::patch('study-materials/{studyMaterial}/publish', [StudyMaterialController::class, 'publish'])
+            ->name('study-materials.publish');
+        Route::patch('study-materials/{studyMaterial}/unpublish', [StudyMaterialController::class, 'unpublish'])
+            ->name('study-materials.unpublish');
+
+        Route::post('study-materials/{studyMaterial}/files', [MaterialFileController::class, 'store'])
+            ->name('study-materials.files.store');
+        Route::patch('study-materials/{studyMaterial}/files/reorder', [MaterialFileController::class, 'reorder'])
+            ->name('study-materials.files.reorder');
+        Route::get('study-materials/{studyMaterial}/files/{file}/preview', [MaterialFileController::class, 'preview'])
+            ->scopeBindings()
+            ->name('study-materials.files.preview');
+        Route::delete('study-materials/{studyMaterial}/files/{file}', [MaterialFileController::class, 'destroy'])
+            ->scopeBindings()
+            ->name('study-materials.files.destroy');
+
+        Route::apiResource('study-materials', StudyMaterialController::class)
+            ->parameters(['study-materials' => 'studyMaterial']);
+
+        // Notices — literal segments must stay above the apiResource.
+        Route::get('notices/filters', [NoticeController::class, 'filterOptions'])
+            ->name('notices.filters');
+        Route::get('notices/{notice}/attachment', [NoticeController::class, 'attachment'])
+            ->name('notices.attachment');
+        Route::patch('notices/{notice}/publish', [NoticeController::class, 'publish'])
+            ->name('notices.publish');
+        Route::patch('notices/{notice}/unpublish', [NoticeController::class, 'unpublish'])
+            ->name('notices.unpublish');
+        Route::apiResource('notices', NoticeController::class);
+
+        // Question bank — literal segments must stay above the apiResource.
+        Route::get('questions/filters', [QuestionController::class, 'filterOptions'])
+            ->name('questions.filters');
+        Route::get('questions/import/template', [QuestionImportController::class, 'template'])
+            ->name('questions.import.template');
+        Route::post('questions/import', [QuestionImportController::class, 'store'])
+            ->name('questions.import');
+        Route::patch('questions/{question}/publish', [QuestionController::class, 'publish'])
+            ->name('questions.publish');
+        Route::patch('questions/{question}/unpublish', [QuestionController::class, 'unpublish'])
+            ->name('questions.unpublish');
+        Route::apiResource('questions', QuestionController::class);
+
+        // Model tests — literal segments must stay above the apiResource.
+        Route::get('model-tests/filters', [ModelTestController::class, 'filterOptions'])
+            ->name('model-tests.filters');
+        Route::patch('model-tests/{modelTest}/publish', [ModelTestController::class, 'publish'])
+            ->name('model-tests.publish');
+        Route::patch('model-tests/{modelTest}/unpublish', [ModelTestController::class, 'unpublish'])
+            ->name('model-tests.unpublish');
+        Route::post('model-tests/{modelTest}/questions', [ModelTestQuestionController::class, 'store'])
+            ->name('model-tests.questions.store');
+        Route::patch('model-tests/{modelTest}/questions/reorder', [ModelTestQuestionController::class, 'reorder'])
+            ->name('model-tests.questions.reorder');
+        Route::delete('model-tests/{modelTest}/questions/{question}', [ModelTestQuestionController::class, 'destroy'])
+            ->name('model-tests.questions.destroy');
+        Route::apiResource('model-tests', ModelTestController::class)
+            ->parameters(['model-tests' => 'modelTest']);
+
+        // Students.
+        Route::patch('students/{student}/active', [StudentController::class, 'toggleActive'])
+            ->name('students.active');
+        Route::apiResource('students', StudentController::class)
+            ->only(['index', 'show']);
+
         // Select/autocomplete option lists — must stay above their apiResource.
-        Route::get('companies/search', [CompanyController::class, 'search'])
-            ->name('companies.search');
-
-        Route::get('departments/search', [DepartmentController::class, 'search'])
-            ->name('departments.search');
-
-        Route::get('designations/search', [DesignationController::class, 'search'])
-            ->name('designations.search');
-
-        Route::get('employees/search', [EmployeeController::class, 'search'])
-            ->name('employees.search');
-
-        Route::controller(TeamController::class)
-            ->prefix('teams')
-            ->name('teams.')
-            ->group(function () {
-                Route::get('members/search', 'searchMembers')->name('members.search');
-                Route::get('search', 'search')->name('search');
-            });
-
-        Route::controller(MyTeamController::class)
-            ->prefix('my-teams')
-            ->name('my-teams.')
-            ->group(function () {
-                Route::get('/', 'index')->name('index');
-                Route::get('/{team}', 'show')->name('show');
-            });
-
-        // Projects — list, detail, searches, inline status, notes, sales reports.
-        Route::prefix('projects')
-            ->name('projects.')
-            ->group(function () {
-                Route::controller(ProjectController::class)->group(function () {
-                    Route::get('/', 'index')->name('index');
-                    Route::get('teams/search', 'searchTeams')->name('teams.search');
-                    Route::get('employees/search', 'searchEmployees')->name('employees.search');
-                    Route::get('clients/search', 'searchClients')->name('clients.search');
-                    Route::get('companies/search', 'searchCompanies')->name('companies.search');
-                    Route::get('departments/search', 'searchDepartments')->name('departments.search');
-                    Route::patch('{project}/business-status', 'updateBusinessStatus')
-                        ->name('business-status.update');
-                });
-
-                Route::controller(ProjectNoteController::class)->group(function () {
-                    Route::get('{project}/notes', 'index')->name('notes.index');
-                    Route::post('{project}/notes', 'store')->name('notes.store');
-                    Route::patch('{project}/notes/{note}', 'update')->name('notes.update');
-                    Route::delete('{project}/notes/{note}', 'destroy')->name('notes.destroy');
-                });
-
-                Route::controller(ProjectSalesReportController::class)->group(function () {
-                    Route::get('{project}/sales-reports', 'index')->name('sales-reports.index');
-                    Route::post('{project}/sales-reports/import', 'import')->name('sales-reports.import');
-                    Route::get('{project}/sales-reports/import/{importId}', 'importStatus')
-                        ->name('sales-reports.import.status');
-                    Route::post('{project}/sales-reports', 'store')->name('sales-reports.store');
-                    Route::patch('{project}/sales-reports/{salesReport}', 'update')->name('sales-reports.update');
-                    Route::delete('{project}/sales-reports/{salesReport}', 'destroy')->name('sales-reports.destroy');
-                });
-
-                Route::controller(PaymentController::class)->group(function () {
-                    Route::post('{project}/payments', 'store')->name('payments.store');
-                    Route::get('{project}/payments/status', 'status')->name('payments.status');
-                    Route::get('{project}/payments/history', 'history')->name('payments.history');
-                });
-
-                // Last — {project} would otherwise swallow the search paths above.
-                Route::get('{project}', [ProjectController::class, 'show'])
-                    ->whereNumber('project')
-                    ->name('show');
-            });
-
-        // Client CSV import — must stay above apiResource('clients').
-        Route::post('clients/import', [ClientController::class, 'import'])
-            ->name('clients.import');
-
         Route::get('activity-logs/filters', [ActivityLogController::class, 'filterOptions'])
             ->name('activity-logs.filters');
-
-        // CRM resources.
-        Route::apiResource('companies', CompanyController::class);
-        Route::apiResource('departments', DepartmentController::class);
-        Route::apiResource('designations', DesignationController::class);
-        Route::apiResource('employees', EmployeeController::class);
-        Route::apiResource('teams', TeamController::class);
-        Route::apiResource('clients', ClientController::class);
-        Route::apiResource('projects', ProjectController::class)->except(['index', 'show']);
 
         Route::apiResource('activity-logs', ActivityLogController::class)
             ->parameters(['activity-logs' => 'activityLog'])
             ->only(['index', 'destroy']);
     });
 
-// Shared with clients — must stay below the staff group.
-Route::middleware('auth:sanctum,client,client-web')->group(function () {
+// Shared endpoints — must stay below the staff group.
+Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ProfileController::class)
         ->prefix('profile')
         ->name('profile.')

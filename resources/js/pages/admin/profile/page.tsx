@@ -245,7 +245,7 @@ export default function Profile() {
                         </div>
                         <div className="space-y-5 p-5">
                             <TextInput
-                                label="New password"
+                                label="New Password"
                                 type="password"
                                 value={data.password}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => setData('password', e.target.value)}
@@ -253,7 +253,7 @@ export default function Profile() {
                                 autoComplete="new-password"
                             />
                             <TextInput
-                                label="Confirm password"
+                                label="Confirm Password"
                                 type="password"
                                 value={data.password_confirmation}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>

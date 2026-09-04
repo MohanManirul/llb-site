@@ -1,4 +1,4 @@
-# Deploying the CRM
+# Deploying AinPath
 
 Coolify builds this repo's `Dockerfile` directly (**Dockerfile build pack**).
 There is no compose file in the deploy path any more.
@@ -7,7 +7,7 @@ That is the whole reason for the change. Coolify treats the two build packs
 completely differently:
 
 - **Dockerfile build pack: rolling.** It starts the new container, waits for its
-  healthcheck to pass, and only then removes the old one. Traefik keeps serving
+  healthcheck to Pass, and only then removes the old one. Traefik keeps serving
   from the old container the whole time. No downtime.
 - **Docker Compose build pack: stop, then start.** It stops the container first
   and starts the new one after. Measured on `production-crm` deployment 104: 33
@@ -31,17 +31,15 @@ Both are load-bearing, and `docker-compose.local.yml` and
 
 - **The queue** is on `QUEUE_CONNECTION=database` in every environment — never
   `sync`. Cache and sessions are on the database too; there is no Redis. What
-  rides on it today: the password-reset mail for both guards
-  (`AdminResetPassword` and `ClientResetPassword` both `implements ShouldQueue`)
-  and the client CSV import (`ImportClientsChunkJob`). With `database` and no
+  rides on it today: the staff Password-reset mail
+  (`AdminResetPassword` `implements ShouldQueue`). With `database` and no
   worker those would be written to the `jobs` table and never run — "forgot
-  password" would appear to succeed and send nothing — so the worker is not
+  Password" would appear to succeed and send nothing — so the worker is not
   optional.
-- **The scheduler** runs `payment:create-reminders` once a day
-  (`routes/console.php`). That is what raises upcoming- and overdue-payment
-  reminders; without it a due date passes and no client is chased. There are two
-  ways to run it — see [The scheduler](#the-scheduler) below, and pick one, not
-  both.
+- **The scheduler** runs whatever `routes/console.php` schedules. Nothing is
+  scheduled there today, so it is idle — keep it wired up anyway, since the
+  first task added expects it. There are two ways to run it — see
+  [The scheduler](#the-scheduler) below, and pick one, not both.
 
 One trap when adding either as a Coolify application: give it the
 `pgrep -f queue:work` healthcheck that `docker-compose.staging.yml` uses. The
@@ -55,7 +53,7 @@ called a failure.
 `production-crm`, so nothing reaches production on a push; the deploy is queued
 by hand in Coolify. Staging (`staging-crm`) deploys from `main`.
 
-The old container serves every request until the new one passes its healthcheck,
+The old container serves every request until the new one Passes its healthcheck,
 so there is no window to plan around and no maintenance page.
 
 ## Migrations
@@ -81,7 +79,7 @@ That is the whole of what it does — every name in `config/admin-permissions.ph
 gets its row, and nothing else. It grants nothing and revokes nothing, which is
 why it is **the one seeder safe to run against a live database**. Run it in any
 release that adds a permission to that config, or the feature behind it is a
-check nobody in the system can pass.
+check nobody in the system can Pass.
 
 **`UserSeeder` must never be run in production.** It walks the same config with
 `syncPermissions()`, which would replace whatever an admin had granted a role by
@@ -90,7 +88,7 @@ hand, and it creates staff accounts besides.
 **Creating the row and granting it are two different things.** Straight after
 seeding nobody holds the new permission; grant it from Admin → Roles to whoever
 should. The exception is anything only `super-admin` is meant to hold — they
-pass every check through `Gate::before` and need no grant — which is what makes
+Pass every check through `Gate::before` and need no grant — which is what makes
 an ungranted permission the safe default rather than a broken deploy.
 
 The seeder is additive. A permission dropped from the config keeps its row, so
@@ -129,9 +127,9 @@ Other application settings that matter:
 
 ## The scheduler
 
-`routes/console.php` runs `payment:create-reminders` once a day. It is what
-raises the upcoming- and overdue-payment notifications clients are chased with
-— without it a due date passes with nobody told.
+`routes/console.php` carries no scheduled tasks at the moment, so the scheduler
+has nothing to fire. Leave it configured regardless: the first task added starts
+running without a deploy change.
 
 Nothing in the web container runs it. Production needs one of:
 
@@ -141,8 +139,8 @@ Nothing in the web container runs it. Production needs one of:
   which is what `docker-compose.local.yml` does locally.
 
 Pick one, not both. `withoutOverlapping()` does hold across hosts — the lock
-lives in the database cache — so a duplicate scheduler would not double-run the
-reminders, but it would double every task added later that forgets the guard.
+lives in the database cache — but a duplicate scheduler would double every task
+that forgets the guard.
 
 ## Rollback
 

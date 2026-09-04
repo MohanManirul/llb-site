@@ -2,14 +2,13 @@
 
 namespace App\Services\Profile;
 
-use App\Models\Client;
 use App\Models\User;
 use App\Utilities\Asset;
 use Illuminate\Support\Facades\DB;
 
 final class ProfileService
 {
-    public function update(User|Client $user, array $data, ?string $imagePath = null): User|Client
+    public function update(User $user, array $data, ?string $imagePath = null): User
     {
         $oldImage = $user->image;
 

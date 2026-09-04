@@ -1,6 +1,6 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
-    "name": "boneek-crm",
+    "name": "llb-pdf",
     "private": true,
     "type": "module",
     "scripts": {

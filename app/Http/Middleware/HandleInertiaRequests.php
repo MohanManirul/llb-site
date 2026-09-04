@@ -2,10 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Client;
+use App\Models\Program;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -41,7 +40,56 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'impersonation' => fn () => $this->impersonation($request),
+            'locale' => fn () => app()->getLocale(),
+            'programs' => fn () => $this->publicPrograms($request),
+            'student' => fn () => $this->studentUser($request),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function studentUser(Request $request): ?array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return null;
+        }
+
+        $student = $request->user('student');
+
+        if (! $student || ! $student->is_active) {
+            return null;
+        }
+
+        return $student->only('id', 'name', 'email', 'phone');
+    }
+
+    /**
+     * Shared only on public pages so the program switcher costs no request;
+     * the admin side gets an empty list.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function publicPrograms(Request $request): array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return [];
+        }
+
+        return Program::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (Program $program) => [
+                'id' => $program->id,
+                'slug' => $program->slug,
+                'name' => $program->translated('name'),
+                'short_name' => $program->translated('short_name', false),
+                'has_levels' => $program->has_levels,
+                'has_exam_stages' => $program->has_exam_stages,
+            ])
+            ->all();
     }
 
     /**
@@ -68,18 +116,10 @@ class HandleInertiaRequests extends Middleware
      */
     private function authUser(Request $request): ?array
     {
-        $account = $request->user() ?? Auth::guard('client-web')->user();
+        $account = $request->user();
 
         if (! $account) {
             return null;
-        }
-
-        if ($account instanceof Client) {
-            return [
-                ...$account->only('id', 'name', 'email'),
-                'roles' => ['client'],
-                'permissions' => [],
-            ];
         }
 
         return [

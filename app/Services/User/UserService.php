@@ -27,16 +27,11 @@ final class UserService
     /**
      * @return Collection<int, array<string, mixed>>
      */
-    public function searchOptions(?string $search = null, ?int $keepUserId = null, ?int $companyId = null): Collection
+    public function searchOptions(?string $search = null): Collection
     {
         $search = trim((string) $search);
 
         return User::query()
-            ->where(fn ($query) => $query
-                ->whereDoesntHave('employees', fn ($employee) => $employee
-                    ->withTrashed()
-                    ->when($companyId, fn ($q) => $q->where('company_id', $companyId)))
-                ->when($keepUserId, fn ($q) => $q->orWhere('id', $keepUserId)))
             ->when($search !== '', fn ($query) => $query
                 ->where(fn ($q) => $q
                     ->whereLike('name', "%{$search}%")

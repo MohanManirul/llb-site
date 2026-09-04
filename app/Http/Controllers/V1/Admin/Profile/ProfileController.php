@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1\Admin\Profile;
 use App\Facades\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Admin\Profile\UpdateProfileRequest;
-use App\Models\Client;
 use App\Models\User;
 use App\Services\Profile\ProfileService;
 use Illuminate\Http\JsonResponse;
@@ -47,7 +46,7 @@ class ProfileController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function presentUser(User|Client $user): array
+    private function presentUser(User $user): array
     {
         return [
             ...$user->only(['id', 'name', 'email']),
