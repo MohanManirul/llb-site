@@ -71,9 +71,9 @@ Mailpit dashboard `:8034`.
 ## Architecture
 
 **Pages are render-only.** The `web` routes never fetch page data — a thin page controller
-renders a React page and passes an id (`['userId' => $user]`). The
+renders a React page and Passes an id (`['userId' => $user]`). The
 only other props are request-derived values the page cannot read for itself: the
-reset-password pages pass the `token` and `email` off the URL. Never domain data. The page
+reset-Password pages Pass the `token` and `email` off the URL. Never domain data. The page
 loads its own data from `/v1/*`
 via `resources/js/lib/api-client.ts` (its `baseURL` is `/v1`, so callers write
 `api.get('/users')`). All logic lives in `app/Http/Controllers/V1/Admin/`.

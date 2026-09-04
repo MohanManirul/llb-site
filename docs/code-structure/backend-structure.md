@@ -3,7 +3,7 @@
 > **This is the target, not a description of the repo.** Where it differs today:
 > `app/Helpers` holds a single `helpers.php`, not the three helper classes below; API
 > controllers live at `app/Http/Controllers/V1/Admin/{Feature}/`, with the
-> web-side controllers — Inertia page renders plus the login and password form
+> web-side controllers — Inertia page renders plus the login and Password form
 > handlers — under `app/Http/Controllers/{Admin,Auth}/`. Follow
 > this for **new** feature folders; follow the surrounding code when editing an
 > existing one. `CLAUDE.md` holds the target-vs-current table.

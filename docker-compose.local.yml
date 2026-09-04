@@ -1,4 +1,4 @@
-# LLB Study — local development.
+# AinPath — local development.
 #
 # Standalone stack: its own network, Postgres and Mailpit, sharing nothing with
 # inventory / LLB Logo-*. Host ports live in 8030-8034, clear of inventory
@@ -135,14 +135,14 @@ services:
     ports:
       - "${FORWARD_DB_PORT:-8032}:5432"
     environment:
-      PGPASSWORD: "${DB_PASSWORD:-secret}"
+      PGPassWORD: "${DB_PassWORD:-secret}"
       POSTGRES_DB: "${DB_DATABASE}"
       POSTGRES_USER: "${DB_USERNAME}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+      POSTGRES_PassWORD: "${DB_PassWORD:-secret}"
     volumes:
       # Do NOT rename this volume. Compose does not migrate data on a
       # rename — it creates an empty one and orphans the old. POSTGRES_*
-      # only apply on FIRST init, so changing DB_USERNAME/DB_PASSWORD/
+      # only apply on FIRST init, so changing DB_USERNAME/DB_PassWORD/
       # DB_DATABASE later just breaks authentication.
       - "pgsql-data:/var/lib/postgresql/data"
     healthcheck:

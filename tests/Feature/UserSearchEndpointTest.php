@@ -72,7 +72,7 @@ class UserSearchEndpointTest extends TestCase
 
     /**
      * TestCase::actingAs silently promotes a role-less user to super-admin, so
-     * the gate has to be checked with an explicit role or it passes for the
+     * the gate has to be checked with an explicit role or it Passes for the
      * wrong reason.
      */
     public function test_a_role_without_the_permission_is_forbidden(): void

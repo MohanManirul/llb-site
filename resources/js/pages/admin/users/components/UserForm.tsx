@@ -218,7 +218,7 @@ export default function UserForm({ user }: UserFormProps) {
                         required={!isEdit}
                     />
                     <TextInput
-                        label="Confirm password"
+                        label="Confirm Password"
                         type="password"
                         value={data.password_confirmation}
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>

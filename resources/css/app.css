@@ -35,6 +35,12 @@
     --color-brand-accent: #2c4dd4;
     --color-brand-muted: #b2c1cc;
 
+    --color-brass: #c19a3f;
+    --color-brass-deep: #96742a;
+    --color-brass-soft: #f4ead3;
+    --color-banyan: #2f6b3f;
+    --color-banyan-deep: #14351f;
+
     /*
      * Surfaces. The shell is a rounded sheet lifted off a brand-navy backdrop:
      * header and backdrop are --color-shell, the sidebar and page canvas sit on

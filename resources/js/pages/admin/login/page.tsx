@@ -88,7 +88,7 @@ export default function Login({ action = '/admin/login' }) {
                                 }
                                 className="text-sm font-medium text-indigo-600 hover:underline"
                             >
-                                Forgot password?
+                                Forgot Password?
                             </Link>
                         </div>
 

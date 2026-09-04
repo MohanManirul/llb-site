@@ -20,7 +20,7 @@ class AcademicStructureSeederTest extends TestCase
 
         $this->assertSame(5, Program::count());
 
-        $this->assertSame(2, Program::where('slug', 'nu-llb-pass')->first()->levels()->count());
+        $this->assertSame(2, Program::where('slug', 'nu-llb-Pass')->first()->levels()->count());
         $this->assertSame(4, Program::where('slug', 'llb-hons')->first()->levels()->count());
         $this->assertSame(2, Program::where('slug', 'llm')->first()->levels()->count());
     }
@@ -81,7 +81,7 @@ class AcademicStructureSeederTest extends TestCase
     }
 
     /**
-     * The same subject name exists under NU LLB (Pass) 2nd Part and under Bar
+     * The same subject name exists under NU LLB (Pass 2-Year-Term) 2nd Part and under Bar
      * Council; the second occurrence must get a program-suffixed slug instead
      * of colliding on the global unique index.
      */

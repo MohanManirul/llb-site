@@ -1,4 +1,4 @@
-export const SITE_NAME = 'LLB Study';
+export const SITE_NAME = 'AinPath';
 
 export const SITE_NAME_BN = 'এলএলবি স্টাডি';
 

@@ -9,7 +9,7 @@ return [
     | Authentication Defaults
     |--------------------------------------------------------------------------
     |
-    | This option defines the default authentication "guard" and password
+    | This option defines the default authentication "guard" and Password
     | reset "broker" for your application. You may change these values
     | as required, but they're a perfect start for most applications.
     |
@@ -83,7 +83,7 @@ return [
     | Resetting Passwords
     |--------------------------------------------------------------------------
     |
-    | These configuration options specify the behavior of Laravel's password
+    | These configuration options specify the behavior of Laravel's Password
     | reset functionality, including the table utilized for token storage
     | and the user provider that is invoked to actually retrieve users.
     |
@@ -92,8 +92,8 @@ return [
     | they have less time to be guessed. You may change this as needed.
     |
     | The throttle setting is the number of seconds a user must wait before
-    | generating more password reset tokens. This prevents the user from
-    | quickly generating a very large amount of password reset tokens.
+    | generating more Password reset tokens. This prevents the user from
+    | quickly generating a very large amount of Password reset tokens.
     |
     */
 
@@ -111,8 +111,8 @@ return [
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
     |
-    | Here you may define the number of seconds before a password confirmation
-    | window expires and users are asked to re-enter their password via the
+    | Here you may define the number of seconds before a Password confirmation
+    | window expires and users are asked to re-enter their Password via the
     | confirmation screen. By default, the timeout lasts for three hours.
     |
     */

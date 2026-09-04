@@ -56,7 +56,7 @@ export default function useQueryParams<T extends Record<string, string>>(
                 const next = { ...current, ...patch };
                 const url = buildUrl(next);
 
-                // Inertia keeps its page object in history.state — passing it
+                // Inertia keeps its page object in history.state — Passing it
                 // through untouched (never `{}`) is what keeps Back working.
                 if (replace) {
                     window.history.replaceState(window.history.state, '', url);

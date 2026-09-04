@@ -149,7 +149,7 @@ return [
         //     'host' => 'https://staging.example.com/log-viewer',
         //     'auth' => [      // Example of HTTP Basic auth
         //         'username' => 'username',
-        //         'password' => 'password',
+        //         'Password' => 'Password',
         //     ],
         //     'verify_server_certificate' => true,
         // ],

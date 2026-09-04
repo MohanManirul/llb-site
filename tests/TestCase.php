@@ -13,7 +13,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * The management API is now permission-gated (Spatie). Tests that just do
      * actingAs(User::factory()->create()) predate that and expect full access,
-     * so a user with no explicit role is signed in as super-admin (who passes
+     * so a user with no explicit role is signed in as super-admin (who Passes
      * every check via Gate::before). Tests exercising a specific role can
      * simply assign it before calling actingAs.
      */
@@ -26,7 +26,7 @@ abstract class TestCase extends BaseTestCase
         return parent::actingAs($user, $guard);
     }
 
-    /** Make this user a super-admin (passes every permission check). */
+    /** Make this user a super-admin (Passes every permission check). */
     protected function grantFullAccess(User $user): User
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();

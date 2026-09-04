@@ -17,6 +17,7 @@ const bn = {
     'nav.close': 'বন্ধ করুন',
     'nav.admin_login': 'অ্যাডমিন লগইন',
 
+    'home.eyebrow': 'বটতলা থেকে এজলাস',
     'home.tagline': 'এলএলবি শিক্ষার্থীদের জন্য সাজেশন, বই ও ক্লাস নোট',
     'home.subtitle': 'সেশন ও বিষয় অনুযায়ী সাজানো পড়ার উপকরণ — সম্পূর্ণ বিনামূল্যে, রেজিস্ট্রেশন ছাড়াই।',
     'home.pick_program': 'আপনার প্রোগ্রাম বেছে নিন',
@@ -81,6 +82,7 @@ const bn = {
     'common.free_badge': 'সম্পূর্ণ ফ্রি',
 
     'footer.about': 'এলএলবি শিক্ষার্থীদের জন্য বিনামূল্যের স্টাডি পোর্টাল।',
+    'footer.tagline': 'কোর্ট চত্বরের বটতলা থেকে এজলাসের যুক্তিতর্ক — আইন শেখার পথে আপনার সঙ্গী।',
     'footer.rights': 'সর্বস্বত্ব সংরক্ষিত।',
 } as const;
 
@@ -98,6 +100,7 @@ const en: Record<TranslationKey, string> = {
     'nav.close': 'Close',
     'nav.admin_login': 'Admin login',
 
+    'home.eyebrow': 'From the banyan courtyard to the ejlas',
     'home.tagline': 'Suggestions, books & class notes for LLB students',
     'home.subtitle': 'Study materials organised by session and subject — completely free, no registration.',
     'home.pick_program': 'Pick your program',
@@ -162,6 +165,7 @@ const en: Record<TranslationKey, string> = {
     'common.free_badge': 'Completely free',
 
     'footer.about': 'A free study portal for LLB students.',
+    'footer.tagline': 'From the banyan shade of the court yard to the arguments of the ejlas — with you all through law school.',
     'footer.rights': 'All rights reserved.',
 };
 

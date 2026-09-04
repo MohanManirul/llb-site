@@ -24,7 +24,7 @@
 x-app-env: &app-env
   PHP_OPCACHE_ENABLE: "1"
   SSL_MODE: "off"
-  APP_NAME: "${APP_NAME:-LLB Study}"
+  APP_NAME: "${APP_NAME:-AinPath}"
   APP_ENV: "${APP_ENV:-staging}"
   APP_KEY: "${APP_KEY}"
   APP_DEBUG: "${APP_DEBUG:-false}"
@@ -41,7 +41,7 @@ x-app-env: &app-env
   DB_PORT: "${DB_PORT:-3306}"
   DB_DATABASE: "${DB_DATABASE}"
   DB_USERNAME: "${DB_USERNAME}"
-  DB_PASSWORD: "${DB_PASSWORD}"
+  DB_PassWORD: "${DB_PassWORD}"
   CACHE_STORE: "${CACHE_STORE:-database}"
   SESSION_DRIVER: "${SESSION_DRIVER:-database}"
   QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"

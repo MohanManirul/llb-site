@@ -1,8 +1,8 @@
 import { FormEvent, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import {
-    AcademicCapIcon,
     Bars3Icon,
+    BuildingLibraryIcon,
     ChevronDownIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
@@ -29,6 +29,7 @@ export default function PublicHeader() {
 
     return (
         <header className="sticky top-0 z-30 border-b border-hairline bg-white/95 backdrop-blur">
+            <div className="h-1 bg-linear-to-r from-brand via-brass to-banyan" />
             <div className="mx-auto flex w-full max-w-300 items-center gap-3 px-4 py-3 md:px-6">
                 <button
                     type="button"
@@ -75,7 +76,7 @@ export default function PublicHeader() {
 
                     <Popover
                         label={t('nav.programs')}
-                        icon={<AcademicCapIcon className="h-4 w-4" />}
+                        icon={<BuildingLibraryIcon className="h-4 w-4" />}
                         panelClassName="w-72 p-2"
                     >
                         {(close) => (

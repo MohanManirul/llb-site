@@ -29,7 +29,7 @@ Node, npm — is installed on the host; the container is the toolchain. The `que
 `app`, `nginx`, `queue`, `scheduler`, `vite`, `pgsql`, `mailpit`. There is no Redis —
 cache, sessions and the queue all run on the database.
 
-Seeding gives you a super-admin: **`admin@gmail.com` / `password`**.
+Seeding gives you a super-admin: **`admin@gmail.com` / `Password`**.
 
 **Do not run `npm install` on the host.** The `vite` container installs its own
 `node_modules` on first boot, and it has to: the bundler ships per-platform native
@@ -74,7 +74,7 @@ Postgres.
 ## Architecture
 
 **Pages are render-only.** The `web` routes never fetch data. They render a React page
-through a thin page controller that passes an id and nothing else — see
+through a thin page controller that Passes an id and nothing else — see
 `UserPageController` (`['userId' => $user]`). The page then loads its own data from
 `/v1/*` through `resources/js/lib/api-client.ts`, whose `baseURL` is `/v1`, so callers
 write `api.get('/users')`.

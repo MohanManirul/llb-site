@@ -63,7 +63,10 @@ export default function PublicPageHeader({
             )}
 
             <div className="flex flex-wrap items-start justify-between gap-3">
-                <h1 className="text-2xl font-bold text-ink md:text-3xl">{title}</h1>
+                <h1 className="flex items-center gap-3 text-2xl font-bold text-ink md:text-3xl">
+                    <span className="h-7 w-1 shrink-0 rounded-full bg-linear-to-b from-brass to-banyan md:h-8" />
+                    {title}
+                </h1>
                 {aside}
             </div>
 

@@ -6,7 +6,7 @@
 
 A button on every row of Settings → Users. An admin presses it, a confirmation
 appears, and then they are **genuinely logged in as that user** — exactly as if
-that user had signed in with their own email and password — landing in that
+that user had signed in with their own email and Password — landing in that
 user's own panel.
 
 This document says how, and **where it is dangerous**. The second half is the
@@ -108,7 +108,7 @@ stops meaning anything.
 | No impersonating while impersonating (nesting) | refuse if the session already carries the marker |
 | The target must still exist | there is no *inactive* state to check: `User` carries no `SoftDeletes` trait and the `users` table has no `deleted_at` or `status` column — deletion is permanent. Route-model binding already 404s a missing id, so this rule is about not writing code for a state that does not exist |
 
-For a super-admin actor the subset check can short-circuit to *pass* — they
+For a super-admin actor the subset check can short-circuit to *Pass* — they
 clear every gate through `Gate::before` regardless. Doing it explicitly keeps
 the rule correct even if the `super-admin` role's permission rows ever drift
 from the config list.
@@ -117,7 +117,7 @@ from the config list.
 
 `Gate::before` short-circuits gates for super-admins. So a
 `UserPolicy::impersonate()` would **never run** for them — the
-super-admin → super-admin case would pass silently, and that is precisely the
+super-admin → super-admin case would Pass silently, and that is precisely the
 case being guarded against.
 
 The rules belong in **`App\Services\Auth\ImpersonationService::start()`**,
@@ -185,7 +185,7 @@ What it does
 (`vendor/laravel/sanctum/…/Http/Middleware/AuthenticateSession.php:43-58`):
 
 ```php
-$request->session()->get('password_hash_'.$driver)   // what the session holds
+$request->session()->get('Password_hash_'.$driver)   // what the session holds
 $request->user()->getAuthPassword()                  // who is logged in now
 // on a mismatch:
 $shouldLogout->each->logoutCurrentDevice();
@@ -193,7 +193,7 @@ $request->session()->flush();
 throw new AuthenticationException(...);
 ```
 
-After impersonating, the session still holds the **admin's** `password_hash_web`
+After impersonating, the session still holds the **admin's** `Password_hash_web`
 while `$request->user()` is now the **target** — two different hashes. So the
 very next `/v1/*` call **flushes** the session.
 
@@ -205,7 +205,7 @@ bounced to the login page.
 **The fix is one line**, after the swap:
 
 ```php
-session()->forget('password_hash_web');
+session()->forget('Password_hash_web');
 ```
 
 The middleware then re-stamps it for the new identity by itself. Needed in both
@@ -232,7 +232,7 @@ The header's ordinary **Logout** button posts to `/admin/logout` →
 `AuthController::logout` → `session()->invalidate()` (line 37). Pressing it
 while impersonating wipes the whole session including `impersonator_id` — the
 admin is thrown out to the login page and has to sign in again with their own
-password.
+Password.
 
 So while impersonating:
 
@@ -268,7 +268,7 @@ says why.
 
 Call `Auth::guard('web')->login($actor)` directly. `login()` replaces the
 session's auth id by itself; nothing extra is needed to clear the old identity.
-And `session()->forget('password_hash_web')` here too (§4).
+And `session()->forget('Password_hash_web')` here too (§4).
 
 ---
 
@@ -334,7 +334,7 @@ The things that were considered for blocking, and why they are open too:
 
 | What was going to be blocked | Why it isn't |
 |---|---|
-| `PATCH /v1/profile` (password / email) | Anyone holding `edit users` can already set someone else's password today through `UserService.php:100-101`, from the Users → Edit screen. Blocking it while impersonating would protect nothing new, only cripple the feature |
+| `PATCH /v1/profile` (Password / email) | Anyone holding `edit users` can already set someone else's Password today through `UserService.php:100-101`, from the Users → Edit screen. Blocking it while impersonating would protect nothing new, only cripple the feature |
 | Writes on the Users / Roles / Access screens | Same argument. The permission is super-admin-only, and they can open those screens under their own name |
 | notification delete / mark-all-read | That person's own notifications, which they could delete themselves |
 
@@ -483,7 +483,7 @@ do not exist on `PageProps` (`inertia.d.ts:10,13`) or on `User`
 - stopping brings the real admin back
 - the stop route works without the permission
 - two activity rows are written, and work done in between carries `impersonator_id`
-- **`password_hash_web` is absent from the session after the swap** (§4's trap) —
+- **`Password_hash_web` is absent from the session after the swap** (§4's trap) —
   without this one assertion the feature stays green in tests and dies in the
   browser in 20 seconds
 - the target's `remember_token` is **unchanged** after stopping (§6's trap)

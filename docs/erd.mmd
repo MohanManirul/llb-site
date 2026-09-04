@@ -1,5 +1,5 @@
 ---
-title: LLB Study — Entity Relationship Diagram
+title: AinPath — Entity Relationship Diagram
 ---
 erDiagram
 
@@ -10,7 +10,7 @@ erDiagram
         string email UK
         string phone
         string image
-        string password
+        string Password
     }
 
     ROLES {
@@ -67,7 +67,7 @@ erDiagram
         text description
     }
 
-    PASSWORD_RESET_TOKENS {
+    PassWORD_RESET_TOKENS {
         string email PK
         string token
     }
@@ -82,4 +82,4 @@ erDiagram
     ROLES   ||--o{ ROLE_HAS_PERMISSIONS     : grants
     PERMISSIONS ||--o{ MODEL_HAS_PERMISSIONS : "assigned to"
     PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS  : "granted via"
-    USERS   ||--o| PASSWORD_RESET_TOKENS : "reset (super-admin only)"
+    USERS   ||--o| PassWORD_RESET_TOKENS : "reset (super-admin only)"

@@ -1,4 +1,4 @@
-# LLB Study — মডিউলভিত্তিক কার্যনীতি
+# AinPath — মডিউলভিত্তিক কার্যনীতি
 
 একটিই Laravel অ্যাপ দুটো কাজ করে: Inertia দিয়ে React পেজ render করে, আর `/v1/*` JSON API সার্ভ করে। পেজ কোনো ডেটা বহন করে না — React mount হয়ে নিজেই API থেকে ডেটা আনে।
 প্রতিটি লেখার প্রবাহ একই: **Route → Controller → FormRequest → Service → Model → Resource**।
@@ -11,9 +11,9 @@
 | 2 | Password Reset | staff-এর ক্ষেত্রে কেবল super-admin পারে; মেইল queue-তে যায়। |
 | 3 | RBAC | spatie/laravel-permission — ১৪টি permission, ৩টি seeded role; `Gate::before` দিয়ে super-admin সব পাশ করে; আসল প্রহরী route/controller middleware, sidebar কেবল লুকায়। |
 | 4 | Access Provisioning | staff অ্যাকাউন্ট এখান থেকে তৈরি হয়; permission তালিকাও এখানেই। |
-| 5 | User | login পরিচয় — নাম, ইমেইল, ফোন, ছবি, password ও একটি role; চাকরির তথ্য এখানে নয়। |
+| 5 | User | login পরিচয় — নাম, ইমেইল, ফোন, ছবি, Password ও একটি role; চাকরির তথ্য এখানে নয়। |
 | 6 | Dashboard | `view dashboard` থাকলে overview section বসে — user-এর গণনা, date range দিয়ে ছাঁকা। |
-| 7 | Profile | নাম/ইমেইল/ছবি/password — password ফাঁকা রাখলে অপরিবর্তিত থাকে। |
+| 7 | Profile | নাম/ইমেইল/ছবি/Password — Password ফাঁকা রাখলে অপরিবর্তিত থাকে। |
 | 8 | Notification | `notifications` টেবিল + bell; অবকাঠামো প্রস্তুত, তবে এখন কোনো উৎস এতে লেখে না। |
 | 9 | Activity Log | কাস্টম audit — কে (causer), কী (description), কার উপর (subject); মুছতে পারে কেবল super-admin। |
 | 10 | System Monitoring | `storage/logs`-এর Log Viewer; আলাদা permission, seed অনুযায়ী কেবল super-admin। |
@@ -21,7 +21,7 @@
 
 ## স্বয়ংক্রিয় নিয়ম (মানুষ ছাড়াই যা ঘটে)
 
-- **Queue-তে চলে** — password reset mail; worker হাতে চালাতে হয়, না চললে কোনো UI সংকেত নেই।
+- **Queue-তে চলে** — Password reset mail; worker হাতে চালাতে হয়, না চললে কোনো UI সংকেত নেই।
 
 ## ERD
 

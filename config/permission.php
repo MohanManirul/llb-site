@@ -38,7 +38,7 @@ return [
         'team' => null,
 
         /*
-         * When using the "HasModels" trait and passing raw IDs to syncModels,
+         * When using the "HasModels" trait and Passing raw IDs to syncModels,
          * attachModels, or detachModels, this model class will be used to
          * resolve those IDs. If null, defaults to the guard's model.
          */
@@ -160,7 +160,7 @@ return [
      * When set to true the package will use Passports Client to check permissions
      */
 
-    'use_passport_client_credentials' => false,
+    'use_Passport_client_credentials' => false,
 
     /*
      * When set to true, the required permission names are added to exception messages.
