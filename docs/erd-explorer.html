@@ -1,0 +1,697 @@
+<title>StepUp Schema Explorer</title>
+<style>
+  :root {
+    --paper: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e4e9ed;
+    --line: #d0d8de;
+    --line-soft: #e2e8ec;
+    --ink: #141d26;
+    --ink-2: #55666f;
+    --ink-3: #86959f;
+    --g-id: #6a4fbf;
+    --g-org: #0d7a70;
+    --g-prj: #9d6212;
+    --g-cc: #ae3b56;
+    --g-bnk: #4a6274;
+    --mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0f1419;
+      --surface: #161f26;
+      --surface-2: #1d2830;
+      --line: #2b3841;
+      --line-soft: #222d35;
+      --ink: #e7eef3;
+      --ink-2: #a0b1bd;
+      --ink-3: #71838f;
+      --g-id: #ab98f7;
+      --g-org: #4ec6b5;
+      --g-prj: #dda43f;
+      --g-cc: #f2849c;
+      --g-bnk: #93abbd;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0f1419;
+    --surface: #161f26;
+    --surface-2: #1d2830;
+    --line: #2b3841;
+    --line-soft: #222d35;
+    --ink: #e7eef3;
+    --ink-2: #a0b1bd;
+    --ink-3: #71838f;
+    --g-id: #ab98f7;
+    --g-org: #4ec6b5;
+    --g-prj: #dda43f;
+    --g-cc: #f2849c;
+    --g-bnk: #93abbd;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 { margin: 0; font-weight: 600; }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 22px;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .brand {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .brand span { color: var(--ink-3); }
+  .tally {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 3px 8px;
+    background: var(--surface);
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .chip:hover, .chip:focus-visible { border-color: var(--ink-3); color: var(--ink); outline: none; }
+  .chip[aria-pressed="true"] { color: var(--ink); border-color: currentColor; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+  .chip b { font-family: var(--mono); font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .shell { display: grid; grid-template-columns: 268px minmax(0, 1fr); align-items: start; }
+  .rail {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+    padding: 14px 12px 28px;
+  }
+  .search {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .search:focus-visible { outline: 2px solid var(--ink-3); outline-offset: 1px; }
+  .grouphead {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 18px 4px 6px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .grouphead::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }
+  .titem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 8px;
+    border: 0;
+    border-left: 2px solid transparent;
+    border-radius: 0 2px 2px 0;
+    background: none;
+    color: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .titem:hover { background: var(--surface-2); color: var(--ink); }
+  .titem:focus-visible { outline: 1px solid var(--ink-3); outline-offset: -1px; }
+  .titem[aria-current="true"] { background: var(--surface-2); color: var(--ink); border-left-color: var(--c); font-weight: 600; }
+  .titem .deg { margin-left: auto; color: var(--ink-3); font-size: 11px; font-variant-numeric: tabular-nums; font-weight: 400; }
+  .hidden { display: none !important; }
+
+  main { padding: 22px 24px 60px; min-width: 0; }
+  .focus-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
+  .focus-head h1 { font-family: var(--mono); font-size: 21px; letter-spacing: -.01em; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--c);
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    padding: 1px 7px;
+  }
+  .lede { color: var(--ink-2); font-size: 13.5px; max-width: 62ch; margin: 0 0 16px; }
+  .lede b { color: var(--ink); font-weight: 600; font-family: var(--mono); font-size: 13px; }
+
+  .mapwrap {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    overflow-x: auto;
+    padding: 6px 0 0;
+  }
+  .maplabels {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 16px 2px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    min-width: 620px;
+  }
+  svg { display: block; min-width: 620px; }
+  .node { cursor: pointer; }
+  .node rect { fill: var(--c); fill-opacity: .07; stroke: var(--c); stroke-width: 1; }
+  .node text { fill: var(--ink); font-family: var(--mono); font-size: 11px; }
+  .node .sub { fill: var(--ink-3); font-size: 9.5px; letter-spacing: .08em; }
+  .node:hover rect, .node:focus-visible rect { fill-opacity: .2; }
+  .node:focus-visible { outline: none; }
+  .node:focus-visible rect { stroke-width: 2; }
+  .node.self rect { fill-opacity: .14; stroke-width: 1.7; }
+  .edge { fill: none; stroke: var(--ink-3); stroke-width: 1.1; }
+  .edge.dash { stroke-dasharray: 3 3; }
+  .card-txt { fill: var(--ink-2); font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em; }
+  .row:hover .edge, .row.lit .edge { stroke: var(--c); stroke-width: 1.9; }
+  .row:hover .card-txt, .row.lit .card-txt { fill: var(--c); }
+  .empty-note { fill: var(--ink-3); font-family: var(--sans); font-size: 12px; font-style: italic; }
+
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; margin-top: 16px; }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    padding: 14px 16px 16px;
+    min-width: 0;
+  }
+  .card h2 {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  th, td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line-soft); }
+  thead th { color: var(--ink-3); font-weight: 400; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.type { color: var(--ink-3); }
+  .key { font-size: 9.5px; letter-spacing: .08em; border: 1px solid var(--line); border-radius: 2px; padding: 0 4px; color: var(--ink-2); }
+  .key.pk { color: var(--c); border-color: currentColor; }
+
+  .rel { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .rel li { border-bottom: 1px solid var(--line-soft); }
+  .rel li:last-child { border-bottom: 0; }
+  .relbtn {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+    padding: 7px 4px;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+  }
+  .relbtn:hover, .relbtn:focus-visible { background: var(--surface-2); outline: none; }
+  .relbtn .card-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    padding-top: 2px;
+    white-space: nowrap;
+  }
+  .relbtn .who { font-family: var(--mono); font-size: 12px; color: var(--c); }
+  .relbtn .how { font-size: 12.5px; color: var(--ink-2); }
+  .relbtn .how em { font-style: normal; color: var(--ink-3); }
+  .subhead {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 12px 0 2px;
+  }
+  .subhead:first-of-type { margin-top: 0; }
+  footer {
+    grid-column: 1 / -1;
+    padding: 16px 24px 22px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-3);
+    font-size: 12.5px;
+  }
+  footer code { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .node rect, .edge { transition: fill-opacity .12s ease, stroke .12s ease, stroke-width .12s ease; }
+  }
+</style>
+
+<header class="top">
+  <div>
+    <div class="brand">StepUp CRM <span>· schema</span></div>
+    <div class="tally" id="tally"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <input class="search" id="q" type="search" placeholder="টেবিল খুঁজুন…" autocomplete="off" aria-label="টেবিল খুঁজুন">
+    <nav id="list" aria-label="টেবিল তালিকা"></nav>
+  </aside>
+
+  <main>
+    <div class="focus-head">
+      <h1 id="tname">USERS</h1>
+      <span class="tag" id="tgroup"></span>
+    </div>
+    <p class="lede" id="tlede"></p>
+
+    <div class="mapwrap">
+      <div class="maplabels">
+        <span>যাকে রেফার করে (parent)</span>
+        <span>যারা একে রেফার করে (child)</span>
+      </div>
+      <svg id="map" role="img" aria-label="সম্পর্কের ম্যাপ"></svg>
+    </div>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>কলাম</h2>
+        <table>
+          <thead><tr><th>নাম</th><th>টাইপ</th><th>কী</th></tr></thead>
+          <tbody id="cols"></tbody>
+        </table>
+      </section>
+      <section class="card">
+        <h2>সম্পর্ক</h2>
+        <div id="rels"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    সোর্স: <code>docs/erd.mmd</code> — একই ডেটা, শুধু ব্রাউজ করার মতো করে সাজানো। কার্ডিনালিটি
+    <code>1</code> = ঠিক একটি, <code>0..1</code> = থাকতে পারে নাও পারে, <code>N</code> = একাধিক।
+    ড্যাশ করা লাইন = আলাদা ডেটাবেস, FK নেই, join করা যায় না।
+  </footer>
+</div>
+
+<script>
+const GROUPS = {
+  id:  { label: "Identity & access", css: "--g-id" },
+  org: { label: "Organisation",      css: "--g-org" },
+  prj: { label: "Projects & sales",  css: "--g-prj" },
+  cc:  { label: "Call center",       css: "--g-cc" },
+  bnk: { label: "boneek (external)", css: "--g-bnk" },
+};
+
+const TABLES = {
+  USERS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["email","string","UK"],["phone","string"],["image","string"],["password","string"]] },
+  CLIENTS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["email","string","UK"],["phone","string","UK"],["password","string"],["is_active","bool"],["deleted_at","timestamp"]] },
+  ROLES: { g: "id", cols: [["id","bigint","PK"],["name","string"],["guard_name","string"]] },
+  PERMISSIONS: { g: "id", cols: [["id","bigint","PK"],["name","string"],["guard_name","string"]] },
+  MODEL_HAS_ROLES: { g: "id", cols: [["role_id","bigint","FK"],["model_type","string"],["model_id","bigint"]] },
+  MODEL_HAS_PERMISSIONS: { g: "id", cols: [["permission_id","bigint","FK"],["model_type","string"],["model_id","bigint"]] },
+  ROLE_HAS_PERMISSIONS: { g: "id", cols: [["permission_id","bigint","FK"],["role_id","bigint","FK"]] },
+  PERSONAL_ACCESS_TOKENS: { g: "id", cols: [["id","bigint","PK"],["tokenable_type","string"],["tokenable_id","bigint"],["token","string","UK"]] },
+  NOTIFICATIONS: { g: "id", cols: [["id","uuid","PK"],["notifiable_type","string"],["notifiable_id","bigint"],["data","text"],["read_at","timestamp"]] },
+  ACTIVITY_LOGS: { g: "id", cols: [["id","bigint","PK"],["type","string"],["subject_type","string"],["subject_id","bigint"],["causer_type","string"],["causer_id","bigint"],["description","text"]] },
+  PASSWORD_RESET_TOKENS: { g: "id", cols: [["email","string","PK"],["token","string"]] },
+  CLIENT_PASSWORD_RESET_TOKENS: { g: "id", cols: [["email","string","PK"],["token","string"]] },
+
+  COMPANIES: { g: "org", cols: [["id","bigint","PK"],["name","string","UK"],["email","string","UK"],["is_active","bool"],["deleted_at","timestamp"]] },
+  DEPARTMENTS: { g: "org", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["name","string"],["is_active","bool"],["deleted_at","timestamp"]] },
+  DESIGNATIONS: { g: "org", cols: [["id","bigint","PK"],["name","string","UK"],["is_active","bool"]] },
+  EMPLOYEES: { g: "org", cols: [["id","bigint","PK"],["user_id","bigint","FK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["designation_id","bigint","FK"],["is_active","bool"],["joining_date","date"],["resignation_date","date"],["deleted_at","timestamp"]] },
+  TEAMS: { g: "org", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["name","string"],["is_active","bool"],["deleted_at","timestamp"]] },
+  TEAM_MEMBERS: { g: "org", cols: [["id","bigint","PK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["role","enum"]] },
+
+  PROJECTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["department_id","bigint","FK"],["client_id","bigint","FK"],["team_id","bigint","FK"],["assigned_employee_id","bigint","FK"],["project_name","string","UK"],["start_date","date"],["end_date","date"],["package_amount","decimal"],["amount_paid","decimal"],["amount_due","decimal"],["project_type","enum"],["sales_target","decimal"],["target_deadline","date"],["achieved_sales","decimal"],["health_status","enum"],["business_status","enum"],["deleted_at","timestamp"]] },
+  PROJECT_MILESTONES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["sequence","smallint"],["period_start","date"],["period_end","date"],["target_amount","decimal"],["achieved_amount","decimal"],["status","enum"]] },
+  SALES_REPORTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["week_start","date"],["week_end","date"],["total_sales","decimal"],["total_order_quantity","int"],["total_amount_spent","decimal"]] },
+  PROJECT_SALES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["project_milestone_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["sale_date","date"],["amount","decimal"],["reference","string"]] },
+  PROJECT_ASSIGNMENTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["assigned_at","timestamp"],["unassigned_at","timestamp"],["reason","enum"]] },
+  PROJECT_NOTES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["user_id","bigint","FK"],["note","text"]] },
+
+  CALL_CENTER_AGENTS: { g: "cc", cols: [["id","bigint","PK"],["user_id","bigint","UK"],["employee_id","bigint","FK"],["is_active","bool"]] },
+  CALL_CENTER_PICKS: { g: "cc", cols: [["id","bigint","PK"],["order_id","uuid"],["business_id","uuid"],["user_id","bigint","FK"],["employee_id","bigint","FK"],["invoice_no","string"],["customer_phone","string"],["order_total","decimal"],["status_at_pick","string"],["attempt_no","int"],["picked_at","timestamp"],["released_at","timestamp"],["outcome","enum"]] },
+  CALL_CENTER_ACTIVITIES: { g: "cc", cols: [["id","bigint","PK"],["pick_id","bigint","FK"],["order_id","uuid"],["user_id","bigint","FK"],["employee_id","bigint","FK"],["action","enum"],["from_status","string"],["to_status","string"],["comment","text"]] },
+
+  BONEEK_ORDERS: { g: "bnk", cols: [["id","uuid","PK"],["business_id","uuid"],["branch_id","uuid"],["customer_id","uuid"],["invoice_no","string"],["status","string"],["previous_status","string"],["type","smallint"],["sub_total","decimal"],["total_amount","decimal"],["due_amount","decimal"],["payment_status","string"]] },
+  BONEEK_ORDER_ITEMS: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["product_id","uuid"],["sku_id","uuid"],["quantity","decimal"],["unit_price","decimal"],["total_amount","decimal"]] },
+  BONEEK_ORDER_SHIPPING_ADDRESSES: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["contact_name","string"],["contact_phone","string"],["address","text"]] },
+  BONEEK_ORDER_LOGS: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["type","smallint"],["note","text"]] },
+  BONEEK_CUSTOMERS: { g: "bnk", cols: [["id","uuid","PK"],["account_id","uuid"],["name","string"],["phone","string"],["email","string"]] },
+  BONEEK_PRODUCT_STOCKS: { g: "bnk", cols: [["id","uuid","PK"],["branch_id","uuid"],["product_id","uuid"],["sku_id","uuid"],["quantity","decimal"]] },
+};
+
+const RELS = [
+  ["USERS","MODEL_HAS_ROLES","1","N","has roles (morph)"],
+  ["USERS","MODEL_HAS_PERMISSIONS","1","N","direct permissions (morph)"],
+  ["USERS","PERSONAL_ACCESS_TOKENS","1","N","tokens (morph)"],
+  ["USERS","NOTIFICATIONS","1","N","receives (morph)"],
+  ["USERS","ACTIVITY_LOGS","1","N","causes (morph)"],
+  ["CLIENTS","PERSONAL_ACCESS_TOKENS","1","N","tokens (morph)"],
+  ["CLIENTS","NOTIFICATIONS","1","N","receives (morph)"],
+  ["ROLES","MODEL_HAS_ROLES","1","N","assigned to"],
+  ["ROLES","ROLE_HAS_PERMISSIONS","1","N","grants"],
+  ["PERMISSIONS","MODEL_HAS_PERMISSIONS","1","N","assigned to"],
+  ["PERMISSIONS","ROLE_HAS_PERMISSIONS","1","N","granted via"],
+  ["USERS","PASSWORD_RESET_TOKENS","1","0..1","reset (super-admin only)"],
+  ["CLIENTS","CLIENT_PASSWORD_RESET_TOKENS","1","0..1","reset (own broker)"],
+
+  ["COMPANIES","DEPARTMENTS","1","N","has"],
+  ["COMPANIES","TEAMS","1","N","has"],
+  ["COMPANIES","EMPLOYEES","1","N","employs"],
+  ["COMPANIES","PROJECTS","1","N","owns"],
+  ["DEPARTMENTS","TEAMS","1","N","has"],
+  ["DEPARTMENTS","EMPLOYEES","1","N","has"],
+  ["DEPARTMENTS","PROJECTS","1","N","scopes (from team)"],
+  ["DESIGNATIONS","EMPLOYEES","0..1","N","held by"],
+  ["USERS","EMPLOYEES","1","N","employed as (1 per company)"],
+  ["TEAMS","TEAM_MEMBERS","1","N","has"],
+  ["EMPLOYEES","TEAM_MEMBERS","1","N","member of (leader or member)"],
+
+  ["CLIENTS","PROJECTS","1","N","contracts"],
+  ["TEAMS","PROJECTS","1","N","handles"],
+  ["EMPLOYEES","PROJECTS","0..1","N","assigned marketer"],
+  ["PROJECTS","PROJECT_MILESTONES","1","N","split into monthly"],
+  ["PROJECTS","SALES_REPORTS","1","N","weekly entry"],
+  ["PROJECTS","PROJECT_SALES","1","N","has"],
+  ["PROJECTS","PROJECT_ASSIGNMENTS","1","N","ownership history"],
+  ["PROJECTS","PROJECT_NOTES","1","N","has"],
+  ["PROJECT_MILESTONES","PROJECT_SALES","0..1","N","attributes"],
+  ["TEAMS","PROJECT_ASSIGNMENTS","1","N","has"],
+  ["EMPLOYEES","PROJECT_ASSIGNMENTS","1","N","has"],
+  ["TEAMS","PROJECT_SALES","0..1","N","credited"],
+  ["EMPLOYEES","PROJECT_SALES","0..1","N","credited"],
+  ["USERS","PROJECT_NOTES","0..1","N","authors"],
+  ["COMPANIES","PROJECT_MILESTONES","1","N","scopes"],
+  ["COMPANIES","SALES_REPORTS","1","N","scopes"],
+  ["COMPANIES","PROJECT_SALES","1","N","scopes"],
+  ["COMPANIES","PROJECT_ASSIGNMENTS","1","N","scopes"],
+  ["COMPANIES","PROJECT_NOTES","1","N","scopes"],
+
+  ["USERS","CALL_CENTER_AGENTS","1","0..1","may be an agent"],
+  ["EMPLOYEES","CALL_CENTER_AGENTS","1","N","payout identity"],
+  ["USERS","CALL_CENTER_PICKS","1","N","picks"],
+  ["EMPLOYEES","CALL_CENTER_PICKS","1","N","credited"],
+  ["CALL_CENTER_PICKS","CALL_CENTER_ACTIVITIES","1","N","timeline of"],
+  ["USERS","CALL_CENTER_ACTIVITIES","1","N","performs"],
+
+  ["BONEEK_ORDERS","CALL_CENTER_PICKS","0..1","N","order_id (FK নেই, cross-DB)", true],
+  ["BONEEK_ORDERS","CALL_CENTER_ACTIVITIES","0..1","N","order_id (FK নেই, cross-DB)", true],
+
+  ["BONEEK_ORDERS","BONEEK_ORDER_ITEMS","1","N","contains"],
+  ["BONEEK_ORDERS","BONEEK_ORDER_SHIPPING_ADDRESSES","1","0..1","ships to"],
+  ["BONEEK_ORDERS","BONEEK_ORDER_LOGS","1","N","merchant timeline"],
+  ["BONEEK_CUSTOMERS","BONEEK_ORDERS","1","N","places"],
+  ["BONEEK_PRODUCT_STOCKS","BONEEK_ORDER_ITEMS","0..1","N","moves stock"],
+  ["BONEEK_ORDERS","BONEEK_ORDERS","1","0..1","dropshipping pair (parent_id)"],
+];
+
+const names = Object.keys(TABLES);
+const rel = RELS.map(([p, c, pc, cc, label, dash]) => ({ p, c, pc, cc, label, dash: !!dash }));
+const parentsOf = n => rel.filter(r => r.c === n && r.p !== n);
+const childrenOf = n => rel.filter(r => r.p === n && r.c !== n);
+const selfOf = n => rel.filter(r => r.p === n && r.c === n);
+const degree = n => parentsOf(n).length + childrenOf(n).length + selfOf(n).length;
+const colorOf = n => `var(${GROUPS[TABLES[n].g].css})`;
+
+document.getElementById("tally").textContent =
+  `${names.length} টেবিল · ${rel.length} সম্পর্ক · ${Object.values(TABLES).reduce((a, t) => a + t.cols.length, 0)} কলাম`;
+
+const legend = document.getElementById("legend");
+const activeGroups = new Set(Object.keys(GROUPS));
+for (const [key, g] of Object.entries(GROUPS)) {
+  const count = names.filter(n => TABLES[n].g === key).length;
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.type = "button";
+  b.setAttribute("aria-pressed", "true");
+  b.style.setProperty("--c", `var(${g.css})`);
+  b.innerHTML = `<span class="dot"></span>${g.label} <b>${count}</b>`;
+  b.addEventListener("click", () => {
+    if (activeGroups.has(key)) activeGroups.delete(key); else activeGroups.add(key);
+    if (!activeGroups.size) activeGroups.add(key);
+    b.setAttribute("aria-pressed", String(activeGroups.has(key)));
+    applyFilter();
+  });
+  legend.append(b);
+}
+
+const list = document.getElementById("list");
+const items = {};
+for (const [key, g] of Object.entries(GROUPS)) {
+  const h = document.createElement("div");
+  h.className = "grouphead";
+  h.dataset.group = key;
+  h.append(document.createTextNode(g.label));
+  list.append(h);
+  for (const n of names.filter(x => TABLES[x].g === key)) {
+    const b = document.createElement("button");
+    b.className = "titem";
+    b.type = "button";
+    b.dataset.group = key;
+    b.dataset.name = n;
+    b.style.setProperty("--c", colorOf(n));
+    b.innerHTML = `<span>${n}</span><span class="deg">${degree(n)}</span>`;
+    b.addEventListener("click", () => select(n));
+    list.append(b);
+    items[n] = b;
+  }
+}
+
+const q = document.getElementById("q");
+function applyFilter() {
+  const term = q.value.trim().toLowerCase();
+  for (const n of names) {
+    const t = TABLES[n];
+    const hit = !term || n.toLowerCase().includes(term) || t.cols.some(c => c[0].includes(term));
+    items[n].classList.toggle("hidden", !(hit && activeGroups.has(t.g)));
+  }
+  for (const h of list.querySelectorAll(".grouphead")) {
+    const any = names.some(n => TABLES[n].g === h.dataset.group && !items[n].classList.contains("hidden"));
+    h.classList.toggle("hidden", !any);
+  }
+}
+q.addEventListener("input", applyFilter);
+
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("map");
+const el = (tag, attrs = {}) => {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+};
+
+const W = 940, PITCH = 46, BOX_H = 30;
+const L = { x: 24, w: 232 }, C = { x: 352, w: 236 }, R = { x: 684, w: 232 };
+
+function drawNode(name, x, y, w, extraClass = "") {
+  const g = el("g", { class: `node ${extraClass}`, tabindex: "0", role: "button" });
+  g.style.setProperty("--c", colorOf(name));
+  g.append(el("rect", { x, y: y - BOX_H / 2, width: w, height: BOX_H, rx: "2" }));
+  const t = el("text", { x: x + 10, y: y + 4 });
+  t.textContent = name;
+  g.append(t);
+  const title = el("title");
+  title.textContent = `${name} — ${GROUPS[TABLES[name].g].label}, ${degree(name)}টি সম্পর্ক`;
+  g.append(title);
+  g.addEventListener("click", () => select(name));
+  g.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(name); }
+  });
+  return g;
+}
+
+function drawMap(name) {
+  svg.textContent = "";
+  const ps = parentsOf(name), cs = childrenOf(name);
+  const rows = Math.max(ps.length, cs.length, 1);
+  const H = rows * PITCH + 56;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("height", H);
+  const cy = H / 2;
+  const stackY = (i, count) => cy - ((count - 1) * PITCH) / 2 + i * PITCH;
+
+  ps.forEach((r, i) => {
+    const y = stackY(i, ps.length);
+    const g = el("g", { class: "row" });
+    g.style.setProperty("--c", colorOf(r.p));
+    g.append(el("path", {
+      class: `edge${r.dash ? " dash" : ""}`,
+      d: `M ${L.x + L.w} ${y} C ${L.x + L.w + 48} ${y} ${C.x - 48} ${cy} ${C.x} ${cy}`,
+    }));
+    const t = el("text", { class: "card-txt", x: (L.x + L.w + C.x) / 2, y: y - 6, "text-anchor": "middle" });
+    t.textContent = `${r.pc} → ${r.cc}`;
+    g.append(t, drawNode(r.p, L.x, y, L.w));
+    svg.append(g);
+  });
+
+  cs.forEach((r, i) => {
+    const y = stackY(i, cs.length);
+    const g = el("g", { class: "row" });
+    g.style.setProperty("--c", colorOf(r.c));
+    g.append(el("path", {
+      class: `edge${r.dash ? " dash" : ""}`,
+      d: `M ${C.x + C.w} ${cy} C ${C.x + C.w + 48} ${cy} ${R.x - 48} ${y} ${R.x} ${y}`,
+    }));
+    const t = el("text", { class: "card-txt", x: (C.x + C.w + R.x) / 2, y: y - 6, "text-anchor": "middle" });
+    t.textContent = `${r.pc} → ${r.cc}`;
+    g.append(t, drawNode(r.c, R.x, y, R.w));
+    svg.append(g);
+  });
+
+  svg.append(drawNode(name, C.x, cy, C.w, "self"));
+
+  const loop = selfOf(name);
+  if (loop.length) {
+    const g = el("g", { class: "row" });
+    g.style.setProperty("--c", colorOf(name));
+    g.append(el("path", {
+      class: "edge",
+      d: `M ${C.x + C.w - 40} ${cy - BOX_H / 2} C ${C.x + C.w - 10} ${cy - 54} ${C.x + 40} ${cy - 54} ${C.x + 46} ${cy - BOX_H / 2}`,
+    }));
+    const t = el("text", { class: "card-txt", x: C.x + C.w / 2, y: cy - 44, "text-anchor": "middle" });
+    t.textContent = `self · ${loop[0].label}`;
+    g.append(t);
+    svg.append(g);
+  }
+  if (!ps.length) {
+    const t = el("text", { class: "empty-note", x: L.x, y: cy });
+    t.textContent = "কোনো parent নেই";
+    svg.append(t);
+  }
+  if (!cs.length) {
+    const t = el("text", { class: "empty-note", x: R.x, y: cy });
+    t.textContent = "কোনো child নেই";
+    svg.append(t);
+  }
+}
+
+function relGroup(title, list, dir) {
+  const wrap = document.createDocumentFragment();
+  const h = document.createElement("div");
+  h.className = "subhead";
+  h.textContent = `${title} · ${list.length}`;
+  wrap.append(h);
+  const ul = document.createElement("ul");
+  ul.className = "rel";
+  for (const r of list) {
+    const other = dir === "up" ? r.p : r.c;
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.className = "relbtn";
+    b.type = "button";
+    b.style.setProperty("--c", colorOf(other));
+    const how = dir === "up"
+      ? `একটি <em>${other}</em>-এর সাথে যুক্ত — ${r.label}`
+      : `${r.label} — <em>${other}</em>${r.cc === "N" ? " (একাধিক)" : ""}`;
+    b.innerHTML =
+      `<span class="card-badge">${r.pc} → ${r.cc}${r.dash ? " ⋯" : ""}</span>` +
+      `<span><span class="who">${other}</span><br><span class="how">${how}</span></span>`;
+    b.addEventListener("click", () => select(other));
+    li.append(b);
+    ul.append(li);
+  }
+  if (!list.length) {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="how" style="color:var(--ink-3);font-size:12.5px">— নেই</span>`;
+    ul.append(li);
+  }
+  wrap.append(ul);
+  return wrap;
+}
+
+let current = null;
+function select(name) {
+  if (!TABLES[name]) return;
+  current = name;
+  const t = TABLES[name];
+  const accent = colorOf(name);
+  document.querySelector("main").style.setProperty("--c", accent);
+
+  for (const [n, b] of Object.entries(items)) b.setAttribute("aria-current", String(n === name));
+  document.getElementById("tname").textContent = name;
+  const gtag = document.getElementById("tgroup");
+  gtag.textContent = GROUPS[t.g].label;
+  gtag.style.setProperty("--c", accent);
+
+  const ps = parentsOf(name), cs = childrenOf(name);
+  document.getElementById("tlede").innerHTML =
+    `<b>${t.cols.length}</b> কলাম · <b>${ps.length}</b> parent · <b>${cs.length}</b> child` +
+    (selfOf(name).length ? " · self-reference আছে" : "") +
+    (t.g === "bnk" ? " · এই টেবিল <b>boneek</b> ডেটাবেসের, CRM থেকে join করা যায় না।" : "");
+
+  const cols = document.getElementById("cols");
+  cols.textContent = "";
+  for (const [cname, ctype, key] of t.cols) {
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      `<td>${cname}</td><td class="type">${ctype}</td>` +
+      `<td>${key ? `<span class="key ${key === "PK" ? "pk" : ""}">${key}</span>` : ""}</td>`;
+    cols.append(tr);
+  }
+
+  const box = document.getElementById("rels");
+  box.textContent = "";
+  box.append(relGroup("যাকে রেফার করে", ps, "up"));
+  box.append(relGroup("যারা একে রেফার করে", cs, "down"));
+
+  drawMap(name);
+  if (location.hash.slice(1) !== name) history.replaceState(null, "", `#${name}`);
+  items[name].scrollIntoView({ block: "nearest" });
+}
+
+window.addEventListener("hashchange", () => {
+  const n = decodeURIComponent(location.hash.slice(1));
+  if (TABLES[n] && n !== current) select(n);
+});
+
+const start = decodeURIComponent(location.hash.slice(1));
+select(TABLES[start] ? start : "PROJECTS");
+applyFilter();
+</script>

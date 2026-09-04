@@ -1,0 +1,378 @@
+---
+title: StepUp CRM — Entity Relationship Diagram (2026-08-12)
+---
+erDiagram
+
+    %% ── Identity & access ───────────────────────────────────────────
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string phone
+        string image
+        string password
+    }
+
+    CLIENTS {
+        bigint id PK
+        string name
+        string email UK
+        string phone UK
+        string password
+        bool is_active
+        timestamp deleted_at
+    }
+
+    ROLES {
+        bigint id PK
+        string name
+        string guard_name
+    }
+
+    PERMISSIONS {
+        bigint id PK
+        string name
+        string guard_name
+    }
+
+    MODEL_HAS_ROLES {
+        bigint role_id FK
+        string model_type
+        bigint model_id
+    }
+
+    MODEL_HAS_PERMISSIONS {
+        bigint permission_id FK
+        string model_type
+        bigint model_id
+    }
+
+    ROLE_HAS_PERMISSIONS {
+        bigint permission_id FK
+        bigint role_id FK
+    }
+
+    PERSONAL_ACCESS_TOKENS {
+        bigint id PK
+        string tokenable_type
+        bigint tokenable_id
+        string token UK
+    }
+
+    NOTIFICATIONS {
+        uuid id PK
+        string notifiable_type
+        bigint notifiable_id
+        text data
+        timestamp read_at
+    }
+
+    ACTIVITY_LOGS {
+        bigint id PK
+        string type
+        string subject_type
+        bigint subject_id
+        string causer_type
+        bigint causer_id
+        text description
+    }
+
+    PASSWORD_RESET_TOKENS {
+        string email PK
+        string token
+    }
+
+    CLIENT_PASSWORD_RESET_TOKENS {
+        string email PK
+        string token
+    }
+
+    %% ── Organisation ────────────────────────────────────────────────
+    COMPANIES {
+        bigint id PK
+        string name UK
+        string email UK
+        bool is_active
+        timestamp deleted_at
+    }
+
+    DEPARTMENTS {
+        bigint id PK
+        bigint company_id FK
+        string name
+        bool is_active
+        timestamp deleted_at
+    }
+
+    DESIGNATIONS {
+        bigint id PK
+        string name UK
+        bool is_active
+    }
+
+    EMPLOYEES {
+        bigint id PK
+        bigint user_id FK
+        bigint company_id FK
+        bigint department_id FK
+        bigint designation_id FK
+        bool is_active
+        date joining_date
+        date resignation_date
+        timestamp deleted_at
+    }
+
+    TEAMS {
+        bigint id PK
+        bigint company_id FK
+        bigint department_id FK
+        string name
+        bool is_active
+        timestamp deleted_at
+    }
+
+    TEAM_MEMBERS {
+        bigint id PK
+        bigint team_id FK
+        bigint employee_id FK
+        enum role
+    }
+
+    %% ── Projects & performance ──────────────────────────────────────
+    PROJECTS {
+        bigint id PK
+        bigint company_id FK
+        bigint department_id FK
+        bigint client_id FK
+        bigint team_id FK
+        bigint assigned_employee_id FK
+        string project_name UK
+        date start_date
+        date end_date
+        decimal package_amount
+        decimal amount_paid
+        decimal amount_due
+        enum project_type
+        decimal sales_target
+        date target_deadline
+        decimal achieved_sales
+        enum health_status
+        enum business_status
+        timestamp deleted_at
+    }
+
+    PROJECT_MILESTONES {
+        bigint id PK
+        bigint company_id FK
+        bigint project_id FK
+        smallint sequence
+        date period_start
+        date period_end
+        decimal target_amount
+        decimal achieved_amount
+        enum status
+    }
+
+    SALES_REPORTS {
+        bigint id PK
+        bigint company_id FK
+        bigint project_id FK
+        date week_start
+        date week_end
+        decimal total_sales
+        int total_order_quantity
+        decimal total_amount_spent
+    }
+
+    PROJECT_SALES {
+        bigint id PK
+        bigint company_id FK
+        bigint project_id FK
+        bigint project_milestone_id FK
+        bigint team_id FK
+        bigint employee_id FK
+        date sale_date
+        decimal amount
+        string reference
+    }
+
+    PROJECT_ASSIGNMENTS {
+        bigint id PK
+        bigint company_id FK
+        bigint project_id FK
+        bigint team_id FK
+        bigint employee_id FK
+        timestamp assigned_at
+        timestamp unassigned_at
+        enum reason
+    }
+
+    PROJECT_NOTES {
+        bigint id PK
+        bigint company_id FK
+        bigint project_id FK
+        bigint user_id FK
+        text note
+    }
+
+    %% ── Call center (CRM side) ──────────────────────────────────────
+    CALL_CENTER_AGENTS {
+        bigint id PK
+        bigint user_id UK
+        bigint employee_id FK
+        bool is_active
+    }
+
+    CALL_CENTER_PICKS {
+        bigint id PK
+        uuid order_id
+        uuid business_id
+        bigint user_id FK
+        bigint employee_id FK
+        string invoice_no
+        string customer_phone
+        decimal order_total
+        string status_at_pick
+        int attempt_no
+        timestamp picked_at
+        timestamp released_at
+        enum outcome
+    }
+
+    CALL_CENTER_ACTIVITIES {
+        bigint id PK
+        bigint pick_id FK
+        uuid order_id
+        bigint user_id FK
+        bigint employee_id FK
+        enum action
+        string from_status
+        string to_status
+        text comment
+    }
+
+    %% ── boneek inventory database (external, no FK possible) ────────
+    BONEEK_ORDERS {
+        uuid id PK
+        uuid business_id
+        uuid branch_id
+        uuid customer_id
+        string invoice_no
+        string status
+        string previous_status
+        smallint type
+        decimal sub_total
+        decimal total_amount
+        decimal due_amount
+        string payment_status
+    }
+
+    BONEEK_ORDER_ITEMS {
+        uuid id PK
+        uuid order_id
+        uuid product_id
+        uuid sku_id
+        decimal quantity
+        decimal unit_price
+        decimal total_amount
+    }
+
+    BONEEK_ORDER_SHIPPING_ADDRESSES {
+        uuid id PK
+        uuid order_id
+        string contact_name
+        string contact_phone
+        text address
+    }
+
+    BONEEK_ORDER_LOGS {
+        uuid id PK
+        uuid order_id
+        smallint type
+        text note
+    }
+
+    BONEEK_CUSTOMERS {
+        uuid id PK
+        uuid account_id
+        string name
+        string phone
+        string email
+    }
+
+    BONEEK_PRODUCT_STOCKS {
+        uuid id PK
+        uuid branch_id
+        uuid product_id
+        uuid sku_id
+        decimal quantity
+    }
+
+    %% ── Relationships: identity & access ────────────────────────────
+    USERS   ||--o{ MODEL_HAS_ROLES          : "has roles (morph)"
+    USERS   ||--o{ MODEL_HAS_PERMISSIONS    : "direct permissions (morph)"
+    USERS   ||--o{ PERSONAL_ACCESS_TOKENS   : "tokens (morph)"
+    USERS   ||--o{ NOTIFICATIONS            : "receives (morph)"
+    USERS   ||--o{ ACTIVITY_LOGS            : "causes (morph)"
+    CLIENTS ||--o{ PERSONAL_ACCESS_TOKENS   : "tokens (morph)"
+    CLIENTS ||--o{ NOTIFICATIONS            : "receives (morph)"
+    ROLES   ||--o{ MODEL_HAS_ROLES          : "assigned to"
+    ROLES   ||--o{ ROLE_HAS_PERMISSIONS     : grants
+    PERMISSIONS ||--o{ MODEL_HAS_PERMISSIONS : "assigned to"
+    PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS  : "granted via"
+    USERS   ||--o| PASSWORD_RESET_TOKENS        : "reset (super-admin only)"
+    CLIENTS ||--o| CLIENT_PASSWORD_RESET_TOKENS : "reset (own broker)"
+
+    %% ── Relationships: organisation ─────────────────────────────────
+    COMPANIES   ||--o{ DEPARTMENTS : has
+    COMPANIES   ||--o{ TEAMS       : has
+    COMPANIES   ||--o{ EMPLOYEES   : employs
+    COMPANIES   ||--o{ PROJECTS    : owns
+    DEPARTMENTS ||--o{ TEAMS       : has
+    DEPARTMENTS ||--o{ EMPLOYEES   : has
+    DEPARTMENTS ||--o{ PROJECTS    : "scopes (from team)"
+    DESIGNATIONS |o--o{ EMPLOYEES  : "held by"
+    USERS       ||--o{ EMPLOYEES   : "employed as (1 per company)"
+    TEAMS       ||--o{ TEAM_MEMBERS : has
+    EMPLOYEES   ||--o{ TEAM_MEMBERS : "member of (leader or member)"
+
+    %% ── Relationships: projects ─────────────────────────────────────
+    CLIENTS   ||--o{ PROJECTS : "contracts"
+    TEAMS     ||--o{ PROJECTS : handles
+    EMPLOYEES |o--o{ PROJECTS : "assigned marketer"
+
+    PROJECTS  ||--o{ PROJECT_MILESTONES  : "split into monthly"
+    PROJECTS  ||--o{ SALES_REPORTS       : "weekly entry"
+    PROJECTS  ||--o{ PROJECT_SALES       : has
+    PROJECTS  ||--o{ PROJECT_ASSIGNMENTS : "ownership history"
+    PROJECTS  ||--o{ PROJECT_NOTES       : has
+    PROJECT_MILESTONES |o--o{ PROJECT_SALES : attributes
+    TEAMS     ||--o{ PROJECT_ASSIGNMENTS : has
+    EMPLOYEES ||--o{ PROJECT_ASSIGNMENTS : has
+    TEAMS     |o--o{ PROJECT_SALES : "credited"
+    EMPLOYEES |o--o{ PROJECT_SALES : "credited"
+    USERS     |o--o{ PROJECT_NOTES : authors
+    COMPANIES ||--o{ PROJECT_MILESTONES  : scopes
+    COMPANIES ||--o{ SALES_REPORTS       : scopes
+    COMPANIES ||--o{ PROJECT_SALES       : scopes
+    COMPANIES ||--o{ PROJECT_ASSIGNMENTS : scopes
+    COMPANIES ||--o{ PROJECT_NOTES       : scopes
+
+    %% ── Relationships: call center ──────────────────────────────────
+    USERS     ||--o| CALL_CENTER_AGENTS : "may be an agent"
+    EMPLOYEES ||--o{ CALL_CENTER_AGENTS : "payout identity"
+    USERS     ||--o{ CALL_CENTER_PICKS  : picks
+    EMPLOYEES ||--o{ CALL_CENTER_PICKS  : "credited"
+    CALL_CENTER_PICKS ||--o{ CALL_CENTER_ACTIVITIES : "timeline of"
+    USERS     ||--o{ CALL_CENTER_ACTIVITIES : performs
+
+    %% ── Cross-database link (id only, no FK, no join possible) ──────
+    CALL_CENTER_PICKS      }o..o| BONEEK_ORDERS : "order_id (no FK)"
+    CALL_CENTER_ACTIVITIES }o..o| BONEEK_ORDERS : "order_id (no FK)"
+
+    BONEEK_ORDERS ||--o{ BONEEK_ORDER_ITEMS              : contains
+    BONEEK_ORDERS ||--o| BONEEK_ORDER_SHIPPING_ADDRESSES : "ships to"
+    BONEEK_ORDERS ||--o{ BONEEK_ORDER_LOGS               : "merchant timeline"
+    BONEEK_CUSTOMERS ||--o{ BONEEK_ORDERS                : places
+    BONEEK_ORDER_ITEMS }o--o| BONEEK_PRODUCT_STOCKS      : "moves stock"
+    BONEEK_ORDERS ||--o| BONEEK_ORDERS                   : "dropshipping pair (parent_id)"

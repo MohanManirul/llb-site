@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        @php($faviconUrl = asset('boneek_favicon.png').'?v='.filemtime(public_path('boneek_favicon.png')))
+        <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
+        <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
+        <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
+        <title inertia>{{ config('app.name', 'StepUp CRM') }}</title>
+
+        {{-- React Fast Refresh preamble — must come before the Vite tag below,
+             or the React plugin throws "can't detect preamble" in dev. --}}
+        @viteReactRefresh
+        @vite(['resources/js/app.tsx', 'resources/css/app.css'])
+        @inertiaHead
+    </head>
+    <body class="font-sans antialiased">
+        <!-- Inertia mounts the React app right here -->
+        @inertia
+    </body>
+</html>

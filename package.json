@@ -1,0 +1,35 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "name": "boneek-crm",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "@types/node": "^22.10.2",
+        "@types/react": "^19.0.2",
+        "@types/react-dom": "^19.0.2",
+        "@vitejs/plugin-react": "^6.0.3",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^3.1",
+        "tailwindcss": "^4.0.0",
+        "typescript": "^5.7.2",
+        "vite": "^8.0.0"
+    },
+    "dependencies": {
+        "@heroicons/react": "^2.2.0",
+        "@inertiajs/react": "^3.4.0",
+        "axios": "^1.18.1",
+        "date-fns": "^4.4.0",
+        "react": "^19.2.7",
+        "react-date-range": "^2.0.1",
+        "react-dom": "^19.2.7",
+        "react-icons": "^5.7.0",
+        "react-markdown": "^10.1.0",
+        "recharts": "^3.10.1",
+        "remark-gfm": "^4.0.1"
+    }
+}

@@ -1,0 +1,1977 @@
+{
+  "info": {
+    "_postman_id": "7c2f9c40-1c2a-4d3e-9f10-stepupcrm0001",
+    "name": "StepUpCRM API v1",
+    "description": "StepUpCRM REST API (`/v1/*`).\n\nTwo route files feed the single `/v1` mount:\n- `routes/admin-v1.php` — staff API (`/v1/admin/*`), plus the shared `/v1/profile` and `/v1/notifications`.\n- `routes/client-v1.php` — client portal API (`/v1/client/*`).\n\nThere is no `/api/*` prefix and no `/v2`.\n\n## Setup\n1. Import `stepupcrm-api.postman_environment.json` and select it.\n2. Set `base_url` (default `https://llb.test`).\n3. Run **Auth → Staff login** — the test script stores `{{token}}` automatically.\n4. For portal endpoints run **Client Portal → Client login** — it stores `{{client_token}}`.\n\nCollection auth is Bearer `{{token}}`; the Client Portal folder overrides it with `{{client_token}}`.\n\n## Notes\n- Every request sends `Accept: application/json`.\n- List endpoints accept `search`, `page`, `per_page` (max 100), `sort`, `direction` (`asc`/`desc`). They are added as disabled query params — tick them in Postman to use them.\n- Endpoints that accept a file (company logo, user/client image, profile image, payment proof, CSV import) use `multipart/form-data`. Updates with a file are sent as `POST` with `_method=put|patch`, which is what the React forms do.\n- Call center `{order}` / `{orderItem}` ids are UUIDs on the `boneek` database.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://llb.test" },
+    { "key": "token", "value": "" },
+    { "key": "client_token", "value": "" },
+    { "key": "user_id", "value": "1" },
+    { "key": "role_id", "value": "1" },
+    { "key": "company_id", "value": "1" },
+    { "key": "department_id", "value": "1" },
+    { "key": "designation_id", "value": "1" },
+    { "key": "employee_id", "value": "1" },
+    { "key": "team_id", "value": "1" },
+    { "key": "client_id", "value": "1" },
+    { "key": "project_id", "value": "1" },
+    { "key": "note_id", "value": "1" },
+    { "key": "sales_report_id", "value": "1" },
+    { "key": "activity_log_id", "value": "1" },
+    { "key": "notification_id", "value": "" },
+    { "key": "agent_id", "value": "1" },
+    { "key": "agent_user_id", "value": "1" },
+    { "key": "order_id", "value": "00000000-0000-0000-0000-000000000000" },
+    { "key": "order_item_id", "value": "00000000-0000-0000-0000-000000000000" },
+    { "key": "business_id", "value": "00000000-0000-0000-0000-000000000000" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Staff login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const token = body.result?.token;",
+                  "pm.test('login returns a token', () => pm.expect(token).to.be.a('string'));",
+                  "if (token) {",
+                  "    pm.collectionVariables.set('token', token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/login",
+            "description": "Sanctum bearer token issue. Stores `{{token}}` from the response."
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/dashboard"
+          }
+        },
+        {
+          "name": "Dashboard report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/dashboard/report?date_from=&date_to=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "dashboard", "report"],
+              "query": [
+                { "key": "date_from", "value": "", "disabled": true },
+                { "key": "date_to", "value": "", "disabled": true, "description": "after_or_equal:date_from" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile & Notifications",
+      "description": "Shared between staff (`auth:sanctum`) and clients (`client`, `client-web`).",
+      "item": [
+        {
+          "name": "Show profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/profile"
+          }
+        },
+        {
+          "name": "Update profile (JSON)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": null,\n  \"password_confirmation\": null,\n  \"remove_image\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/profile"
+          }
+        },
+        {
+          "name": "Update profile (with image)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "_method", "value": "patch", "type": "text" },
+                { "key": "name", "value": "Admin User", "type": "text" },
+                { "key": "email", "value": "admin@example.com", "type": "text" },
+                { "key": "image", "type": "file", "src": [], "description": "jpg,jpeg,png,webp — max 2 MB" },
+                { "key": "remove_image", "value": "0", "type": "text", "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/profile"
+          }
+        },
+        {
+          "name": "List notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/notifications"
+          }
+        },
+        {
+          "name": "Mark all as read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/notifications/read-all"
+          }
+        },
+        {
+          "name": "Mark one as read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/notifications/{{notification_id}}/read"
+          }
+        },
+        {
+          "name": "Delete notification",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/notifications/{{notification_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Access & Permissions",
+      "item": [
+        {
+          "name": "Permission list",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/permissions"
+          }
+        },
+        {
+          "name": "Create staff login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Staff\",\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/staff"
+          }
+        },
+        {
+          "name": "Grant client login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/clients/{{client_id}}/login-access"
+          }
+        },
+        {
+          "name": "Revoke client login",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/clients/{{client_id}}/login-access"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/users?search=&page=1&per_page=15&sort=&direction=asc",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "users"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true, "description": "max 100" },
+                { "key": "sort", "value": "", "disabled": true },
+                { "key": "direction", "value": "asc", "disabled": true, "description": "asc|desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search users (picker)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/users/search?search=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "users", "search"],
+              "query": [{ "key": "search", "value": "", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Role options",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/users/roles"
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Jane Doe", "type": "text" },
+                { "key": "email", "value": "jane@example.com", "type": "text" },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "password", "value": "password123", "type": "text" },
+                { "key": "password_confirmation", "value": "password123", "type": "text" },
+                { "key": "role", "value": "admin", "type": "text", "description": "must exist in roles (guard web)" },
+                { "key": "image", "type": "file", "src": [], "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/users"
+          }
+        },
+        {
+          "name": "Show user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/users/{{user_id}}"
+          }
+        },
+        {
+          "name": "Update user (with image)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "_method", "value": "put", "type": "text" },
+                { "key": "name", "value": "Jane Doe", "type": "text" },
+                { "key": "email", "value": "jane@example.com", "type": "text" },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "role", "value": "admin", "type": "text" },
+                { "key": "password", "value": "", "type": "text", "disabled": true },
+                { "key": "password_confirmation", "value": "", "type": "text", "disabled": true },
+                { "key": "image", "type": "file", "src": [], "disabled": true },
+                { "key": "remove_image", "value": "0", "type": "text", "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/users/{{user_id}}"
+          }
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/users/{{user_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "List roles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/roles?search=&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "roles"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Permission groups",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/roles/permission-groups"
+          }
+        },
+        {
+          "name": "Create role",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"call center agent\",\n  \"permissions\": [\n    \"view call center orders\",\n    \"edit call center orders\"\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/roles"
+          }
+        },
+        {
+          "name": "Show role",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/roles/{{role_id}}"
+          }
+        },
+        {
+          "name": "Update role",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"call center agent\",\n  \"permissions\": [\n    \"view call center orders\"\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/roles/{{role_id}}"
+          }
+        },
+        {
+          "name": "Delete role",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/roles/{{role_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Companies",
+      "item": [
+        {
+          "name": "List companies",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/companies?search=&is_active=1&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "companies"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "1", "disabled": true, "description": "0|1" },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true },
+                { "key": "sort", "value": "", "disabled": true },
+                { "key": "direction", "value": "asc", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search companies",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/companies/search?search=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "companies", "search"],
+              "query": [{ "key": "search", "value": "", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Create company",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "StepUp Ltd", "type": "text" },
+                { "key": "email", "value": "info@stepup.test", "type": "text" },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "website", "value": "https://stepup.test", "type": "text" },
+                { "key": "address", "value": "Dhaka, Bangladesh", "type": "text" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "logo", "type": "file", "src": [], "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/companies"
+          }
+        },
+        {
+          "name": "Show company",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/companies/{{company_id}}"
+          }
+        },
+        {
+          "name": "Update company (with logo)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "_method", "value": "put", "type": "text" },
+                { "key": "name", "value": "StepUp Ltd", "type": "text" },
+                { "key": "email", "value": "info@stepup.test", "type": "text" },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "website", "value": "https://stepup.test", "type": "text" },
+                { "key": "address", "value": "Dhaka, Bangladesh", "type": "text" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "logo", "type": "file", "src": [], "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/companies/{{company_id}}"
+          }
+        },
+        {
+          "name": "Delete company",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/companies/{{company_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Departments",
+      "item": [
+        {
+          "name": "List departments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/departments?search=&is_active=active&company_id=1&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "departments"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "active", "disabled": true, "description": "active|inactive" },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search departments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/departments/search?search=&company_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "departments", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create department",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": 1,\n  \"name\": \"Sales\",\n  \"description\": \"Sales department\",\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/departments"
+          }
+        },
+        {
+          "name": "Show department",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/departments/{{department_id}}"
+          }
+        },
+        {
+          "name": "Update department",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": 1,\n  \"name\": \"Sales\",\n  \"description\": \"Sales department\",\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/departments/{{department_id}}"
+          }
+        },
+        {
+          "name": "Delete department",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/departments/{{department_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Designations",
+      "item": [
+        {
+          "name": "List designations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/designations?search=&is_active=active&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "designations"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "active", "disabled": true, "description": "active|inactive" },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search designations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/designations/search?search=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "designations", "search"],
+              "query": [{ "key": "search", "value": "", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Create designation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Software Engineer\",\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/designations"
+          }
+        },
+        {
+          "name": "Show designation",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/designations/{{designation_id}}"
+          }
+        },
+        {
+          "name": "Update designation",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Senior Software Engineer\",\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/designations/{{designation_id}}"
+          }
+        },
+        {
+          "name": "Delete designation",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/designations/{{designation_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List employees",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/employees?search=&is_active=1&company_id=&department_id=&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "employees"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "1", "disabled": true, "description": "0|1" },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search employees",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/employees/search?search=&company_id=&department_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "employees", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create employee",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"company_id\": 1,\n  \"department_id\": 1,\n  \"designation_id\": 1,\n  \"description\": null,\n  \"joining_date\": \"2026-01-01\",\n  \"resignation_date\": null,\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/employees"
+          }
+        },
+        {
+          "name": "Show employee",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/employees/{{employee_id}}"
+          }
+        },
+        {
+          "name": "Update employee",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"company_id\": 1,\n  \"department_id\": 1,\n  \"designation_id\": 1,\n  \"description\": null,\n  \"joining_date\": \"2026-01-01\",\n  \"resignation_date\": null,\n  \"is_active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/employees/{{employee_id}}"
+          }
+        },
+        {
+          "name": "Delete employee",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/employees/{{employee_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "List teams",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/teams?search=&is_active=1&company_id=&department_id=&team_id=&employee_id=&role=&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "teams"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "1", "disabled": true, "description": "0|1" },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true },
+                { "key": "team_id", "value": "{{team_id}}", "disabled": true },
+                { "key": "employee_id", "value": "{{employee_id}}", "disabled": true },
+                { "key": "role", "value": "leader", "disabled": true, "description": "leader|member" },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search teams",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/teams/search?search=&company_id=&department_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "teams", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search team members",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/teams/members/search?search=&company_id=&department_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "teams", "members", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create team",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": 1,\n  \"department_id\": 1,\n  \"name\": \"Team Alpha\",\n  \"description\": \"Sales team\",\n  \"is_active\": true,\n  \"members\": [\n    { \"employee_id\": 1, \"role\": \"leader\" },\n    { \"employee_id\": 2, \"role\": \"member\" }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/teams"
+          }
+        },
+        {
+          "name": "Show team",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/teams/{{team_id}}"
+          }
+        },
+        {
+          "name": "Update team",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": 1,\n  \"department_id\": 1,\n  \"name\": \"Team Alpha\",\n  \"description\": \"Sales team\",\n  \"is_active\": true,\n  \"members\": [\n    { \"employee_id\": 1, \"role\": \"leader\" }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/teams/{{team_id}}"
+          }
+        },
+        {
+          "name": "Delete team",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/teams/{{team_id}}"
+          }
+        },
+        {
+          "name": "My teams",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/my-teams"
+          }
+        },
+        {
+          "name": "My team detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/my-teams/{{team_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "List clients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/clients?search=&is_active=1&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "clients"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "is_active", "value": "1", "disabled": true, "description": "0|1" },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create client",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Acme Corp", "type": "text" },
+                { "key": "email", "value": "client@example.com", "type": "text" },
+                { "key": "password", "value": "password123", "type": "text", "disabled": true },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "address", "value": "Dhaka", "type": "text" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "image", "type": "file", "src": [], "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/clients"
+          }
+        },
+        {
+          "name": "Show client",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/clients/{{client_id}}"
+          }
+        },
+        {
+          "name": "Update client (with image)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "_method", "value": "put", "type": "text" },
+                { "key": "name", "value": "Acme Corp", "type": "text" },
+                { "key": "email", "value": "client@example.com", "type": "text" },
+                { "key": "phone", "value": "01700000000", "type": "text" },
+                { "key": "address", "value": "Dhaka", "type": "text" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "image", "type": "file", "src": [], "disabled": true }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/clients/{{client_id}}"
+          }
+        },
+        {
+          "name": "Delete client",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/clients/{{client_id}}"
+          }
+        },
+        {
+          "name": "Import clients (CSV)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [], "description": "CSV only — max 10 MB" }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/clients/import"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/projects?search=&company_id=&department_id=&team_id=&client_id=&health_status=&business_status=&performance=&date_from=&date_to=&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "projects"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true },
+                { "key": "department_id", "value": "{{department_id}}", "disabled": true },
+                { "key": "team_id", "value": "{{team_id}}", "disabled": true },
+                { "key": "client_id", "value": "{{client_id}}", "disabled": true },
+                { "key": "health_status", "value": "on_track", "disabled": true, "description": "upcoming|on_track|at_risk|off_track" },
+                { "key": "business_status", "value": "campaign_running", "disabled": true, "description": "business_setup|campaign_running|campaign_off|on_hold|completed|closed" },
+                { "key": "performance", "value": "risk", "disabled": true, "description": "risk|performing" },
+                { "key": "date_from", "value": "2026-01-01", "disabled": true, "description": "Y-m-d" },
+                { "key": "date_to", "value": "2026-12-31", "disabled": true, "description": "Y-m-d" },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "per_page", "value": "15", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}"
+          }
+        },
+        {
+          "name": "Search teams (project form)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/projects/teams/search?search=&company_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "projects", "teams", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "company_id", "value": "{{company_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search employees (project form)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/projects/employees/search?search=&team_id=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "projects", "employees", "search"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "team_id", "value": "{{team_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search clients (project form)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/projects/clients/search?search=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "projects", "clients", "search"],
+              "query": [{ "key": "search", "value": "", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": 1,\n  \"project_name\": \"Acme Growth\",\n  \"team_id\": 1,\n  \"client_id\": 1,\n  \"assigned_employee_id\": 1,\n  \"business_name\": \"Acme Corp\",\n  \"website_url\": \"https://acme.test\",\n  \"description\": \"Monthly retainer project.\",\n  \"start_date\": \"2026-01-01\",\n  \"contract_months\": 6,\n  \"contract_days\": 0,\n  \"contact_person\": \"John Doe\",\n  \"contact_email\": \"john@acme.test\",\n  \"contact_phone\": \"01700000000\",\n  \"package_amount\": 50000,\n  \"total_amount\": 50000,\n  \"amount_paid\": 0,\n  \"next_payment_date\": \"2026-02-01\",\n  \"project_type\": \"regular\",\n  \"sales_target\": null,\n  \"target_start_date\": null,\n  \"target_months\": null,\n  \"target_days\": null,\n  \"business_status\": \"business_setup\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects",
+            "description": "`project_type` is `regular` or `challenge_based`. For `challenge_based`, `sales_target` and `target_months` become required."
+          }
+        },
+        {
+          "name": "Update project",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_name\": \"Acme Growth\",\n  \"team_id\": 1,\n  \"client_id\": 1,\n  \"assigned_employee_id\": 1,\n  \"business_name\": \"Acme Corp\",\n  \"website_url\": \"https://acme.test\",\n  \"description\": \"Monthly retainer project.\",\n  \"start_date\": \"2026-01-01\",\n  \"contract_months\": 6,\n  \"contract_days\": 0,\n  \"contact_person\": \"John Doe\",\n  \"contact_email\": \"john@acme.test\",\n  \"contact_phone\": \"01700000000\",\n  \"package_amount\": 50000,\n  \"total_amount\": 50000,\n  \"amount_paid\": 0,\n  \"next_payment_date\": \"2026-02-01\",\n  \"project_type\": \"regular\",\n  \"business_status\": \"campaign_running\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}"
+          }
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}"
+          }
+        },
+        {
+          "name": "Update business status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_status\": \"campaign_running\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/business-status"
+          }
+        },
+        {
+          "name": "Notes — list",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/notes"
+          }
+        },
+        {
+          "name": "Notes — create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Client asked for a weekly call.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/notes"
+          }
+        },
+        {
+          "name": "Notes — update",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Updated note text.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/notes/{{note_id}}"
+          }
+        },
+        {
+          "name": "Notes — delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/notes/{{note_id}}"
+          }
+        },
+        {
+          "name": "Sales reports — list",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/projects/{{project_id}}/sales-reports?week_start=&week_end=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "projects", "{{project_id}}", "sales-reports"],
+              "query": [
+                { "key": "week_start", "value": "", "disabled": true },
+                { "key": "week_end", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sales reports — create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"week_start\": \"2026-08-10\",\n  \"week_end\": \"2026-08-16\",\n  \"total_sales\": 120000,\n  \"total_order_quantity\": 240,\n  \"total_amount_spent\": 30000,\n  \"description\": \"Weekly summary.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/sales-reports"
+          }
+        },
+        {
+          "name": "Sales reports — update",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"week_start\": \"2026-08-10\",\n  \"week_end\": \"2026-08-16\",\n  \"total_sales\": 125000,\n  \"total_order_quantity\": 250,\n  \"total_amount_spent\": 31000,\n  \"description\": \"Corrected figures.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/sales-reports/{{sales_report_id}}"
+          }
+        },
+        {
+          "name": "Sales reports — delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/sales-reports/{{sales_report_id}}"
+          }
+        },
+        {
+          "name": "Payments — record a payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "payment_type", "value": "bank_transfer", "type": "text", "description": "cash|bank_transfer|cheque|card|mobile_wallet|ssl_gateway|other" },
+                { "key": "amount", "value": "10000", "type": "text", "description": "cannot exceed the project's due amount" },
+                { "key": "payment_date", "value": "2026-08-19", "type": "text", "description": "Y-m-d, not in the future" },
+                { "key": "next_payment_date", "value": "2026-09-19", "type": "text", "description": "Y-m-d, must be in the future" },
+                { "key": "reference_number", "value": "TRX-000123", "type": "text", "description": "required for bank_transfer, cheque, card, mobile_wallet, ssl_gateway" },
+                { "key": "bank_name", "value": "BRAC Bank", "type": "text", "description": "required for bank_transfer" },
+                { "key": "cheque_number", "value": "", "type": "text", "disabled": true, "description": "required for cheque" },
+                { "key": "card_last_four", "value": "", "type": "text", "disabled": true },
+                { "key": "wallet_type", "value": "", "type": "text", "disabled": true, "description": "bkash|nagad|rocket — required for mobile_wallet" },
+                { "key": "payment_method", "value": "", "type": "text", "disabled": true, "description": "required for other" },
+                { "key": "notes", "value": "", "type": "text", "disabled": true },
+                { "key": "proof", "type": "file", "src": [], "disabled": true, "description": "jpeg,png,jpg,gif,webp,pdf — max 5 MB" }
+              ]
+            },
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/payments"
+          }
+        },
+        {
+          "name": "Payments — status",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/payments/status"
+          }
+        },
+        {
+          "name": "Payments — history",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/projects/{{project_id}}/payments/history"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activity Logs",
+      "item": [
+        {
+          "name": "List activity logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/admin/activity-logs?search=&type=&subject_type=&date_from=&date_to=&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "activity-logs"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "type", "value": "", "disabled": true },
+                { "key": "subject_type", "value": "", "disabled": true },
+                { "key": "date_from", "value": "2026-08-01", "disabled": true, "description": "Y-m-d" },
+                { "key": "date_to", "value": "2026-08-31", "disabled": true, "description": "Y-m-d" },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter options",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/activity-logs/filters"
+          }
+        },
+        {
+          "name": "Delete activity log",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/admin/activity-logs/{{activity_log_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Call Center",
+      "description": "The `{order}` binding resolves against the **boneek** (inventory) database and is UUID-keyed. Editing endpoints run `OrderEditAccess` — the agent must be holding the order, the permission alone is not enough.",
+      "item": [
+        {
+          "name": "Queue",
+          "item": [
+            {
+              "name": "New orders",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/new-orders?search=&business_id=&order_type=&date_from=&date_to=&page=1&per_page=15",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "new-orders"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "business_id", "value": "{{business_id}}", "disabled": true, "description": "uuid, boneek.businesses" },
+                    { "key": "order_type", "value": "", "disabled": true, "description": "callable OrderType values" },
+                    { "key": "date_from", "value": "", "disabled": true },
+                    { "key": "date_to", "value": "", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "per_page", "value": "15", "disabled": true },
+                    { "key": "sort", "value": "", "disabled": true },
+                    { "key": "direction", "value": "desc", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Picked orders",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/picked-orders?search=&business_id=&status=&agent_user_id=&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "picked-orders"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "business_id", "value": "{{business_id}}", "disabled": true },
+                    { "key": "status", "value": "approved", "disabled": true, "description": "pending|approved|follow_up|processing|hold|cancelled|send_to_supplier|…" },
+                    { "key": "agent_user_id", "value": "{{agent_user_id}}", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "per_page", "value": "15", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Picked order stats",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/picked-orders/stats?business_id=&agent_user_id=&date_from=&date_to=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "picked-orders", "stats"],
+                  "query": [
+                    { "key": "business_id", "value": "{{business_id}}", "disabled": true },
+                    { "key": "agent_user_id", "value": "{{agent_user_id}}", "disabled": true },
+                    { "key": "date_from", "value": "", "disabled": true },
+                    { "key": "date_to", "value": "", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Filter options",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/filter-options"
+              }
+            },
+            {
+              "name": "Courier score",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/courier-score?phone=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "courier-score"],
+                  "query": [{ "key": "phone", "value": "01700000000", "disabled": true }]
+                }
+              }
+            },
+            {
+              "name": "Search businesses",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/businesses/search?search=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "businesses", "search"],
+                  "query": [{ "key": "search", "value": "", "disabled": true }]
+                }
+              }
+            },
+            {
+              "name": "Search agents",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agents/search?search=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agents", "search"],
+                  "query": [{ "key": "search", "value": "", "disabled": true }]
+                }
+              }
+            },
+            {
+              "name": "Bulk pick",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_ids\": [\n    \"{{order_id}}\"\n  ]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/bulk-pick",
+                "description": "1–100 order uuids."
+              }
+            },
+            {
+              "name": "Bulk unpick",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_ids\": [\n    \"{{order_id}}\"\n  ]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/bulk-unpick"
+              }
+            },
+            {
+              "name": "Pick one order",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/pick"
+              }
+            },
+            {
+              "name": "Unpick one order",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/pick"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order details & editing",
+          "item": [
+            {
+              "name": "Show order",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}"
+              }
+            },
+            {
+              "name": "Order history",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/history"
+              }
+            },
+            {
+              "name": "Update status",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"cancelled\",\n  \"reason_type\": 1,\n  \"reason_note\": \"Customer unreachable\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/status",
+                "description": "Agent-settable statuses: `approved`, `cancelled`, `follow_up`, and `send_to_supplier` on a dropshipping order that is already `approved`.\n\n`reason_type` / `reason_note` are **required** for `cancelled` and `follow_up`, and **prohibited** for `approved`.\n\nCancellation reasons: 1 customer unreachable, 2 payment issue, 3 changed mind, 4 not interested, 5 delivery issue, 6 out of area, 7 stock out, 8 price issue, 9 duplicate, 10 fake, 0 other.\nFollow-up reasons: 1 switch off, 2 did not receive, 3 busy, 4 inform later, 5 talk to support, 0 other.\n`reason_note` max 50 chars."
+              }
+            },
+            {
+              "name": "Lookups",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/lookups"
+              }
+            },
+            {
+              "name": "Search products (Add Product picker)",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/products/search?search=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "orders", "{{order_id}}", "products", "search"],
+                  "query": [{ "key": "search", "value": "", "disabled": true }]
+                },
+                "description": "Scoped to the supplier the order already carries, and to orderable products only."
+              }
+            },
+            {
+              "name": "Add items",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_items\": [\n    {\n      \"product_id\": \"00000000-0000-0000-0000-000000000000\",\n      \"sku_id\": null,\n      \"unit_id\": null,\n      \"quantity\": 1\n    }\n  ]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/items",
+                "description": "Adding a product already on the order tops up the existing line at the price it was sold at."
+              }
+            },
+            {
+              "name": "Update item quantity",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 2\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/items/{{order_item_id}}/quantity",
+                "description": "Whole units only — enforced on the endpoint, not just in React."
+              }
+            },
+            {
+              "name": "Update item discount",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"discount_type\": \"fixed\",\n  \"discount_value\": 50\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/items/{{order_item_id}}/discount",
+                "description": "`discount_type`: `fixed` or `percentage`."
+              }
+            },
+            {
+              "name": "Remove item",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/items/{{order_item_id}}",
+                "description": "Removing the **last** item is refused — cancel the order instead."
+              }
+            },
+            {
+              "name": "Update order discount",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"discount_type\": \"percentage\",\n  \"discount_value\": 10\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/discount",
+                "description": "A fixed discount above the subtotal is rejected outright."
+              }
+            },
+            {
+              "name": "Update shipping charge",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"shipping_charge\": 120,\n  \"delivery_partner_id\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/shipping-charge"
+              }
+            },
+            {
+              "name": "Update shipping address",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"John Doe\",\n  \"contact_phone\": \"01700000000\",\n  \"address\": \"House 1, Road 2, Dhaka\",\n  \"country_id\": null,\n  \"division_id\": null,\n  \"district_id\": null,\n  \"area_id\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/shipping-address",
+                "description": "Location ids are boneek uuids — fetch them from **Locations**."
+              }
+            },
+            {
+              "name": "Update customer (name)",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"field\": \"name\",\n  \"name\": \"John Doe\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/customer",
+                "description": "`field` is `name`, `contact` or `tag`.\n- `name` → `name`\n- `contact` → `phone`, `alternative_phone`, `email`\n- `tag` → `customer_tag_id`\n\nRenaming the customer also renames their ledger account, mirroring inventory's `CustomerObserver`."
+              }
+            },
+            {
+              "name": "Update customer (contact)",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"field\": \"contact\",\n  \"phone\": \"01700000000\",\n  \"alternative_phone\": null,\n  \"email\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/customer"
+              }
+            },
+            {
+              "name": "Update customer (tag)",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"field\": \"tag\",\n  \"customer_tag_id\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/customer"
+              }
+            },
+            {
+              "name": "Update order note",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"additional_note\": \"Call after 6 pm.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/note"
+              }
+            },
+            {
+              "name": "Add timeline comment",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"comment\": \"Customer confirmed the address.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/orders/{{order_id}}/comments",
+                "description": "CRM-only (`call_center_activities`) — the merchant never sees it. Not behind the edit permission."
+              }
+            },
+            {
+              "name": "Locations",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/locations/divisions?parent_id=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "locations", "divisions"],
+                  "query": [{ "key": "parent_id", "value": "", "disabled": true }]
+                },
+                "description": "Path segment must be `divisions`, `districts` or `areas`."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Agents",
+          "item": [
+            {
+              "name": "List agents",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agents?search=&is_active=1&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agents"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "is_active", "value": "1", "disabled": true, "description": "0|1" },
+                    { "key": "page", "value": "1", "disabled": true },
+                    { "key": "per_page", "value": "15", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Agent candidates",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agents/candidates?search=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agents", "candidates"],
+                  "query": [{ "key": "search", "value": "", "disabled": true }]
+                }
+              }
+            },
+            {
+              "name": "Create agent",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user_id\": 1,\n  \"employee_id\": 1,\n  \"is_active\": true\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/agents"
+              }
+            },
+            {
+              "name": "Update agent",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee_id\": 1,\n  \"is_active\": false\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{base_url}}/v1/admin/call-center/agents/{{agent_id}}"
+              }
+            },
+            {
+              "name": "Delete agent",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/agents/{{agent_id}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Agent performance",
+          "description": "Read-only. A separate door from the agent's own picked orders — a report stays readable after the pick closes.",
+          "item": [
+            {
+              "name": "Performance list",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agent-performance?search=&agent_user_id=&date_from=&date_to=&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agent-performance"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "agent_user_id", "value": "{{agent_user_id}}", "disabled": true },
+                    { "key": "date_from", "value": "", "disabled": true },
+                    { "key": "date_to", "value": "", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Performance stats",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agent-performance/stats?date_from=&date_to=&agent_user_id=",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agent-performance", "stats"],
+                  "query": [
+                    { "key": "date_from", "value": "", "disabled": true },
+                    { "key": "date_to", "value": "", "disabled": true },
+                    { "key": "agent_user_id", "value": "{{agent_user_id}}", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Agent report",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/agent-performance/{{agent_user_id}}"
+              }
+            },
+            {
+              "name": "Agent report — orders",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/v1/admin/call-center/agent-performance/{{agent_user_id}}/orders?search=&outcome=&date_from=&date_to=&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["v1", "admin", "call-center", "agent-performance", "{{agent_user_id}}", "orders"],
+                  "query": [
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "outcome", "value": "approved", "disabled": true, "description": "approved|cancelled|follow_up|released|stale" },
+                    { "key": "date_from", "value": "", "disabled": true },
+                    { "key": "date_to", "value": "", "disabled": true },
+                    { "key": "page", "value": "1", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Agent report — one order",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/agent-performance/{{agent_user_id}}/orders/{{order_id}}"
+              }
+            },
+            {
+              "name": "Agent report — order history",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": "{{base_url}}/v1/admin/call-center/agent-performance/{{agent_user_id}}/orders/{{order_id}}/history"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Client Portal",
+      "description": "Guards: `client` (Bearer) and `client-web` (session), plus `EnsureClientAudience`. Requests here send `{{client_token}}`.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+      },
+      "item": [
+        {
+          "name": "Client login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const token = body.result?.token;",
+                  "pm.test('client login returns a token', () => pm.expect(token).to.be.a('string'));",
+                  "if (token) {",
+                  "    pm.collectionVariables.set('client_token', token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"client@example.com\",\n  \"password\": \"password\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{base_url}}/v1/client/login"
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/logout"
+          }
+        },
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/dashboard"
+          }
+        },
+        {
+          "name": "Dashboard report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/client/dashboard/report?date_from=&date_to=",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "client", "dashboard", "report"],
+              "query": [
+                { "key": "date_from", "value": "", "disabled": true },
+                { "key": "date_to", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/v1/client/projects?search=&health_status=&business_status=&date_from=&date_to=&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "client", "projects"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "health_status", "value": "on_track", "disabled": true, "description": "upcoming|on_track|at_risk|off_track" },
+                { "key": "business_status", "value": "campaign_running", "disabled": true, "description": "business_setup|campaign_running|campaign_off|on_hold|completed|closed" },
+                { "key": "date_from", "value": "", "disabled": true, "description": "Y-m-d" },
+                { "key": "date_to", "value": "", "disabled": true, "description": "Y-m-d" },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/projects/{{project_id}}"
+          }
+        },
+        {
+          "name": "Payments — status",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/projects/{{project_id}}/payments/status"
+          }
+        },
+        {
+          "name": "Payments — history",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/projects/{{project_id}}/payments/history"
+          }
+        },
+        {
+          "name": "Notifications — list",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/notifications"
+          }
+        },
+        {
+          "name": "Notifications — mark all read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/notifications/read-all"
+          }
+        },
+        {
+          "name": "Notifications — mark one read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/notifications/{{notification_id}}/read"
+          }
+        },
+        {
+          "name": "Notifications — delete",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{base_url}}/v1/client/notifications/{{notification_id}}"
+          }
+        }
+      ]
+    }
+  ]
+}

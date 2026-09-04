@@ -1,0 +1,129 @@
+# Staging deployment for Coolify (Docker Compose build pack).
+# Not for local development - use docker-compose.local.yml for that.
+#
+# MySQL is a separate Coolify resource on the same server; the app must
+# have "Connect To Predefined Network" enabled in Coolify so its hostname
+# (the resource UUID) resolves from this container.
+#
+# All secrets/config come from the Coolify UI environment tab. Coolify
+# writes them to the deployment .env, which compose uses for the ${VAR}
+# interpolation below and as env_file for anything not listed here.
+#
+# QUEUE_CONNECTION defaults to "database" and the `queue` service below is
+# what drains it. Every queued job rides the default queue, so one bare
+# `queue:work` covers all of them. If this were "sync" instead, queued jobs
+# would run inline inside the web request and get killed by the PHP/nginx
+# timeout. Cache/sessions use the database - no Redis needed at this scale.
+#
+# The queue worker and the scheduler are separate containers because the base
+# image runs one process. See DEPLOY.md; without the scheduler
+# `call-center:reconcile` never fires and picks whose order changed in boneek
+# sit in an agent's list forever, and without the worker anything dispatched
+# parks in the `jobs` table with nothing to pick it up.
+
+x-app-env: &app-env
+  PHP_OPCACHE_ENABLE: "1"
+  SSL_MODE: "off"
+  APP_NAME: "${APP_NAME:-StepUp CRM}"
+  APP_ENV: "${APP_ENV:-staging}"
+  APP_KEY: "${APP_KEY}"
+  APP_DEBUG: "${APP_DEBUG:-false}"
+  APP_URL: "${APP_URL}"
+  # stderr keeps feeding Alloy/Loki; daily also writes storage/logs so
+  # Log Viewer has files to show. LOG_DAILY_DAYS prunes them.
+  LOG_CHANNEL: "${LOG_CHANNEL:-stack}"
+  LOG_STACK: "${LOG_STACK:-stderr,daily}"
+  LOG_LEVEL: "${LOG_LEVEL:-debug}"
+  LOG_DAILY_DAYS: "${LOG_DAILY_DAYS:-14}"
+  LOG_VIEWER_API_STATEFUL_DOMAINS: "${LOG_VIEWER_API_STATEFUL_DOMAINS}"
+  DB_CONNECTION: "${DB_CONNECTION:-mysql}"
+  DB_HOST: "${DB_HOST}"
+  DB_PORT: "${DB_PORT:-3306}"
+  DB_DATABASE: "${DB_DATABASE}"
+  DB_USERNAME: "${DB_USERNAME}"
+  DB_PASSWORD: "${DB_PASSWORD}"
+  CACHE_STORE: "${CACHE_STORE:-database}"
+  SESSION_DRIVER: "${SESSION_DRIVER:-database}"
+  QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
+  # Must stay above the worker's --timeout, or a job still running gets
+  # released back onto the queue and a second worker starts it again. The
+  # framework default is 90, which is under the 900 the worker allows.
+  DB_QUEUE_RETRY_AFTER: "${DB_QUEUE_RETRY_AFTER:-1200}"
+  FILESYSTEM_DISK: "${FILESYSTEM_DISK:-public}"
+  MAIL_MAILER: "${MAIL_MAILER:-log}"
+  SESSION_DOMAIN: "${SESSION_DOMAIN}"
+  SANCTUM_STATEFUL_DOMAINS: "${SANCTUM_STATEFUL_DOMAINS}"
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: boneek-crm-staging
+  restart: unless-stopped
+  env_file:
+    - path: .env
+      required: false
+  volumes:
+    - storage-app:/var/www/html/storage/app
+    # Log Viewer (/admin/log-viewer) reads these files. Without the volume
+    # every log is lost on redeploy, because the container filesystem is
+    # rebuilt each time. Shared with the worker and the scheduler so their
+    # lines show up too.
+    - storage-logs:/var/www/html/storage/logs
+
+services:
+  web:
+    <<: *app
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    environment:
+      <<: *app-env
+      # Only the web container migrates and links storage. Two containers
+      # running the migrator on deploy race each other.
+      AUTORUN_ENABLED: "true"
+      AUTORUN_LARAVEL_MIGRATION: "true"
+      AUTORUN_LARAVEL_STORAGE_LINK: "true"
+
+  queue:
+    <<: *app
+    environment:
+      <<: *app-env
+    command: ["php", "artisan", "queue:work", "--tries=1", "--timeout=900", "--sleep=1"]
+    # Let a job in flight use its full 900s timeout before docker kills it,
+    # the same pairing docker-compose.local.yml uses.
+    stop_signal: SIGTERM
+    stop_grace_period: 910s
+    # Overrides the Dockerfile HEALTHCHECK, which curls /up. There is no
+    # web server in this container, so that probe would sit unhealthy
+    # forever and Coolify would call every deploy a failure.
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "queue:work"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  scheduler:
+    <<: *app
+    environment:
+      <<: *app-env
+    command: ["php", "artisan", "schedule:work"]
+    # Overrides the Dockerfile HEALTHCHECK, which curls /up. There is no
+    # web server in this container, so that probe would sit unhealthy
+    # forever and Coolify would call every deploy a failure.
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "schedule:work"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  storage-app:
+  storage-logs:

@@ -1,0 +1,211 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@font-face {
+    font-family: 'CurrencySign';
+    src:
+        local('Nirmala UI Bold'), local('NirmalaUI-Bold'),
+        local('Noto Sans Bengali Bold'), local('NotoSansBengali-Bold'),
+        local('Bangla Sangam MN Bold'), local('Bangla MN Bold'),
+        local('Mukti Narrow Bold'), local('Kalpurush');
+    unicode-range: U+09F3;
+    font-display: swap;
+}
+
+/*
+ * Tailwind v4 removed the default `cursor: pointer` on buttons.
+ * Restore it globally for all enabled buttons (and links acting as buttons),
+ * so we don't have to add `cursor-pointer` to every element.
+ */
+@layer base {
+    /* The app shell owns the only scroll container; the document must not add
+       a second scrollbar behind it. */
+    html,
+    body {
+        overflow: hidden;
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+
+
+@theme {
+    --font-sans:
+        'CurrencySign', 'Inter', ui-sans-serif, system-ui, -apple-system,
+        'Segoe UI', sans-serif;
+
+    /* ...existing tokens... */
+    --color-brand: #002044;
+    --color-brand-accent: #2c4dd4;
+    --color-brand-muted: #b2c1cc;
+
+    /*
+     * Surfaces. The shell is a rounded sheet lifted off a brand-navy backdrop:
+     * header and backdrop are --color-shell, the sidebar and page canvas sit on
+     * top of it. Values follow the inventory frontend, near-black included.
+     */
+    --color-shell: #1a1a1a;
+    --color-shell-soft: #2c2c2e;
+    --color-canvas: #f1f1f1;
+    --color-sidebar: #ebebeb;
+    --color-hairline: #0000001a;
+
+    /* Ink. #303030 is the body default — not black, not gray-700. */
+    --color-ink: #303030;
+    --color-ink-soft: #3e3e3e;
+    --color-ink-muted: #6b7280;
+
+    /* Field surface, shared by every input and select. */
+    --color-field: #fbfbfb;
+
+    /* Radii the reference uses at each scale. */
+    --radius-card: 16px;
+    --radius-table: 20px;
+    --radius-control: 10px;
+    --radius-chip: 8px;
+
+    /* Progress bar animation */
+    --animate-progress: progress 1s ease-in-out infinite;
+
+    @keyframes progress {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(400%);
+        }
+    }
+}
+/*
+ * react-date-range ships its own stylesheet; these pull the picker onto the
+ * inventory frontend's design — a pill preset rail with a tick, square day
+ * selection, and month names on the arrow row. Scoped to .rdr-popover so the
+ * extra class outranks the library's own single-class rules whichever order
+ * the two sheets land in the bundle.
+ */
+.rdr-popover .rdrDefinedRangesWrapper {
+    width: 190px;
+    padding: 6px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.rdr-popover .rdrStaticRange {
+    border-bottom: 0;
+}
+
+.rdr-popover .rdrStaticRangeLabel {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--color-ink);
+}
+
+.rdr-popover .rdrStaticRange:hover .rdrStaticRangeLabel,
+.rdr-popover .rdrStaticRange:focus .rdrStaticRangeLabel {
+    background: #f9fafb;
+}
+
+.rdr-popover .rdrStaticRangeSelected .rdrStaticRangeLabel {
+    background: #f3f4f6;
+    font-weight: 500;
+}
+
+.rdr-popover .rdrStaticRangeSelected .rdrStaticRangeLabel::after {
+    content: '\2713';
+    float: right;
+}
+
+/* "Custom" only reports where the window came from — it gets no tick. */
+.rdr-popover .rdrStaticRange:last-child .rdrStaticRangeLabel::after {
+    content: none;
+}
+
+.rdr-popover .rdrStaticRange:nth-child(2),
+.rdr-popover .rdrStaticRange:nth-child(7) {
+    margin-bottom: 9px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/*
+ * The library stacks the arrow row above the month names. Collapsing it lets
+ * the arrows sit on the same line as the names, as the reference has them.
+ */
+.rdr-popover .rdrMonthAndYearWrapper {
+    height: 0;
+    padding: 0;
+    align-items: flex-start;
+}
+
+.rdr-popover .rdrMonthAndYearPickers {
+    display: none;
+}
+
+.rdr-popover .rdrNextPrevButton {
+    position: relative;
+    top: 8px;
+    margin: 0 12px;
+    background: transparent;
+}
+
+.rdr-popover .rdrNextPrevButton:hover {
+    background: #f3f4f6;
+}
+
+.rdr-popover .rdrPprevButton i {
+    border-color: transparent var(--color-ink) transparent transparent;
+}
+
+.rdr-popover .rdrNextButton i {
+    border-color: transparent transparent transparent var(--color-ink);
+}
+
+.rdr-popover .rdrMonthName {
+    padding: 8px 0 4px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.rdr-popover .rdrWeekDay {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+}
+
+.rdr-popover .rdrDayNumber span {
+    font-size: 13px;
+    color: var(--color-ink);
+}
+
+.rdr-popover .rdrDayPassive .rdrDayNumber span {
+    color: #d1d5db;
+}
+
+/* Square-with-rounded-corners selection, and an in-range bar that stays whole. */
+.rdr-popover .rdrStartEdge,
+.rdr-popover .rdrDayStartPreview {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.rdr-popover .rdrEndEdge,
+.rdr-popover .rdrDayEndPreview {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.rdr-popover .rdrSelected {
+    border-radius: 6px;
+}
+
+.rdr-popover .rdrDayToday .rdrDayNumber span::after {
+    background: var(--color-brand-accent);
+}
