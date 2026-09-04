@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Program;
+use App\Models\StudyMaterial;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -47,9 +50,24 @@ class ApiDashboardReportTest extends TestCase
             ]);
     }
 
-    public function test_the_stat_card_carries_the_live_user_count(): void
+    public function test_the_stat_cards_carry_the_published_material_counts(): void
     {
-        User::factory()->count(3)->create();
+        $program = Program::create([
+            'slug' => 'llb-hons', 'name_bn' => 'অনার্স', 'name_en' => 'LLB (Hons)',
+        ]);
+        $subject = Subject::create([
+            'program_id' => $program->id, 'slug' => 'jurisprudence',
+            'name_bn' => 'আইনতত্ত্ব', 'name_en' => 'Jurisprudence',
+        ]);
+
+        StudyMaterial::create([
+            'type' => 'suggestion', 'slug' => 's-1', 'title_bn' => 'সাজেশন',
+            'subject_id' => $subject->id, 'status' => 'published', 'published_at' => now()->subMinute(),
+        ]);
+        StudyMaterial::create([
+            'type' => 'book', 'slug' => 'b-draft', 'title_bn' => 'খসড়া বই',
+            'subject_id' => $subject->id,
+        ]);
 
         $response = $this->actingAs(User::factory()->create())
             ->getJson('/v1/admin/dashboard/report')
@@ -57,7 +75,9 @@ class ApiDashboardReportTest extends TestCase
 
         $cards = collect($response->json('result.cards'))->pluck('value', 'label');
 
-        $this->assertSame('4', $cards['Users']);
+        $this->assertSame('1', $cards['Suggestions']);
+        $this->assertSame('0', $cards['Books']);
+        $this->assertSame('1', $cards['Subjects']);
     }
 
     /** The range picker has to actually narrow the count. */
@@ -69,7 +89,7 @@ class ApiDashboardReportTest extends TestCase
 
         $cards = collect($response->json('result.cards'))->pluck('value', 'label');
 
-        $this->assertSame('0', $cards['Users']);
+        $this->assertSame('0', $cards['Suggestions']);
         $this->assertTrue($response->json('result.range.scoped'));
     }
 

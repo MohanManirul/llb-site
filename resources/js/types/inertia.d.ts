@@ -11,7 +11,17 @@ export interface Impersonation {
     since: number;
 }
 
+export interface SharedProgramRef {
+    slug: string;
+    name: { bn: string | null; en: string | null };
+    short_name: { bn: string | null; en: string | null };
+    has_levels: boolean;
+    has_exam_stages: boolean;
+}
+
 export interface SharedPageProps {
+    locale: 'bn' | 'en';
+    programs: SharedProgramRef[];
     auth: {
         user: AuthUser | null;
     };

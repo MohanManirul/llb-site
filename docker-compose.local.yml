@@ -1,4 +1,4 @@
-# StepUp CRM (llb-pdf) — local development.
+# LLB Study — local development.
 #
 # Standalone stack: its own network, Postgres and Mailpit, sharing nothing with
 # inventory / LLB Logo-*. Host ports live in 8030-8034, clear of inventory

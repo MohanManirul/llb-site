@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -27,6 +28,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('v1')
                 ->name('v1.')
                 ->group(base_path('routes/admin-v1.php'));
+
+            // The anonymous public API. Mounted on an explicit middleware
+            // array, not the `api` group: statefulApi() prepends session
+            // middleware to `api`, which would start a session and set a
+            // cookie on every anonymous GET — killing response caching for
+            // no benefit. Staying under the v1/ prefix keeps the JSON error
+            // rendering and the FK-violation handler below.
+            Route::middleware([
+                SubstituteBindings::class,
+                'throttle:public',
+            ])
+                ->prefix('v1/public')
+                ->name('v1.public.')
+                ->group(base_path('routes/public-v1.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
@@ -49,6 +64,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // tokens. This only affects the `api` group — the `web`/Inertia stack
         // below is unchanged. এর মানে auth:sanctum একই ডোমেইনের ব্রাউজার রিকোয়েস্টে session cookie দিয়েও পাস করবে, আর মোবাইল/এক্সটার্নাল ক্লায়েন্টে Bearer token দিয়ে। তাই একই middleware দুই ধরনের ক্লায়েন্ট সামলাচ্ছে — এটাই ডিজাইন, ভাঙার দরকার নেই।
         $middleware->statefulApi();
+
+        // The locale cookie is a plain preference — leaving it unencrypted
+        // keeps it readable before the encrypter runs and in tests.
+        $middleware->encryptCookies(except: ['locale', 'llb_vid']);
 
         // Spatie route middleware: `role:super-admin`, `permission:users.view`
         $middleware->alias([
@@ -79,8 +98,13 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // 23503 is the Postgres SQLSTATE; SQLite and MySQL raise 23000 with a
+        // foreign-key message, which is what the test suite exercises.
         $exceptions->render(function (QueryException $e, Request $request) {
-            if ($e->getCode() === '23503' && $request->is('v1/*')) {
+            $isForeignKeyViolation = $e->getCode() === '23503'
+                || ($e->getCode() === '23000' && stripos($e->getMessage(), 'foreign key') !== false);
+
+            if ($isForeignKeyViolation && $request->is('v1/*')) {
                 return ApiResponse::respondError(
                     'This record is linked to other data and cannot be modified or deleted.',
                     409,
@@ -90,20 +114,28 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // Render friendly Inertia pages for missing routes (404) and pages
-        // the permission middleware refused (403).
+        // the permission middleware refused (403). The staff side and the
+        // public site get different pages — a student hitting a dead link
+        // must not land on an admin-branded screen.
         $exceptions->respond(function (Response $response, Throwable $e, Request $request) {
-            if (! $request->is('v1/*') && $response->getStatusCode() === 404) {
-                return Inertia::render('admin/errors/not-found/page')
-                    ->toResponse($request)
-                    ->setStatusCode(404);
+            if ($request->is('v1/*')) {
+                return $response;
             }
 
-            if (! $request->is('v1/*') && $response->getStatusCode() === 403) {
-                return Inertia::render('admin/errors/forbidden/page')
-                    ->toResponse($request)
-                    ->setStatusCode(403);
+            $area = $request->is('admin', 'admin/*') ? 'admin' : 'public';
+
+            $page = match ($response->getStatusCode()) {
+                404 => "{$area}/errors/not-found/page",
+                403 => "{$area}/errors/forbidden/page",
+                default => null,
+            };
+
+            if ($page === null) {
+                return $response;
             }
 
-            return $response;
+            return Inertia::render($page)
+                ->toResponse($request)
+                ->setStatusCode($response->getStatusCode());
         });
     })->create();

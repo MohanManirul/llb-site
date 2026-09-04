@@ -15,7 +15,10 @@ export default function DashboardLayout({ children, wide = false }: DashboardLay
 
     return (
         <PageTitleProvider>
-            <div className="flex h-screen flex-col bg-canvas">
+            {/* The admin shell owns its own scroll container; the document
+                behind it must not add a second scrollbar. Scoped here rather
+                than on html/body, so public pages can scroll normally. */}
+            <div className="flex h-dvh flex-col overflow-hidden bg-canvas">
                 <ImpersonationBanner />
 
                 <SiteHeader

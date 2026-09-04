@@ -7,7 +7,8 @@
         <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
         <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
         <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
-        <title inertia>{{ config('app.name', 'StepUp CRM') }}</title>
+        <title inertia>{{ config('app.name', 'LLB Study') }}</title>
+        <meta name="description" content="এলএলবি শিক্ষার্থীদের জন্য সেশন ও বিষয়ভিত্তিক সাজেশন, বই ও ক্লাস নোট — বিনামূল্যে।">
 
         {{-- React Fast Refresh preamble — must come before the Vite tag below,
              or the React plugin throws "can't detect preamble" in dev. --}}

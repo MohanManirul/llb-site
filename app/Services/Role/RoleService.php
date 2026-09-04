@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 
 final class RoleService
 {
-    private const GROUP_STRIP = ['view ', 'create ', 'edit ', 'delete ', 'manage '];
+    private const GROUP_STRIP = ['view ', 'create ', 'edit ', 'delete ', 'manage ', 'publish '];
 
     private const GROUP_ALIASES = [
         'impersonate users' => 'users',

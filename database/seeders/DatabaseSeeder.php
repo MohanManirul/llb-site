@@ -13,6 +13,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            AcademicStructureSeeder::class,
         ]);
+
+        if (app()->environment('local')) {
+            $this->call([
+                DemoContentSeeder::class,
+                DemoAnalyticsSeeder::class,
+            ]);
+        }
     }
 }

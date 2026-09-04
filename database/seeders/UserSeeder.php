@@ -26,30 +26,37 @@ class UserSeeder extends Seeder
         'delete activity logs',
         'view system monitoring',
         'impersonate users',
+        'create academic structure',
+        'edit academic structure',
+        'delete academic structure',
+        'delete study materials',
+        'publish study materials',
+        'delete notices',
+        'publish notices',
     ];
 
     public const array PEOPLE = [
         [
             'name' => 'Nusrat Jahan',
-            'email' => 'nusrat.jahan@stepuptech.com.bd',
+            'email' => 'nusrat.jahan@llbstudy.test',
             'phone' => '+8801713000201',
             'role' => self::ADMIN,
         ],
         [
             'name' => 'Mahfuzur Rahman',
-            'email' => 'mahfuzur.rahman@stepuptech.com.bd',
+            'email' => 'mahfuzur.rahman@llbstudy.test',
             'phone' => '+8801713000202',
             'role' => self::STAFF,
         ],
         [
             'name' => 'Sharmin Akter',
-            'email' => 'sharmin.akter@stepuptech.com.bd',
+            'email' => 'sharmin.akter@llbstudy.test',
             'phone' => '+8801713000203',
             'role' => self::STAFF,
         ],
         [
             'name' => 'Imran Hossain',
-            'email' => 'imran.hossain@stepuplogistics.com.bd',
+            'email' => 'imran.hossain@llbstudy.test',
             'phone' => '+8801713000208',
             'role' => self::STAFF,
         ],

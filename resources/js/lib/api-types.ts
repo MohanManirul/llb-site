@@ -22,8 +22,19 @@ export interface SimpleResourcePaginator<T> {
     status_count?: Record<string, number>;
 }
 
+export interface PaginationMeta extends SimplePaginationMeta {
+    total: number;
+    last_page: number;
+}
+
+export interface ResourcePaginator<T> {
+    data: T[];
+    links: PaginationLinks;
+    meta: PaginationMeta;
+}
+
 export function dataTablePagination<T>(
-    paginator: SimpleResourcePaginator<T> | null,
+    paginator: SimpleResourcePaginator<T> | ResourcePaginator<T> | null,
 ): DataTablePagination | undefined {
     if (!paginator) return undefined;
 

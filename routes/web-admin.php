@@ -1,7 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AcademicSessionPageController;
 use App\Http\Controllers\Admin\ActivityLogPageController;
+use App\Http\Controllers\Admin\NoticePageController;
+use App\Http\Controllers\Admin\ProgramPageController;
 use App\Http\Controllers\Admin\RolePageController;
+use App\Http\Controllers\Admin\StudyMaterialPageController;
+use App\Http\Controllers\Admin\SubjectPageController;
 use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ImpersonationController;
@@ -30,6 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', fn () => redirect()->route('dashboard'))->name('admin.index');
 
     Route::get('/dashboard', fn () => Inertia::render('admin/dashboard/page'))->name('dashboard');
+    Route::get('/reports', fn () => Inertia::render('admin/reports/page'))
+        ->middleware('permission:view dashboard')
+        ->name('reports');
     Route::get('/profile', fn () => Inertia::render('admin/profile/page'))->name('profile');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -58,9 +66,44 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{role}/edit', 'edit')->name('edit');
         });
 
+    Route::controller(StudyMaterialPageController::class)
+        ->prefix('study-materials')
+        ->name('study-materials.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/{studyMaterial}/edit', 'edit')->name('edit');
+        });
+
+    Route::controller(NoticePageController::class)
+        ->prefix('notices')
+        ->name('notices.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/{notice}/edit', 'edit')->name('edit');
+        });
+
+    // Academic structure — programs and sessions are single list pages
+    // (create/edit happen in a modal); subjects get full pages.
+    Route::get('/academic/programs', [ProgramPageController::class, 'index'])
+        ->name('academic.programs.index');
+    Route::get('/academic/sessions', [AcademicSessionPageController::class, 'index'])
+        ->name('academic.sessions.index');
+
+    Route::controller(SubjectPageController::class)
+        ->prefix('academic/subjects')
+        ->name('academic.subjects.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/{subject}/edit', 'edit')->name('edit');
+        });
+
     // Settings — forwards to the first section the user may open.
     Route::get('/settings', function () {
         $sections = [
+            'view academic structure' => '/admin/academic/programs',
             'view activity logs' => '/admin/activity-logs',
         ];
 

@@ -1,4 +1,4 @@
-# Deploying the CRM
+# Deploying LLB Study
 
 Coolify builds this repo's `Dockerfile` directly (**Dockerfile build pack**).
 There is no compose file in the deploy path any more.

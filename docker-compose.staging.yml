@@ -24,7 +24,7 @@
 x-app-env: &app-env
   PHP_OPCACHE_ENABLE: "1"
   SSL_MODE: "off"
-  APP_NAME: "${APP_NAME:-StepUp CRM}"
+  APP_NAME: "${APP_NAME:-LLB Study}"
   APP_ENV: "${APP_ENV:-staging}"
   APP_KEY: "${APP_KEY}"
   APP_DEBUG: "${APP_DEBUG:-false}"

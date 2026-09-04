@@ -24,9 +24,20 @@ export default defineConfig(({ mode }) => {
             laravel({
                 input: ["resources/css/app.css", "resources/js/app.tsx"],
                 refresh: true,
+                // Bunny splits each family into ~9 unicode-range subsets, and
+                // `preload` defaults to "all WOFF2 variants" — so preload is
+                // pinned to the one weight that blocks first paint.
                 fonts: [
                     bunny("Inter", {
                         weights: [400, 500, 600, 700],
+                        preload: [{ weight: 400 }],
+                    }),
+                    bunny("Hind Siliguri", {
+                        weights: [400, 600],
+                        subsets: ["bengali", "latin"],
+                        display: "swap",
+                        preload: [{ weight: 400 }],
+                        fallbacks: ["Nirmala UI", "Noto Sans Bengali", "sans-serif"],
                     }),
                 ],
             }),

@@ -7,6 +7,13 @@ import {
     ClockIcon,
     ServerStackIcon,
     DocumentTextIcon,
+    AcademicCapIcon,
+    FolderOpenIcon,
+    MegaphoneIcon,
+    ChartBarIcon,
+    RectangleStackIcon,
+    CalendarDaysIcon,
+    BookmarkIcon,
 } from '@heroicons/react/24/outline';
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -29,6 +36,24 @@ export const navItems: NavItem[] = [
         icon: HomeIcon,
         href: '/dashboard',
     },
+    {
+        label: 'Study Materials',
+        icon: FolderOpenIcon,
+        href: '/study-materials',
+        permission: 'view study materials',
+    },
+    {
+        label: 'Notices',
+        icon: MegaphoneIcon,
+        href: '/notices',
+        permission: 'view notices',
+    },
+    {
+        label: 'Reports',
+        icon: ChartBarIcon,
+        href: '/reports',
+        permission: 'view dashboard',
+    },
 ];
 
 export const settingsItem: NavItem = {
@@ -38,6 +63,31 @@ export const settingsItem: NavItem = {
 };
 
 export const settingsSections: NavItem[] = [
+    {
+        label: 'Academic Structure',
+        icon: AcademicCapIcon,
+        permission: 'view academic structure',
+        children: [
+            {
+                label: 'Programs',
+                icon: RectangleStackIcon,
+                href: '/academic/programs',
+                permission: 'view academic structure',
+            },
+            {
+                label: 'Sessions',
+                icon: CalendarDaysIcon,
+                href: '/academic/sessions',
+                permission: 'view academic structure',
+            },
+            {
+                label: 'Subjects',
+                icon: BookmarkIcon,
+                href: '/academic/subjects',
+                permission: 'view academic structure',
+            },
+        ],
+    },
     {
         label: 'Roles',
         icon: ShieldCheckIcon,

@@ -58,6 +58,9 @@ export { default as DeleteButton } from './DeleteButton';
 export type { DeleteButtonProps } from './DeleteButton';
 
 export { default as ImageUpload } from './ImageUpload';
+
+export { default as FileUpload } from './FileUpload';
+export type { FileUploadProps } from './FileUpload';
 export type { ImageUploadProps } from './ImageUpload';
 
 

@@ -5,15 +5,15 @@ import api from '@/lib/api-client';
 import { flash, errorMessage } from '@/lib/flash';
 import { DateRangeInput } from '@/components/ui';
 import {
-    UsersIcon,
-    UserGroupIcon,
-    BriefcaseIcon,
-    CurrencyBangladeshiIcon,
-    CheckCircleIcon,
-    ShoppingBagIcon,
-    TicketIcon,
-    DocumentTextIcon,
+    AcademicCapIcon,
+    ArrowDownTrayIcon,
     ArrowPathIcon,
+    BookOpenIcon,
+    BookmarkIcon,
+    DocumentTextIcon,
+    LightBulbIcon,
+    MegaphoneIcon,
+    UsersIcon,
 } from '@heroicons/react/24/outline';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
 import type { DashboardReport } from './types';
@@ -31,14 +31,14 @@ const DEFAULT_RANGE = (() => {
 })();
 
 const ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
-    customers: UsersIcon,
-    leads: UserGroupIcon,
-    deals: BriefcaseIcon,
-    money: CurrencyBangladeshiIcon,
-    check: CheckCircleIcon,
-    orders: ShoppingBagIcon,
-    tickets: TicketIcon,
-    invoice: DocumentTextIcon,
+    suggestions: LightBulbIcon,
+    books: BookOpenIcon,
+    notes: DocumentTextIcon,
+    downloads: ArrowDownTrayIcon,
+    notices: MegaphoneIcon,
+    subjects: BookmarkIcon,
+    programs: AcademicCapIcon,
+    users: UsersIcon,
 };
 
 const COLORS: Record<string, string> = {
@@ -151,7 +151,7 @@ export default function Dashboard({ reportUrl = '/admin/dashboard/report' }: Das
                     >
                         {cards.map((card) => {
                             const CardIcon =
-                                ICONS[card.icon ?? ''] ?? CurrencyBangladeshiIcon;
+                                ICONS[card.icon ?? ''] ?? DocumentTextIcon;
                             return (
                                 <StatCard
                                     key={card.label}

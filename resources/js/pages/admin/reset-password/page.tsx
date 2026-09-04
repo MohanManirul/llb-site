@@ -43,10 +43,10 @@ export default function ResetPassword({
                         className="flex items-center justify-center gap-2 mb-6"
                     >
                         <span className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-[#002044] text-white font-bold">
-                            C
+                            L
                         </span>
                         <span className="text-xl font-bold tracking-wider uppercase text-[#002044]">
-                            CRM
+                            LLB
                         </span>
                     </Link>
 

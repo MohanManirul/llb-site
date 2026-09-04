@@ -28,5 +28,24 @@ return [
 
         // system monitoring permissions
         'view system monitoring',
+        // academic structure permissions
+        'view academic structure',
+        'create academic structure',
+        'edit academic structure',
+        'delete academic structure',
+
+        // study materials permissions
+        'view study materials',
+        'create study materials',
+        'edit study materials',
+        'delete study materials',
+        'publish study materials',
+
+        // notices permissions
+        'view notices',
+        'create notices',
+        'edit notices',
+        'delete notices',
+        'publish notices',
     ],
 ];

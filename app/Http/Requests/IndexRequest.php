@@ -41,6 +41,11 @@ abstract class IndexRequest extends FormRequest
         return 'desc';
     }
 
+    protected function defaultPerPage(): int
+    {
+        return 10;
+    }
+
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -62,7 +67,7 @@ abstract class IndexRequest extends FormRequest
             sortBy: $this->validated('sort') ?? $this->defaultSort(),
             sortDir: $this->validated('direction') ?? $this->defaultDirection(),
             page: (int) ($this->validated('page') ?? 1),
-            perPage: (int) ($this->validated('per_page') ?? 10),
+            perPage: (int) ($this->validated('per_page') ?? $this->defaultPerPage()),
             filters: Arr::except($this->validated(), [
                 'search', 'page', 'per_page', 'sort', 'direction',
             ]),

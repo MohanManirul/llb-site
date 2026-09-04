@@ -1,4 +1,4 @@
-# StepUp CRM — মডিউলভিত্তিক কার্যনীতি
+# LLB Study — মডিউলভিত্তিক কার্যনীতি
 
 একটিই Laravel অ্যাপ দুটো কাজ করে: Inertia দিয়ে React পেজ render করে, আর `/v1/*` JSON API সার্ভ করে। পেজ কোনো ডেটা বহন করে না — React mount হয়ে নিজেই API থেকে ডেটা আনে।
 প্রতিটি লেখার প্রবাহ একই: **Route → Controller → FormRequest → Service → Model → Resource**।

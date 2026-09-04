@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Deployment image for the StepUp CRM backend (Laravel + Inertia/React).
+# Deployment image for the LLB Study backend (Laravel + Inertia/React).
 # Coolify builds this file directly (Dockerfile build pack), which is what lets
 # a deploy roll instead of stopping the container first. See DEPLOY.md. This
 # file is deployment-only. Local development builds docker/local/Dockerfile via

@@ -2,6 +2,10 @@
 
 namespace App\Services\Dashboard;
 
+use App\Enums\MaterialType;
+use App\Models\Notice;
+use App\Models\StudyMaterial;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -48,14 +52,46 @@ final class DashboardReportService
      */
     private function adminReport(?string $from, ?string $to): array
     {
+        $published = StudyMaterial::query()->publiclyVisible();
+
         return [
             'heading' => 'Dashboard Overview',
             'cards' => [
                 [
-                    'label' => 'Users',
-                    'value' => (string) User::query()->createdBetween($from, $to)->count(),
-                    'icon' => 'customers',
+                    'label' => 'Suggestions',
+                    'value' => (string) (clone $published)->where('type', MaterialType::Suggestion)->createdBetween($from, $to)->count(),
+                    'icon' => 'suggestions',
+                    'color' => 'indigo',
+                ],
+                [
+                    'label' => 'Books',
+                    'value' => (string) (clone $published)->where('type', MaterialType::Book)->createdBetween($from, $to)->count(),
+                    'icon' => 'books',
                     'color' => 'blue',
+                ],
+                [
+                    'label' => 'Class Notes',
+                    'value' => (string) (clone $published)->where('type', MaterialType::Note)->createdBetween($from, $to)->count(),
+                    'icon' => 'notes',
+                    'color' => 'green',
+                ],
+                [
+                    'label' => 'Total Downloads',
+                    'value' => (string) StudyMaterial::query()->sum('download_count'),
+                    'icon' => 'downloads',
+                    'color' => 'amber',
+                ],
+                [
+                    'label' => 'Active Notices',
+                    'value' => (string) Notice::query()->publiclyVisible()->unexpired()->count(),
+                    'icon' => 'notices',
+                    'color' => 'red',
+                ],
+                [
+                    'label' => 'Subjects',
+                    'value' => (string) Subject::query()->where('is_active', true)->count(),
+                    'icon' => 'subjects',
+                    'color' => 'purple',
                 ],
             ],
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Program;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -39,7 +40,36 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'impersonation' => fn () => $this->impersonation($request),
+            'locale' => fn () => app()->getLocale(),
+            'programs' => fn () => $this->publicPrograms($request),
         ];
+    }
+
+    /**
+     * Shared only on public pages so the program switcher costs no request;
+     * the admin side gets an empty list.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function publicPrograms(Request $request): array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return [];
+        }
+
+        return Program::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (Program $program) => [
+                'slug' => $program->slug,
+                'name' => $program->translated('name'),
+                'short_name' => $program->translated('short_name', false),
+                'has_levels' => $program->has_levels,
+                'has_exam_stages' => $program->has_exam_stages,
+            ])
+            ->all();
     }
 
     /**
