@@ -62,7 +62,6 @@ target doesn't hold it, the door back is shut. No limit of its own;
 | | |
 |---|---|
 | Migration | separate ALTER migration (the original has already shipped to production) |
-| Call center writes | nothing blocked |
 | Time limit | none |
 | Permission | `super-admin` only |
 

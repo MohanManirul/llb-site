@@ -6,17 +6,12 @@ import {
     BriefcaseIcon,
     Cog6ToothIcon,
     RectangleStackIcon,
-    PhoneArrowUpRightIcon,
-    CubeIcon,
-    ViewfinderCircleIcon,
-    InboxIcon,
     BuildingOffice2Icon,
     ShieldCheckIcon,
     UsersIcon,
     ClockIcon,
     ServerStackIcon,
     DocumentTextIcon,
-    ChartBarIcon,
 } from '@heroicons/react/24/outline';
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -61,55 +56,6 @@ export const navItems: NavItem[] = [
         label: 'Projects',
         icon: RectangleStackIcon,
         href: '/projects',
-    },
-    {
-        // No href of its own: the group is a heading, and Incomplete Orders is
-        // the only screen under it until the CRM grows one of the others.
-        label: 'Orders',
-        icon: InboxIcon,
-        permission: 'view call center',
-        children: [
-            {
-                label: 'Incomplete Orders',
-                href: '/orders/incomplete-orders',
-                permission: 'view call center',
-            },
-        ],
-    },
-    {
-        label: 'Call Center',
-        icon: PhoneArrowUpRightIcon,
-        href: '/call-center',
-        permission: 'view call center',
-        children: [
-            {
-                label: 'Picked Order',
-                icon: CubeIcon,
-                href: '/call-center/picked-orders',
-                permission: 'view call center',
-            },
-            {
-                label: 'New Order',
-                icon: ViewfinderCircleIcon,
-                href: '/call-center/new-orders',
-                permission: 'view call center',
-            },
-            {
-                // Supervisors only — an ordinary agent never sees this entry.
-                label: 'Agents',
-                icon: UsersIcon,
-                href: '/call-center/agents',
-                permission: 'manage call center agents',
-            },
-            {
-                // Also supervisors only, and behind its own permission so it
-                // can be granted without the roster screen.
-                label: 'Performance',
-                icon: ChartBarIcon,
-                href: '/call-center/performance',
-                permission: 'view call center performance',
-            },
-        ],
     },
 ];
 

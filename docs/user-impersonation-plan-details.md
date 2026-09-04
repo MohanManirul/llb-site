@@ -162,7 +162,7 @@ session()->regenerate();   // optional — see the first bullet
   disappears and the admin is trapped inside. `AuthController::logout` does
   exactly that (`AuthController.php:37`) — see §6.
 - **The `web` guard only.** The Users list holds only `web` users. The client
-  portal's `client-web` guard is out of scope this round (§14).
+  portal's `client-web` guard is out of scope this round (§13).
 - **No Sanctum token.** Impersonation lives in the browser session only.
   Minting a token in the target's name would outlive the session — a permanent
   key nobody can take back.
@@ -223,7 +223,7 @@ own journey, and the target may not have permission to open it.
 No need to branch by role: `/admin/dashboard` opens for everyone, and the
 sidebar (`resources/js/config/sidebarNav.ts`, filtered in
 `Sidebar.tsx:26,41`) sifts itself by permission — so impersonating a
-call-center-agent shows that agent's menu.
+team-leader shows that leader's menu.
 
 ---
 
@@ -318,85 +318,23 @@ and from queues — the `runningInConsole()` guard inside `resolveCauser()`
 > to make schema changes in the original `create_*_table`, but
 > `2026_08_03_000000_create_activity_logs_table.php` has **already shipped to
 > production**, and a migration that has run does not run again.
-> `2026_08_18_090000_drop_product_details_table.php` is a separate migration for
-> exactly this reason — *"deployed databases still carry the table and only a
-> migration reaches them"*. Same here.
+> Deployed databases carry what has already run, and only a new migration
+> reaches them.
 > The column is `nullable`, FK to users, `nullOnDelete()` — if the
 > impersonator's account is deleted the log row survives, only the name goes.
 
 ---
 
-## 8 — 🔴 The sharpest danger: call center
+## 8 — What is blocked while impersonating: nothing
 
-Every piece of call center work is written against `request->user()` —
-`call_center_picks.user_id`, `call_center_activities.user_id`. While
-impersonating that is **the agent's name**, and there is no column anywhere
-saying "it was actually the supervisor".
-
-What follows from that:
-
-| What happens | Why it can't be undone |
-|---|---|
-| `AgentPerformanceService` counts the work on that agent's scorecard | The whole Performance menu (`#66`) rests on "what the agent did themselves" — that foundation becomes a lie |
-| `orders.call_center_charge` is stamped once | CLAUDE.md: stamped once, never written again, deducted from the dropshipper's payout. A real merchant gets billed |
-| Send to Supplier opens an order in another business's name | The boneek connection has no DELETE grant — there is no path back |
-| `order_logs` is insert-only | The merchant sees that line and it cannot be removed |
-| Approving closes the pick | The real agent can then no longer open their own order (`guardPicked`) |
-
-`AgentPerformanceService`'s own docblock and CLAUDE.md say the same thing:
-**nobody may be credited with a call they did not make.** Impersonation is a
-machine for doing exactly that.
-
-### Decision: nothing is blocked — full impersonation
-
-The list above has not stopped being true, but the decision is that **logging in
-as another account means being able to do everything that account could do**.
-Call center writes are not fenced off separately: pick, unpick, status change,
-item edit, comment, Send to Supplier — all open.
-
-The reasoning rests on two things:
-
-1. **Only `super-admin` gets the permission** (§2). A super-admin can already
-   call every call center endpoint directly today on the strength of
-   `Gate::before` — impersonation gives them no new power, only a different
-   pair of eyes.
-2. **Half-open impersonation is the worst of both.** A supervisor who can see
-   the problem on the agent's screen but cannot fix it gets no support value out
-   of the feature, and will go around it and do the same work from their own
-   account — at which point not just the attribution but the context is lost too.
-
-**The price, stated plainly:** every consequence in the table above stands.
-`call_center_picks.user_id` and `call_center_activities.user_id` will carry the
-**agent's** id, there is no impersonator column there, and
-`AgentPerformanceService` will count the work on the agent's scorecard.
-`call_center_charge` and the supplier order are both irreversible.
-
-**The answer is not schema, it is the bracket.** §7's "Started/Stopped
-impersonating" rows fence the whole window, so "from 10:05 to 10:20 admin X was
-wearing agent Y's account" can always be stated, and anything written inside
-that window can be traced back to them. Separate columns on
-`call_center_picks`/`call_center_activities` are **not** being added: that would
-mean touching every query in `AgentPerformanceService` and the foundation of the
-Performance menu, which is a bigger job than this feature.
-
-> ⚠️ **So the start/stop log rows are not optional** — they are now the only
-> audit there is. And because there is no time limit (§4), an admin who closes
-> the browser and walks away never writes the "Stopped" row; the window then has
-> to be assumed open until the session expires.
-
----
-
-## 9 — What is blocked while impersonating: nothing
-
-An earlier draft had a `DenyWhileImpersonating` middleware here. After §8's
-decision it is **not being built** — impersonating means being able to do
-everything that account could do, so no routes are fenced off.
+An earlier draft had a `DenyWhileImpersonating` middleware here. It is **not
+being built** — impersonating means being able to do everything that account
+could do, so no routes are fenced off.
 
 The things that were considered for blocking, and why they are open too:
 
 | What was going to be blocked | Why it isn't |
 |---|---|
-| Every call center write | §8 |
 | `PATCH /v1/profile` (password / email) | Anyone holding `edit users` can already set someone else's password today through `UserService.php:100-101`, from the Users → Edit screen. Blocking it while impersonating would protect nothing new, only cripple the feature |
 | Writes on the Users / Roles / Access screens | Same argument. The permission is super-admin-only, and they can open those screens under their own name |
 | notification delete / mark-all-read | That person's own notifications, which they could delete themselves |
@@ -411,7 +349,7 @@ others.
 
 ---
 
-## 10 — UI
+## 9 — UI
 
 ### Button
 
@@ -419,7 +357,7 @@ In the Actions column of
 `resources/js/pages/admin/users/index/page.tsx` (lines 77-90), to the right of
 Edit. That column currently holds a single Edit `Link` and nothing else. There
 is no kebab-menu component in this repo, and
-`resources/js/pages/admin/call-center/agents/columns.tsx:64,73` already
+`resources/js/pages/admin/clients/index/page.tsx:121-135` already
 demonstrates the pattern of two `size="sm"` Buttons in a row — follow that.
 
 - Gate: `usePermissions().can('impersonate users')`
@@ -465,7 +403,7 @@ An `impersonation: { name, since }` entry in the Inertia shared props
 > (There are no blade error pages in this app, so there is **no** need to write
 > a `403.blade.php`.) But those pages do not use `DashboardLayout` — they are
 > full-screen in their own right — so there is no banner and no Return button on
-> them. After §9 none of our own middleware returns 403 any more, but hitting a
+> them. After §8 none of our own middleware returns 403 any more, but hitting a
 > 403 on some page because the target holds fewer permissions is entirely
 > normal — it is the single most common thing that happens during an
 > impersonation.
@@ -476,7 +414,7 @@ An `impersonation: { name, since }` entry in the Inertia shared props
 
 ---
 
-## 11 — File list
+## 10 — File list
 
 **New**
 
@@ -484,9 +422,8 @@ An `impersonation: { name, since }` entry in the Inertia shared props
 |---|---|
 | `app/Services/Auth/ImpersonationService.php` | every rule from §3, start/stop |
 | `app/Http/Controllers/Auth/ImpersonationController.php` | two methods, request/response only |
-| `resources/js/components/common/ImpersonationBanner.tsx` | §10 |
-| `tests/Feature/ImpersonationTest.php` | §12 |
-| `tests/Feature/ImpersonationCallCenterTest.php` | §12's call center case, which needs the boneek fixtures |
+| `resources/js/components/common/ImpersonationBanner.tsx` | §9 |
+| `tests/Feature/ImpersonationTest.php` | §11 |
 | `database/migrations/..._add_impersonator_id_to_activity_logs_table.php` | §7 |
 
 **Changed**
@@ -496,7 +433,7 @@ An `impersonation: { name, since }` entry in the Inertia shared props
 | `config/admin-permissions.php` | `impersonate users` |
 | `database/seeders/UserSeeder.php` | both EXCLUDED lists |
 | `app/Services/Role/RoleService.php` | `GROUP_ALIASES` |
-| `app/Providers/AppServiceProvider.php` | binds `ImpersonationService` as a singleton, so the actor's permission set is memoized once per request rather than per Users row (§10) |
+| `app/Providers/AppServiceProvider.php` | binds `ImpersonationService` as a singleton, so the actor's permission set is memoized once per request rather than per Users row (§9) |
 | `routes/web-admin.php` | two POST routes |
 | `app/Support/ActivityLog.php` | `impersonator_id` |
 | `app/Models/ActivityLog.php` | `impersonator()` relation |
@@ -506,12 +443,12 @@ An `impersonation: { name, since }` entry in the Inertia shared props
 | `app/Http/Middleware/HandleInertiaRequests.php` | shared `impersonation` |
 | `app/Http/Resources/User/UserResource.php` | `can_impersonate` |
 | `resources/js/pages/admin/users/index/page.tsx` | button + modal |
-| `resources/js/pages/admin/errors/forbidden/page.tsx` | Return button (§10) |
+| `resources/js/pages/admin/errors/forbidden/page.tsx` | Return button (§9) |
 | `resources/js/components/common/DashboardLayout.tsx` | banner |
 | `resources/js/components/common/SiteHeader.tsx` | Logout → Return |
 | `resources/js/types/inertia.d.ts` | the shared `impersonation` prop |
 | `resources/js/pages/admin/users/types.ts` | `can_impersonate` |
-| `DEPLOY.md` | the permission step (§13) |
+| `DEPLOY.md` | the permission step (§12) |
 
 Both type files are mandatory, not tidiness: CLAUDE.md requires a clean
 `npx tsc --noEmit`, and `usePage().props.impersonation` / `row.can_impersonate`
@@ -536,7 +473,7 @@ do not exist on `PageProps` (`inertia.d.ts:10,13`) or on `User`
 
 ---
 
-## 12 — Tests
+## 11 — Tests
 
 `tests/Feature/ImpersonationTest.php`, at minimum:
 
@@ -552,20 +489,14 @@ do not exist on `PageProps` (`inertia.d.ts:10,13`) or on `User`
   without this one assertion the feature stays green in tests and dies in the
   browser in 20 seconds
 - the target's `remember_token` is **unchanged** after stopping (§6's trap)
-- **a call center pick succeeds while impersonating**, and
-  `call_center_picks.user_id` holds the target's id — §8's decision is
-  deliberate, not an accident; without a test someone will later mistake it for
-  a bug and block it
 
 > ⚠️ `TestCase::actingAs` (`tests/TestCase.php:20-27`) turns a role-less user
-> into a super-admin — which is why the call center tests wrote their own
-> `scopedAgent()` helper (e.g.
-> `tests/Feature/ApiCallCenterOrderDetailsAccessTest.php:96`). Every role here
-> must be assigned explicitly too, or every assertion is meaningless.
+> into a super-admin. Every role here must be assigned explicitly, or every
+> assertion is meaningless.
 
 ---
 
-## 13 — Deploy
+## 12 — Deploy
 
 1. Deploy the release (`php artisan migrate --force` brings §7's ALTER migration)
 2. `php artisan db:seed --class=PermissionSeeder --force` — creates the
@@ -583,7 +514,7 @@ its `syncPermissions()` would replace whatever an admin granted by hand.
 
 ---
 
-## 14 — Not in this round
+## 13 — Not in this round
 
 | | Why |
 |---|---|
@@ -594,17 +525,17 @@ its `syncPermissions()` would replace whatever an admin granted by hand.
 
 ---
 
-## 15 — The decisions (already made — 20 August 2026)
+## 14 — The decisions (already made — 20 August 2026)
 
 | | Decision | Consequence |
 |---|---|---|
 | Migration (§7) | **a separate ALTER migration** | `create_activity_logs_table` untouched; deployed databases get the column |
-| Call center writes (§8) | **nothing blocked** — logging in as an account means doing everything that account could | `DenyWhileImpersonating` middleware dropped; the audit rests on the start/stop bracket |
+| Blocked routes (§8) | **nothing blocked** — logging in as an account means doing everything that account could | `DenyWhileImpersonating` middleware dropped; the audit rests on the start/stop bracket |
 | Time limit (§4) | **no limit** | `ExpireImpersonation` middleware dropped; `SESSION_LIFETIME=120` is the ceiling |
 | Permission (§2) | **`super-admin` only** | added to `ADMIN_EXCLUDED` **and** `STAFF_EXCLUDED` |
 
 Two of these have to be read together: **everything open** is safe only
 **because** the permission is super-admin-only. The day it is given to `admin`
-or `call-center-supervisor`, §8 has to be reopened — at that point that person
-could use impersonation to do things they could not do under their own name,
-which is precisely what §3's subset rule exists to prevent.
+or any other role, §8 has to be reopened — at that point that person could use
+impersonation to do things they could not do under their own name, which is
+precisely what §3's subset rule exists to prevent.

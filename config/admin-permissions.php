@@ -62,16 +62,6 @@ return [
         'edit sales reports',
         'delete sales reports',
 
-        // call center permissions
-        'view call center',
-        'pick call center orders',
-        'unpick call center orders',
-        'update call center order status',
-        'edit call center orders',
-        'view all call center orders',
-        'manage call center agents',
-        'view call center performance',
-
         // payment permissions
         'view payments',
         'manage payments',

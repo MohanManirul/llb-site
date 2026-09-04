@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\CallCenterAgent;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Designation;
@@ -50,35 +49,6 @@ class DatabaseSeederTest extends TestCase
         $this->assertSame(count(UserSeeder::PEOPLE), Employee::query()->count());
     }
 
-    public function test_it_puts_the_call_center_agents_on_the_roster(): void
-    {
-        $this->seedAsProduction();
-
-        $expected = count(array_filter(
-            UserSeeder::PEOPLE,
-            fn (array $person) => $person['call_center'] ?? false,
-        ));
-
-        $this->assertSame($expected, CallCenterAgent::query()->count());
-
-        $supervisor = User::query()->firstWhere('email', 'tanvir.ahmed@boneek.com.bd');
-        $this->assertTrue($supervisor->hasRole(UserSeeder::CALL_CENTER_SUPERVISOR));
-        $this->assertTrue($supervisor->can('manage call center agents'));
-
-        $agent = User::query()->firstWhere('email', 'sadia.islam@boneek.com.bd');
-        $this->assertTrue($agent->can('pick call center orders'));
-        $this->assertFalse(
-            $agent->can('view all call center orders'),
-            'an agent sees only their own picks',
-        );
-
-        // Each agent is credited to the company their employment names.
-        $this->assertSame(
-            Employee::query()->where('user_id', $agent->id)->value('id'),
-            CallCenterAgent::query()->where('user_id', $agent->id)->value('employee_id'),
-        );
-    }
-
     public function test_the_roles_it_creates_are_the_ones_the_app_expects(): void
     {
         $this->seedAsProduction();
@@ -88,8 +58,6 @@ class DatabaseSeederTest extends TestCase
                 UserSeeder::SUPER_ADMIN,
                 UserSeeder::ADMIN,
                 UserSeeder::STAFF,
-                UserSeeder::CALL_CENTER_AGENT,
-                UserSeeder::CALL_CENTER_SUPERVISOR,
             ],
             Role::query()->pluck('name')->all(),
         );
@@ -108,7 +76,6 @@ class DatabaseSeederTest extends TestCase
             Company::query()->count(),
             Department::query()->count(),
             Employee::query()->count(),
-            CallCenterAgent::query()->count(),
         ];
 
         $this->seedAsProduction();
@@ -118,7 +85,6 @@ class DatabaseSeederTest extends TestCase
             Company::query()->count(),
             Department::query()->count(),
             Employee::query()->count(),
-            CallCenterAgent::query()->count(),
         ]);
 
         $this->assertSame('Moved, Gulshan 2, Dhaka', $company->fresh()->address);

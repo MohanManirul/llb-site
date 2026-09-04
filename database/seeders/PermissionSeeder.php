@@ -14,8 +14,8 @@ use Spatie\Permission\PermissionRegistrar;
  * by hand, and creates staff accounts besides.
  *
  * Additive on purpose. A permission dropped from the config keeps its row here;
- * deleting it is a migration's job, as `drop_product_details_table` does, because
- * only a migration reaches a deployed database.
+ * deleting it is a migration's job, because only a migration reaches a deployed
+ * database.
  *
  *     php artisan db:seed --class=PermissionSeeder --force
  */

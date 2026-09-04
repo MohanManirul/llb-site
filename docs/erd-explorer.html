@@ -12,8 +12,6 @@
     --g-id: #6a4fbf;
     --g-org: #0d7a70;
     --g-prj: #9d6212;
-    --g-cc: #ae3b56;
-    --g-bnk: #4a6274;
     --mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
     --sans: system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, sans-serif;
   }
@@ -30,8 +28,6 @@
       --g-id: #ab98f7;
       --g-org: #4ec6b5;
       --g-prj: #dda43f;
-      --g-cc: #f2849c;
-      --g-bnk: #93abbd;
     }
   }
   :root[data-theme="dark"] {
@@ -46,8 +42,6 @@
     --g-id: #ab98f7;
     --g-org: #4ec6b5;
     --g-prj: #dda43f;
-    --g-cc: #f2849c;
-    --g-bnk: #93abbd;
   }
 
   * { box-sizing: border-box; }
@@ -334,7 +328,6 @@
   <footer>
     সোর্স: <code>docs/erd.mmd</code> — একই ডেটা, শুধু ব্রাউজ করার মতো করে সাজানো। কার্ডিনালিটি
     <code>1</code> = ঠিক একটি, <code>0..1</code> = থাকতে পারে নাও পারে, <code>N</code> = একাধিক।
-    ড্যাশ করা লাইন = আলাদা ডেটাবেস, FK নেই, join করা যায় না।
   </footer>
 </div>
 
@@ -343,8 +336,6 @@ const GROUPS = {
   id:  { label: "Identity & access", css: "--g-id" },
   org: { label: "Organisation",      css: "--g-org" },
   prj: { label: "Projects & sales",  css: "--g-prj" },
-  cc:  { label: "Call center",       css: "--g-cc" },
-  bnk: { label: "boneek (external)", css: "--g-bnk" },
 };
 
 const TABLES = {
@@ -374,17 +365,6 @@ const TABLES = {
   PROJECT_SALES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["project_milestone_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["sale_date","date"],["amount","decimal"],["reference","string"]] },
   PROJECT_ASSIGNMENTS: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["team_id","bigint","FK"],["employee_id","bigint","FK"],["assigned_at","timestamp"],["unassigned_at","timestamp"],["reason","enum"]] },
   PROJECT_NOTES: { g: "prj", cols: [["id","bigint","PK"],["company_id","bigint","FK"],["project_id","bigint","FK"],["user_id","bigint","FK"],["note","text"]] },
-
-  CALL_CENTER_AGENTS: { g: "cc", cols: [["id","bigint","PK"],["user_id","bigint","UK"],["employee_id","bigint","FK"],["is_active","bool"]] },
-  CALL_CENTER_PICKS: { g: "cc", cols: [["id","bigint","PK"],["order_id","uuid"],["business_id","uuid"],["user_id","bigint","FK"],["employee_id","bigint","FK"],["invoice_no","string"],["customer_phone","string"],["order_total","decimal"],["status_at_pick","string"],["attempt_no","int"],["picked_at","timestamp"],["released_at","timestamp"],["outcome","enum"]] },
-  CALL_CENTER_ACTIVITIES: { g: "cc", cols: [["id","bigint","PK"],["pick_id","bigint","FK"],["order_id","uuid"],["user_id","bigint","FK"],["employee_id","bigint","FK"],["action","enum"],["from_status","string"],["to_status","string"],["comment","text"]] },
-
-  BONEEK_ORDERS: { g: "bnk", cols: [["id","uuid","PK"],["business_id","uuid"],["branch_id","uuid"],["customer_id","uuid"],["invoice_no","string"],["status","string"],["previous_status","string"],["type","smallint"],["sub_total","decimal"],["total_amount","decimal"],["due_amount","decimal"],["payment_status","string"]] },
-  BONEEK_ORDER_ITEMS: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["product_id","uuid"],["sku_id","uuid"],["quantity","decimal"],["unit_price","decimal"],["total_amount","decimal"]] },
-  BONEEK_ORDER_SHIPPING_ADDRESSES: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["contact_name","string"],["contact_phone","string"],["address","text"]] },
-  BONEEK_ORDER_LOGS: { g: "bnk", cols: [["id","uuid","PK"],["order_id","uuid"],["type","smallint"],["note","text"]] },
-  BONEEK_CUSTOMERS: { g: "bnk", cols: [["id","uuid","PK"],["account_id","uuid"],["name","string"],["phone","string"],["email","string"]] },
-  BONEEK_PRODUCT_STOCKS: { g: "bnk", cols: [["id","uuid","PK"],["branch_id","uuid"],["product_id","uuid"],["sku_id","uuid"],["quantity","decimal"]] },
 };
 
 const RELS = [
@@ -433,23 +413,6 @@ const RELS = [
   ["COMPANIES","PROJECT_SALES","1","N","scopes"],
   ["COMPANIES","PROJECT_ASSIGNMENTS","1","N","scopes"],
   ["COMPANIES","PROJECT_NOTES","1","N","scopes"],
-
-  ["USERS","CALL_CENTER_AGENTS","1","0..1","may be an agent"],
-  ["EMPLOYEES","CALL_CENTER_AGENTS","1","N","payout identity"],
-  ["USERS","CALL_CENTER_PICKS","1","N","picks"],
-  ["EMPLOYEES","CALL_CENTER_PICKS","1","N","credited"],
-  ["CALL_CENTER_PICKS","CALL_CENTER_ACTIVITIES","1","N","timeline of"],
-  ["USERS","CALL_CENTER_ACTIVITIES","1","N","performs"],
-
-  ["BONEEK_ORDERS","CALL_CENTER_PICKS","0..1","N","order_id (FK নেই, cross-DB)", true],
-  ["BONEEK_ORDERS","CALL_CENTER_ACTIVITIES","0..1","N","order_id (FK নেই, cross-DB)", true],
-
-  ["BONEEK_ORDERS","BONEEK_ORDER_ITEMS","1","N","contains"],
-  ["BONEEK_ORDERS","BONEEK_ORDER_SHIPPING_ADDRESSES","1","0..1","ships to"],
-  ["BONEEK_ORDERS","BONEEK_ORDER_LOGS","1","N","merchant timeline"],
-  ["BONEEK_CUSTOMERS","BONEEK_ORDERS","1","N","places"],
-  ["BONEEK_PRODUCT_STOCKS","BONEEK_ORDER_ITEMS","0..1","N","moves stock"],
-  ["BONEEK_ORDERS","BONEEK_ORDERS","1","0..1","dropshipping pair (parent_id)"],
 ];
 
 const names = Object.keys(TABLES);
@@ -663,8 +626,7 @@ function select(name) {
   const ps = parentsOf(name), cs = childrenOf(name);
   document.getElementById("tlede").innerHTML =
     `<b>${t.cols.length}</b> কলাম · <b>${ps.length}</b> parent · <b>${cs.length}</b> child` +
-    (selfOf(name).length ? " · self-reference আছে" : "") +
-    (t.g === "bnk" ? " · এই টেবিল <b>boneek</b> ডেটাবেসের, CRM থেকে join করা যায় না।" : "");
+    (selfOf(name).length ? " · self-reference আছে" : "");
 
   const cols = document.getElementById("cols");
   cols.textContent = "";

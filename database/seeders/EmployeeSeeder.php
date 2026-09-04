@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\CallCenterAgent;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Designation;
@@ -24,7 +23,6 @@ class EmployeeSeeder extends Seeder
         }
 
         $employees = 0;
-        $agents = 0;
 
         foreach (UserSeeder::PEOPLE as $person) {
             $user = User::query()->firstWhere('email', $person['email']);
@@ -46,7 +44,7 @@ class EmployeeSeeder extends Seeder
                 continue;
             }
 
-            $employee = Employee::updateOrCreate(
+            Employee::updateOrCreate(
                 ['user_id' => $user->id, 'company_id' => $companyId],
                 [
                     'department_id' => $department->id,
@@ -57,17 +55,8 @@ class EmployeeSeeder extends Seeder
             );
 
             $employees++;
-
-            if ($person['call_center'] ?? false) {
-                CallCenterAgent::updateOrCreate(
-                    ['user_id' => $user->id],
-                    ['employee_id' => $employee->id, 'is_active' => true],
-                );
-
-                $agents++;
-            }
         }
 
-        $this->command->info("{$employees} employees and {$agents} call center agents are in place");
+        $this->command->info("{$employees} employees are in place");
     }
 }

@@ -88,8 +88,8 @@ services:
         stop_signal: SIGTERM
         stop_grace_period: 910s
 
-    # routes/console.php runs call-center:reconcile every ten minutes, which is
-    # what closes picks whose order changed or vanished in boneek. `schedule:work`
+    # routes/console.php runs payment:create-reminders once a day, which is what
+    # chases clients about an upcoming or overdue payment. `schedule:work`
     # is the long-running equivalent of the production cron entry — no crontab
     # inside the image, and it survives a container restart on its own.
     scheduler:

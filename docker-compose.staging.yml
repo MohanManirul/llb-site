@@ -17,8 +17,8 @@
 #
 # The queue worker and the scheduler are separate containers because the base
 # image runs one process. See DEPLOY.md; without the scheduler
-# `call-center:reconcile` never fires and picks whose order changed in boneek
-# sit in an agent's list forever, and without the worker anything dispatched
+# `payment:create-reminders` never fires and no client is chased about an
+# upcoming or overdue payment, and without the worker anything dispatched
 # parks in the `jobs` table with nothing to pick it up.
 
 x-app-env: &app-env

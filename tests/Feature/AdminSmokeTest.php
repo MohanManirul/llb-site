@@ -19,7 +19,6 @@ class AdminSmokeTest extends TestCase
             '/admin/roles', '/admin/roles/create', '/admin/companies', '/admin/departments',
             '/admin/designations', '/admin/activity-logs', '/admin/employees', '/admin/employees/create',
             '/admin/teams', '/admin/teams/create', '/admin/clients', '/admin/clients/create',
-            '/admin/call-center', '/admin/call-center/new-orders',
             '/admin/projects', '/admin/projects/create', '/admin/settings',
         ];
         $bad = [];

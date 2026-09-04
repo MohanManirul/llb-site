@@ -8,8 +8,6 @@ use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
 {
-    public const string CALL_CENTER = 'Call Center';
-
     public const array NAMES = [
         'Human Resources' => 'Hiring, payroll and everything about the people.',
         'Finance & Accounts' => 'Billing, collections and the books.',
@@ -17,7 +15,6 @@ class DepartmentSeeder extends Seeder
         'Digital Marketing' => 'Campaigns, content and the funnel.',
         'Sales' => 'Owns the pipeline and the targets.',
         'Customer Support' => 'Answers customers after the sale.',
-        self::CALL_CENTER => 'Confirms merchant orders over the phone.',
         'Operations' => 'Logistics, procurement and day-to-day running.',
     ];
 

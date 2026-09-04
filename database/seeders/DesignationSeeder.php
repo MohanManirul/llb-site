@@ -18,8 +18,6 @@ class DesignationSeeder extends Seeder
         'Web Developer',
         'PPC Specialist',
         'Business Development Executive',
-        'Call Center Supervisor',
-        'Call Center Agent',
     ];
 
     public function run(): void

@@ -36,7 +36,6 @@ class TeamsSeeder extends Seeder
                 ['name' => 'Backend Services', 'department' => 'Engineering'],
                 ['name' => 'Customer Success', 'department' => 'Customer Support'],
                 ['name' => 'Sales Operations', 'department' => 'Sales'],
-                ['name' => 'Call Center Operations', 'department' => 'Call Center'],
                 ['name' => 'Accounts Receivable', 'department' => 'Finance & Accounts'],
             ],
             'StepUp Logistics Ltd.' => [

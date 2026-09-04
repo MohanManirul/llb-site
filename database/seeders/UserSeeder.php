@@ -14,10 +14,6 @@ class UserSeeder extends Seeder
 
     public const string STAFF = 'staff';
 
-    public const string CALL_CENTER_SUPERVISOR = 'call-center-supervisor';
-
-    public const string CALL_CENTER_AGENT = 'call-center-agent';
-
     private const array ADMIN_EXCLUDED = [
         'delete activity logs',
         'view system monitoring',
@@ -31,22 +27,6 @@ class UserSeeder extends Seeder
         'view system monitoring',
         'manage payments',
         'impersonate users',
-    ];
-
-    private const array CALL_CENTER_AGENT_PERMISSIONS = [
-        'view dashboard',
-        'view call center',
-        'pick call center orders',
-        'unpick call center orders',
-        'update call center order status',
-        'edit call center orders',
-    ];
-
-    private const array CALL_CENTER_SUPERVISOR_EXTRA = [
-        'view all call center orders',
-        'manage call center agents',
-        'view call center performance',
-        'view employees',
     ];
 
     public const array PEOPLE = [
@@ -78,46 +58,6 @@ class UserSeeder extends Seeder
             'designation' => 'Digital Marketing Manager',
         ],
         [
-            'name' => 'Tanvir Ahmed',
-            'email' => 'tanvir.ahmed@boneek.com.bd',
-            'phone' => '+8801713000204',
-            'role' => self::CALL_CENTER_SUPERVISOR,
-            'company' => 'Boneek Commerce Ltd.',
-            'department' => DepartmentSeeder::CALL_CENTER,
-            'designation' => 'Call Center Supervisor',
-            'call_center' => true,
-        ],
-        [
-            'name' => 'Sadia Islam',
-            'email' => 'sadia.islam@boneek.com.bd',
-            'phone' => '+8801713000205',
-            'role' => self::CALL_CENTER_AGENT,
-            'company' => 'Boneek Commerce Ltd.',
-            'department' => DepartmentSeeder::CALL_CENTER,
-            'designation' => 'Call Center Agent',
-            'call_center' => true,
-        ],
-        [
-            'name' => 'Rakibul Hasan',
-            'email' => 'rakibul.hasan@boneek.com.bd',
-            'phone' => '+8801713000206',
-            'role' => self::CALL_CENTER_AGENT,
-            'company' => 'Boneek Commerce Ltd.',
-            'department' => DepartmentSeeder::CALL_CENTER,
-            'designation' => 'Call Center Agent',
-            'call_center' => true,
-        ],
-        [
-            'name' => 'Farhana Yasmin',
-            'email' => 'farhana.yasmin@boneek.com.bd',
-            'phone' => '+8801713000207',
-            'role' => self::CALL_CENTER_AGENT,
-            'company' => 'Boneek Commerce Ltd.',
-            'department' => DepartmentSeeder::CALL_CENTER,
-            'designation' => 'Call Center Agent',
-            'call_center' => true,
-        ],
-        [
             'name' => 'Imran Hossain',
             'email' => 'imran.hossain@stepuplogistics.com.bd',
             'phone' => '+8801713000208',
@@ -142,14 +82,6 @@ class UserSeeder extends Seeder
 
         Role::findOrCreate(self::STAFF, 'web')->syncPermissions(
             array_values(array_diff($permissions, self::STAFF_EXCLUDED)),
-        );
-
-        Role::findOrCreate(self::CALL_CENTER_AGENT, 'web')->syncPermissions(
-            self::CALL_CENTER_AGENT_PERMISSIONS,
-        );
-
-        Role::findOrCreate(self::CALL_CENTER_SUPERVISOR, 'web')->syncPermissions(
-            array_merge(self::CALL_CENTER_AGENT_PERMISSIONS, self::CALL_CENTER_SUPERVISOR_EXTRA),
         );
 
         $this->seedPeople();

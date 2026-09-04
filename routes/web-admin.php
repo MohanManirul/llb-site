@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityLogPageController;
-use App\Http\Controllers\Admin\CallCenterPageController;
 use App\Http\Controllers\Admin\ClientPageController;
 use App\Http\Controllers\Admin\CompanyPageController;
 use App\Http\Controllers\Admin\DepartmentPageController;
@@ -119,30 +118,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::get('/{client}/edit', 'edit')->name('edit');
-        });
-
-    // The bare call-center path is the module's own overview dashboard.
-    Route::controller(CallCenterPageController::class)
-        ->prefix('call-center')
-        ->name('call-center.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/picked-orders', 'pickedOrders')->name('picked-orders');
-            Route::get('/new-orders', 'newOrders')->name('new-orders');
-            Route::get('/agents', 'agents')->name('agents');
-            Route::get('/performance', 'performance')->name('performance');
-            Route::get('/performance/{userId}', 'agentReport')->name('performance.agent');
-            Route::get('/performance/{userId}/orders/{orderId}', 'agentReportOrder')
-                ->name('performance.agent-order');
-            Route::get('/orders/{orderId}', 'orderDetails')->name('order-details');
-        });
-
-    // The Orders menu. Its own path, outside the call center's.
-    Route::controller(CallCenterPageController::class)
-        ->prefix('orders')
-        ->name('orders.')
-        ->group(function () {
-            Route::get('/incomplete-orders', 'incompleteOrders')->name('incomplete-orders');
         });
 
     // Show carries no permission — the API scopes what each role may load.

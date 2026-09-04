@@ -99,33 +99,6 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
-        /*
-         * The inventory (boneek) database. Read-mostly, but not read-only: the
-         * call center module writes a column-scoped set of `orders`,
-         * `order_items`, `order_shipping_addresses`, `customers`, `accounts.name`,
-         * `order_logs` and `product_stocks.quantity`, and Send to Supplier
-         * inserts a whole `orders` row for the supplier's business. The
-         * authoritative list is the allowed-writes table in CLAUDE.md, and
-         * DEPLOY.md turns that same list into GRANTs. Its schema is owned by the
-         * inventory project — never run migrations against this connection.
-         *
-         * The driver is env-driven so the test suite can swap it for sqlite.
-         */
-        'boneek' => [
-            'driver' => env('BONEEK_DB_DRIVER', 'pgsql'),
-            'url' => env('BONEEK_DB_URL'),
-            'host' => env('BONEEK_DB_HOST', '127.0.0.1'),
-            'port' => env('BONEEK_DB_PORT', '5432'),
-            'database' => env('BONEEK_DB_DATABASE', 'boneek'),
-            'username' => env('BONEEK_DB_USERNAME', 'root'),
-            'password' => env('BONEEK_DB_PASSWORD', ''),
-            'charset' => env('BONEEK_DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('BONEEK_DB_SSLMODE', 'prefer'),
-        ],
-
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

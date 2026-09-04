@@ -21,14 +21,6 @@ final class RoleService
         'project client info' => 'projects',
         'project client' => 'projects',
         'project contact' => 'projects',
-
-        'pick call center orders' => 'call center',
-        'unpick call center orders' => 'call center',
-        'update call center order status' => 'call center',
-        'all call center orders' => 'call center',
-        'call center agents' => 'call center',
-        'call center orders' => 'call center',
-        'call center performance' => 'call center',
     ];
 
     /**

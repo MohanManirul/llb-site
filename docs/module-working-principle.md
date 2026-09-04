@@ -10,7 +10,7 @@
 | 1 | Staff Authentication | `/admin/login` → `web` guard session; একই session cookie দিয়েই `/v1` API চলে (`statefulApi`), ব্যর্থ চেষ্টাও activity log-এ ওঠে। |
 | 2 | Client Portal Auth | `/login` → `client-web` guard; `is_active` না হলে ঢুকতে দেয় না, আর `EnsureClientAudience` staff session-কে client API-তে ঢুকতে বাধা দেয়। |
 | 3 | Password Reset | staff ও client-এর টোকেন সম্পূর্ণ আলাদা টেবিলে; staff-এর ক্ষেত্রে কেবল super-admin পারে; মেইল queue-তে যায়। |
-| 4 | RBAC | spatie/laravel-permission — ৫৪টি permission, ৫টি seeded role; `Gate::before` দিয়ে super-admin সব পাশ করে; আসল প্রহরী route/controller middleware, sidebar কেবল লুকায়। |
+| 4 | RBAC | spatie/laravel-permission — ৫৬টি permission, ৫টি seeded role; `Gate::before` দিয়ে super-admin সব পাশ করে; আসল প্রহরী route/controller middleware, sidebar কেবল লুকায়। |
 | 5 | Access Provisioning | admin client-কে password দিয়ে portal login দেয়, revoke করলে সব token মুছে random ৬৪-অক্ষরের password বসে; staff অ্যাকাউন্টও এখান থেকে তৈরি হয়। |
 | 6 | User | login পরিচয় — নাম, ইমেইল, ফোন, ছবি, password ও একটি role; চাকরির তথ্য এখানে নয়। |
 | 7 | Company | সর্বোচ্চ সাংগঠনিক একক; Department/Team/Employee/Project সবই এর অধীনে, soft delete ও FK restrict। |
@@ -28,16 +28,10 @@
 | 19 | Profile | নাম/ইমেইল/ছবি/password — staff ও client একই endpoint ব্যবহার করে, password ফাঁকা রাখলে অপরিবর্তিত থাকে। |
 | 20 | Notification | `notifications` টেবিল + bell; এখন পর্যন্ত লেখে দুটি উৎস — client CSV import আর payment (received / due / overdue)। |
 | 21 | Activity Log | কাস্টম audit — কে (causer), কী (description), কার উপর (subject); মুছতে পারে কেবল super-admin। |
-| 22 | CC Agent Roster | কে queue-তে কাজ করবে ও কোন company-র হয়ে; roster-এ active row না থাকলে permission থাকলেও ৪০৩। |
-| 23 | CC New Orders / Pick | queue = `pending` + কারো হাতে নেই; partial unique index দুজনের দ্বন্দ্ব database-এই ঠেকায়; একজন সর্বোচ্চ ৫০টি ধরে রাখতে পারে। |
-| 24 | CC Status Outcome | agent কেবল approve/cancel/follow-up দিতে পারে; লেখা হয় **আগে boneek, পরে CRM**; follow-up দিলে pick খোলা থাকে। |
-| 25 | CC Order Editing | লেখার আগে দুটি প্রশ্ন — agent কি order ধরে আছে, আর merchant-এর নিয়মে এখনো সম্পাদনাযোগ্য কি; দাম, ছাড়, VAT ও stock-এর নিয়ম inventory থেকে হুবহু ported। |
-| 26 | CC Courier Score | বাইরের API, ফল cache-এ রাখা; API বন্ধ থাকলে চুপচাপ খালি ফেরে, call center থামে না। |
-| 27 | CC Reconciler | প্রতি ১০ মিনিটে চলে — merchant নিজে বদলে ফেলা order-এর pick `stale` করে বন্ধ করে দেয়। |
-| 28 | System Monitoring | `storage/logs`-এর Log Viewer; আলাদা permission, seed অনুযায়ী কেবল super-admin। |
-| 29 | Settings Hub | `/admin/settings` ব্যবহারকারীর অনুমতিতে খোলা প্রথম section-এ পাঠায়, কোনোটিই না থাকলে ৪০৩। |
-| 30 | Payment Collection | admin/staff project-এর বিপরীতে টাকা তোলে; এক transaction-এ payment + history + project amount, commit-এর পরে notification, invoice ও মেইল। |
-| 31 | Payment Notification | client দুই জায়গায় খবর পায় — নিজস্ব `payment_notifications` তালিকা আর bell-এর `notifications`; reminder scheduler থেকে, received payment থেকে। |
+| 22 | System Monitoring | `storage/logs`-এর Log Viewer; আলাদা permission, seed অনুযায়ী কেবল super-admin। |
+| 23 | Settings Hub | `/admin/settings` ব্যবহারকারীর অনুমতিতে খোলা প্রথম section-এ পাঠায়, কোনোটিই না থাকলে ৪০৩। |
+| 24 | Payment Collection | admin/staff project-এর বিপরীতে টাকা তোলে; এক transaction-এ payment + history + project amount, commit-এর পরে notification, invoice ও মেইল। |
+| 25 | Payment Notification | client দুই জায়গায় খবর পায় — নিজস্ব `payment_notifications` তালিকা আর bell-এর `notifications`; reminder scheduler থেকে, received payment থেকে। |
 
 ## Payment Collection ও তার Notification
 
@@ -81,8 +75,7 @@
 - **Sales report লেখা হলে** — Observer সঙ্গে সঙ্গে milestone-এর achieved ও project-এর health stamp করে (queue নয়, একই request-এ)।
 - **Payment লেখা হলে** — commit-এর পরে (`DB::afterCommit`) client-এর notification, invoice তৈরি ও invoice মেইলের queue job — তিনটিই আপনা-আপনি।
 - **Queue-তে চলে** — client CSV import, password reset mail ও `SendInvoiceEmailJob`; worker হাতে চালাতে হয়, না চললে কোনো UI সংকেত নেই।
-- **Cron-এ চলে** — `call-center:reconcile` প্রতি ১০ মিনিটে, আর `payment:create-reminders` প্রতিদিন সকাল ৯টায় (Asia/Dhaka)।
-- **দুই ডাটাবেসে যৌথ transaction নেই** — তাই call center সবসময় আগে boneek-এ লেখে, পরে CRM-এ; উল্টো হলে CRM এমন কাজের দাবি করত যা ঘটেনি।
+- **Cron-এ চলে** — `payment:create-reminders` প্রতিদিন সকাল ৯টায় (Asia/Dhaka)।
 
 ## ERD
 
