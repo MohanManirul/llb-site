@@ -22,7 +22,7 @@ export default function DashboardLayout({ children, wide = false }: DashboardLay
                     onToggleDrawer={() => setSidebarOpen((v) => !v)}
                 />
 
-                <div className="flex min-h-0 flex-1 overflow-hidden bg-shell">
+                <div className="flex min-h-0 flex-1 overflow-hidden bg-canvas">
                     <div className="flex min-h-0 flex-1 overflow-hidden rounded-t-2xl">
                         <Sidebar
                             open={sidebarOpen}

@@ -1,4 +1,4 @@
-# Boneek CRM
+# llb-pdf
 
 A CRM built as a **Laravel 13 + Inertia + React 19** app that talks to its own REST API.
 One Laravel application serves both the Inertia pages and the versioned `/v1/*` JSON
@@ -49,7 +49,7 @@ macOS build and the container stops booting.
 Every service and the reasoning behind it is documented in `docker-compose.local.yml`.
 
 There is a second, Laragon/Windows path built on `.env.example` (which targets
-`https://boneek-crm.test` and sqlite) and `composer run dev`. It is not the supported
+`https://llb-pdf.test` and sqlite) and `composer run dev`. It is not the supported
 route and nothing above applies to it.
 
 ## Commands

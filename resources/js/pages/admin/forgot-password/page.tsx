@@ -34,8 +34,8 @@ export default function ForgotPassword({
                         className="flex items-center justify-center gap-2 mb-6"
                     >
                         <img
-                            src="/assets/logos/boneek.png"
-                            alt="Boneek Logo"
+                            src="/llb.jpg"
+                            alt="LLB Logo Logo"
                             className="h-auto w-45"
                         />
                     </Link>

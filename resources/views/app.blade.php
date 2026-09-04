@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        @php($faviconUrl = asset('boneek_favicon.png').'?v='.filemtime(public_path('boneek_favicon.png')))
+        @php($faviconUrl = asset('llb_favicon.png').'?v='.filemtime(public_path('llb_favicon.png')))
         <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
         <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
         <link rel="apple-touch-icon" href="{{ $faviconUrl }}">

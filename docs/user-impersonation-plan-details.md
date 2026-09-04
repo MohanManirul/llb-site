@@ -178,7 +178,7 @@ session()->regenerate();   // optional — see the first bullet
 
 `config/sanctum.php:82` registers
 `'authenticate_session' => AuthenticateSession::class`, and `.env` carries
-`SANCTUM_STATEFUL_DOMAINS=boneek-crm.localhost,localhost,127.0.0.1` — meaning
+`SANCTUM_STATEFUL_DOMAINS=llb-pdf.localhost,localhost,127.0.0.1` — meaning
 every `/v1/*` XHR the panel fires goes through that middleware.
 
 What it does

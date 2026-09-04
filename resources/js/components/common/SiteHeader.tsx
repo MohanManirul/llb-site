@@ -30,22 +30,22 @@ export default function SiteHeader({
     }
 
     return (
-        <header className="w-full shrink-0 bg-shell px-4">
+        <header className="w-full shrink-0 border-b border-hairline bg-white px-4">
             <div className="flex h-16 items-center gap-3 lg:gap-5">
 
                 <button
                     onClick={onToggleDrawer}
                     aria-label="Toggle sidebar"
-                    className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-white/10 lg:hidden"
+                    className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-black/5 lg:hidden"
                 >
-                    <Bars3BottomLeftIcon className="h-6 w-6 text-white/80" />
+                    <Bars3BottomLeftIcon className="h-6 w-6 text-ink" />
                 </button>
 
                 <Link href={`${base}/dashboard`} className="flex shrink-0 items-center">
                     <img
-                        src="/assets/logos/boneek.png"
-                        alt="Boneek"
-                        className="h-auto w-32 object-contain brightness-0 invert md:w-40"
+                        src="/llb.jpg"
+                        alt="LLB Logo"
+                        className="h-auto w-32 object-contain md:w-40"
                     />
                 </Link>
 
@@ -55,9 +55,9 @@ export default function SiteHeader({
                     <div className="relative">
                         <button
                             onClick={() => setUserMenuOpen((v) => !v)}
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 hover:bg-white/15"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-hairline bg-black/5 hover:bg-black/10"
                         >
-                            <UserCircleIcon className="h-6 w-6 text-white/85" />
+                            <UserCircleIcon className="h-6 w-6 text-ink" />
                         </button>
 
                         {userMenuOpen && (

@@ -58,7 +58,7 @@ x-app: &app
   build:
     context: .
     dockerfile: Dockerfile
-  image: boneek-crm-staging
+  image: llb-pdf-staging
   restart: unless-stopped
   env_file:
     - path: .env

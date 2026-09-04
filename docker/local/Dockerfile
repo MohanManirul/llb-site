@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Local development image for boneek-crm (StepUp CRM).
+# Local development image for llb-pdf (StepUp CRM).
 #
 # PHP-FPM only — nginx runs in its own container and reaches this one over the
 # compose network on port 9000. The project root is bind-mounted at runtime, so
