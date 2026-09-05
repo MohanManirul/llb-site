@@ -29,7 +29,7 @@ class DemoExamPrepSeeder extends Seeder
 
     private const array STUDENTS = [
         ['name' => 'রাকিব হাসান', 'email' => 'student1@example.com', 'phone' => '01711000001', 'program' => 'bar-council'],
-        ['name' => 'ফারহানা আক্তার', 'email' => 'student2@example.com', 'phone' => '01711000002', 'program' => 'nu-llb-Pass'],
+        ['name' => 'ফারহানা আক্তার', 'email' => 'student2@example.com', 'phone' => '01711000002', 'program' => 'nu-llb-pass'],
         ['name' => 'তানভীর আহমেদ', 'email' => 'student3@example.com', 'phone' => null, 'program' => null, 'is_active' => false],
     ];
 
@@ -155,43 +155,43 @@ class DemoExamPrepSeeder extends Seeder
             'reference' => 'বার কাউন্সিল অর্ডার, ১৯৭২', 'status' => 'archived',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract', 'exam_year' => 2024,
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract', 'exam_year' => 2024,
             'question_bn' => 'চুক্তি আইন, ১৮৭২ এর কোন ধারায় চুক্তির সংজ্ঞা দেওয়া হয়েছে?', 'question_en' => 'Which section of the Contract Act, 1872 defines a contract?',
             'options' => ['ধারা ২(ক)', 'ধারা ২(ঙ)', 'ধারা ২(জ)', 'ধারা ১০'], 'correct' => 3,
             'explanation_bn' => 'ধারা ২(জ) অনুযায়ী আইনত বলবৎযোগ্য সম্মতিই চুক্তি; ধারা ১০-এ বৈধ চুক্তির উপাদান।', 'reference' => 'চুক্তি আইন, ধারা ২(জ)',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract', 'exam_year' => 2024,
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract', 'exam_year' => 2024,
             'question_bn' => 'চুক্তি করার যোগ্যতা চুক্তি আইনের কোন ধারায় বর্ণিত?', 'question_en' => 'Capacity to contract is dealt with in which section of the Contract Act?',
             'options' => ['ধারা ১০', 'ধারা ১১', 'ধারা ১৩', 'ধারা ১৪'], 'correct' => 2,
             'reference' => 'চুক্তি আইন, ধারা ১১',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract', 'exam_year' => 2023,
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract', 'exam_year' => 2023,
             'question_bn' => 'প্রতিদান (consideration) এর সংজ্ঞা চুক্তি আইনের কোন ধারায়?', 'question_en' => 'Consideration is defined in which section of the Contract Act?',
             'options' => ['ধারা ২(খ)', 'ধারা ২(ঘ)', 'ধারা ২৩', 'ধারা ২৫'], 'correct' => 2,
             'reference' => 'চুক্তি আইন, ধারা ২(ঘ)',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Jurisprudence', 'exam_year' => 2024,
+            'program' => 'nu-llb-pass', 'subject' => 'Jurisprudence', 'exam_year' => 2024,
             'question_bn' => '"আইন হলো সার্বভৌমের আদেশ" — উক্তিটি কার?', 'question_en' => '"Law is the command of the sovereign" — who said this?',
             'options' => ['জন অস্টিন', 'স্যাভিনি', 'জেরেমি বেন্থাম', 'হ্যান্স কেলসেন'], 'correct' => 1,
             'explanation_bn' => 'জন অস্টিন বিশ্লেষণাত্মক ইতিবাচক আইনতত্ত্বে আইনকে সার্বভৌমের আদেশ হিসেবে দেখেছেন।', 'reference' => 'Austin, The Province of Jurisprudence Determined',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Jurisprudence', 'exam_year' => 2023,
+            'program' => 'nu-llb-pass', 'subject' => 'Jurisprudence', 'exam_year' => 2023,
             'question_bn' => 'বিশুদ্ধ আইন তত্ত্বের (Pure Theory of Law) প্রবক্তা কে?', 'question_en' => 'Who propounded the Pure Theory of Law?',
             'options' => ['রোস্কো পাউন্ড', 'হ্যান্স কেলসেন', 'এইচ. এল. এ. হার্ট', 'হেনরি মেইন'], 'correct' => 2,
             'reference' => 'Kelsen, Pure Theory of Law',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Muslim Law', 'exam_year' => 2024,
+            'program' => 'nu-llb-pass', 'subject' => 'Muslim Law', 'exam_year' => 2024,
             'question_bn' => 'মুসলিম পারিবারিক আইন অধ্যাদেশ কত সালের?', 'question_en' => 'The Muslim Family Laws Ordinance is of which year?',
             'options' => ['১৯৩৯', '১৯৬১', '১৯৭৪', '১৯৮৫'], 'correct' => 2,
             'reference' => 'মুসলিম পারিবারিক আইন অধ্যাদেশ, ১৯৬১',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Muslim Law', 'exam_year' => null,
+            'program' => 'nu-llb-pass', 'subject' => 'Muslim Law', 'exam_year' => null,
             'question_bn' => 'মুসলিম আইনে দেনমোহর কী? (খসড়া প্রশ্ন)', 'question_en' => 'What is dower in Muslim law? (draft question)',
             'options' => ['স্ত্রীর প্রাপ্য অর্থ বা সম্পত্তি', 'স্বামীর প্রাপ্য অর্থ', 'উত্তরাধিকার', 'দান'], 'correct' => 1,
             'status' => 'draft',
@@ -210,7 +210,7 @@ class DemoExamPrepSeeder extends Seeder
             'reference' => 'দণ্ডবিধি, ধারা ২৯৯ ও ৩০০',
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract', 'type' => 'written', 'exam_year' => 2024,
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract', 'type' => 'written', 'exam_year' => 2024,
             'question_bn' => 'একটি বৈধ চুক্তির অপরিহার্য উপাদানসমূহ আলোচনা করুন।',
             'question_en' => 'Discuss the essential elements of a valid contract.',
             'reference' => 'চুক্তি আইন, ধারা ১০',
@@ -240,7 +240,7 @@ class DemoExamPrepSeeder extends Seeder
             'subjects' => ['Penal Code', 'Law of Evidence'],
         ],
         [
-            'program' => 'nu-llb-Pass',
+            'program' => 'nu-llb-pass',
             'title_bn' => 'এলএলবি ১ম পর্ব মডেল টেস্ট (খসড়া)', 'title_en' => 'LLB 1st Part Model Test (Draft)',
             'description_bn' => 'চুক্তি আইন, আইনতত্ত্ব ও মুসলিম আইনের ওপর প্রস্তুতিমূলক টেস্ট — এখনও প্রকাশিত হয়নি।',
             'duration_minutes' => 20, 'negative_mark' => 0.5, 'status' => 'draft',
@@ -258,7 +258,7 @@ class DemoExamPrepSeeder extends Seeder
         ['student' => 'student1@example.com', 'program' => 'bar-council', 'subject' => 'Penal Code', 'question_count' => 10, 'correct_count' => 8, 'days_ago' => 6],
         ['student' => 'student1@example.com', 'program' => 'bar-council', 'subject' => 'Code of Civil Procedure', 'question_count' => 10, 'correct_count' => 6, 'days_ago' => 4],
         ['student' => 'student1@example.com', 'program' => 'bar-council', 'subject' => 'Law of Evidence', 'question_count' => 20, 'correct_count' => 15, 'days_ago' => 1],
-        ['student' => 'student2@example.com', 'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract', 'question_count' => 10, 'correct_count' => 7, 'days_ago' => 3],
+        ['student' => 'student2@example.com', 'program' => 'nu-llb-pass', 'subject' => 'Law of Contract', 'question_count' => 10, 'correct_count' => 7, 'days_ago' => 3],
     ];
 
     public function run(): void

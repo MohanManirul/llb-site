@@ -26,21 +26,21 @@ class DemoContentSeeder extends Seeder
 {
     private const array MATERIALS = [
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract',
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract',
             'type' => 'suggestion', 'title_bn' => 'চুক্তি আইন সাজেশন ২০২৬', 'title_en' => 'Law of Contract Suggestion 2026',
             'description_bn' => 'বিগত বছরের প্রশ্ন বিশ্লেষণ করে সাজানো গুরুত্বপূর্ণ প্রশ্নের তালিকা।',
             'session' => '2025-26', 'exam_year' => 2026, 'status' => 'published', 'is_featured' => true,
             'files' => [['label_bn' => null, 'pages' => 12]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract',
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract',
             'type' => 'note', 'title_bn' => 'চুক্তি আইন ক্লাস নোট', 'title_en' => 'Law of Contract Class Notes',
             'description_bn' => 'ক্লাস লেকচারের পূর্ণাঙ্গ নোট, ধারা ধরে ধরে ব্যাখ্যা।',
             'session' => '2025-26', 'status' => 'published',
             'files' => [['label_bn' => null, 'pages' => 48]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Contract',
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Contract',
             'type' => 'book', 'title_bn' => 'চুক্তি আইন হ্যান্ডবুক', 'title_en' => 'Law of Contract Handbook',
             'author' => 'ড. মো. আবদুল হালিম', 'publisher' => 'ল বুক হাউস', 'edition' => '৫ম সংস্করণ',
             'status' => 'published',
@@ -50,31 +50,31 @@ class DemoContentSeeder extends Seeder
             ],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Jurisprudence',
+            'program' => 'nu-llb-pass', 'subject' => 'Jurisprudence',
             'type' => 'suggestion', 'title_bn' => 'আইনতত্ত্ব সাজেশন ২০২৬', 'title_en' => 'Jurisprudence Suggestion 2026',
             'session' => '2025-26', 'exam_year' => 2026, 'status' => 'published',
             'files' => [['label_bn' => null, 'pages' => 10]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Muslim Law',
+            'program' => 'nu-llb-pass', 'subject' => 'Muslim Law',
             'type' => 'note', 'title_bn' => 'মুসলিম আইন সংক্ষিপ্ত নোট', 'title_en' => 'Muslim Law Short Notes',
             'session' => '2025-26', 'status' => 'published',
             'files' => [['label_bn' => null, 'pages' => 36]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Law of Evidence',
+            'program' => 'nu-llb-pass', 'subject' => 'Law of Evidence',
             'type' => 'suggestion', 'title_bn' => 'সাক্ষ্য আইন সাজেশন ২০২৬', 'title_en' => 'Law of Evidence Suggestion 2026',
             'session' => '2025-26', 'exam_year' => 2026, 'status' => 'published', 'is_featured' => true,
             'files' => [['label_bn' => null, 'pages' => 14]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Code of Civil Procedure',
+            'program' => 'nu-llb-pass', 'subject' => 'Code of Civil Procedure',
             'type' => 'book', 'title_bn' => 'দেওয়ানি কার্যবিধি ভাষ্য', 'title_en' => 'Commentary on the Code of Civil Procedure',
             'author' => 'বিচারপতি মো. হাসান', 'status' => 'published',
             'files' => [['label_bn' => null, 'pages' => 412]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Penal Code',
+            'program' => 'nu-llb-pass', 'subject' => 'Penal Code',
             'type' => 'note', 'title_bn' => 'দণ্ডবিধি ধারাভিত্তিক নোট', 'title_en' => 'Penal Code Section-wise Notes',
             'session' => '2025-26', 'status' => 'published',
             'files' => [['label_bn' => null, 'pages' => 64]],
@@ -105,7 +105,7 @@ class DemoContentSeeder extends Seeder
             'files' => [['label_bn' => null, 'pages' => 12]],
         ],
         [
-            'program' => 'nu-llb-Pass', 'subject' => 'Hindu Law',
+            'program' => 'nu-llb-pass', 'subject' => 'Hindu Law',
             'type' => 'suggestion', 'title_bn' => 'হিন্দু আইন সাজেশন (খসড়া)', 'title_en' => 'Hindu Law Suggestion (Draft)',
             'session' => '2025-26', 'exam_year' => 2026, 'status' => 'draft',
             'files' => [['label_bn' => null, 'pages' => 8]],
@@ -115,10 +115,10 @@ class DemoContentSeeder extends Seeder
     private const array NOTICES = [
         [
             'title_bn' => '২০২৬ সালের এলএলবি (পাস) পরীক্ষার সময়সূচি প্রকাশ',
-            'title_en' => 'LLB (Pass 2-Year-Term) Examination Schedule 2026',
+            'title_en' => 'LLB (Pass) Examination Schedule 2026',
             'excerpt_bn' => '১ম ও ২য় পর্বের পরীক্ষা শুরু হবে মার্চের প্রথম সপ্তাহে।',
             'body_bn' => "জাতীয় বিশ্ববিদ্যালয়ের ২০২৬ সালের এলএলবি (পাস) পরীক্ষার সময়সূচি প্রকাশিত হয়েছে।\n\n১ম পর্বের পরীক্ষা শুরু: মার্চের প্রথম সপ্তাহ\n২য় পর্বের পরীক্ষা শুরু: এপ্রিলের দ্বিতীয় সপ্তাহ\n\nবিস্তারিত সময়সূচি সংযুক্ত PDF-এ দেওয়া হলো। ফর্ম পূরণের শেষ তারিখ মনে রেখে প্রস্তুতি নিন।",
-            'category' => 'exam', 'program' => 'nu-llb-Pass', 'session' => '2025-26',
+            'category' => 'exam', 'program' => 'nu-llb-pass', 'session' => '2025-26',
             'is_pinned' => true, 'status' => 'published', 'attachment' => true,
         ],
         [
@@ -134,7 +134,7 @@ class DemoContentSeeder extends Seeder
             'title_en' => 'Class Routine for 1st Part (Session 2025-26)',
             'excerpt_bn' => 'নতুন সেশনের ক্লাস রুটিন সংযুক্ত করা হলো।',
             'body_bn' => "২০২৫-২৬ সেশনের ১ম পর্বের ক্লাস রুটিন সংযুক্ত PDF-এ দেওয়া হলো।\n\nক্লাস শুরু আগামী রবিবার থেকে। রুটিনে কোনো পরিবর্তন হলে এই নোটিশ হালনাগাদ করা হবে।",
-            'category' => 'routine', 'program' => 'nu-llb-Pass', 'session' => '2025-26',
+            'category' => 'routine', 'program' => 'nu-llb-pass', 'session' => '2025-26',
             'status' => 'published', 'attachment' => true,
         ],
         [

@@ -18,9 +18,9 @@ class AcademicStructureSeeder extends Seeder
 {
     private const array PROGRAMS = [
         [
-            'slug' => 'nu-llb-Pass',
+            'slug' => 'nu-llb-pass',
             'name_bn' => 'এলএলবি (পাস)',
-            'name_en' => 'LLB (Pass 2-Year-Term)',
+            'name_en' => 'LLB (Pass)',
             'short_name_bn' => 'পাস কোর্স',
             'short_name_en' => 'Pass',
             'has_levels' => true,
@@ -101,7 +101,7 @@ class AcademicStructureSeeder extends Seeder
     ];
 
     private const array SUBJECTS = [
-        'nu-llb-Pass' => [
+        'nu-llb-pass' => [
             '1st-part' => [
                 ['name_en' => 'Jurisprudence', 'name_bn' => 'আইনতত্ত্ব'],
                 ['name_en' => 'Law of Contract', 'name_bn' => 'চুক্তি আইন'],
