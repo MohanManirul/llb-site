@@ -52,7 +52,7 @@ class DemoAnalyticsSeeder extends Seeder
     {
         $paths = [
             '/bn', '/bn/browse', '/bn/suggestions', '/bn/books', '/bn/notices',
-            '/bn/programs/nu-llb-Pass', '/bn/programs/bar-council', '/en/browse',
+            '/bn/programs/nu-llb-pass', '/bn/programs/bar-council', '/en/browse',
         ];
 
         $visitorIds = [];
