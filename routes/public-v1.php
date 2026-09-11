@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\V1\PublicApi\CatalogController;
+use App\Http\Controllers\V1\PublicApi\CollegeController;
 use App\Http\Controllers\V1\PublicApi\MaterialController;
 use App\Http\Controllers\V1\PublicApi\MaterialFileController;
 use App\Http\Controllers\V1\PublicApi\NoticeController;
@@ -51,5 +52,8 @@ Route::get('notices/{notice:slug}', [NoticeController::class, 'show'])->name('no
 Route::get('notices/{notice:slug}/attachment', [NoticeController::class, 'attachment'])
     ->middleware('throttle:downloads')
     ->name('notices.attachment');
+
+Route::get('colleges', [CollegeController::class, 'index'])->name('colleges.index');
+Route::get('colleges/options', [CollegeController::class, 'options'])->name('colleges.options');
 
 Route::post('pulse', PulseController::class)->name('pulse');

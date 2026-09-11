@@ -28,6 +28,7 @@ class StoreNoticeRequest extends FormRequest
             'body_en' => ['nullable', 'string', 'max:20000'],
             'category' => ['required', Rule::enum(NoticeCategory::class)],
             'program_id' => ['nullable', 'integer', Rule::exists('programs', 'id')],
+            'college_id' => ['nullable', 'integer', Rule::exists('colleges', 'id')],
             'program_level_id' => [
                 'nullable', 'integer',
                 Rule::exists('program_levels', 'id')->where('program_id', $this->input('program_id')),

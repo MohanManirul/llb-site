@@ -1,10 +1,10 @@
-import { FormEvent, useEffect, useState, type ReactNode } from 'react';
+import { FormEvent, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import PublicLayout from '@/components/public/PublicLayout';
 import PublicPageHeader from '@/components/public/PublicPageHeader';
 import AppLink from '@/components/public/AppLink';
 import { ErrorCard, LoadingBlock } from '@/components/public/helpers';
-import { Button, Pagination, SelectInput, TextInput } from '@/components/ui';
+import { Button, Pagination, SearchableSelect, SelectInput, TextInput } from '@/components/ui';
 import api from '@/lib/api-client';
 import type { ApiEnvelope } from '@/lib/api-types';
 import { errorMessage, flash, validationErrors } from '@/lib/flash';
@@ -19,14 +19,17 @@ interface ProfileForm {
     name: string;
     phone: string;
     program_id: string;
+    college_id: string;
     password: string;
     password_confirmation: string;
 }
 
 export default function StudentProfilePage() {
-    const { t, tx, d, n } = useTranslation();
+    const { t, tx, d, n, locale } = useTranslation();
     const { logout } = useStudent();
     const programs = usePage().props.programs ?? [];
+
+    const collegeFetchUrl = useMemo(() => `/v1/public/colleges?locale=${locale}`, [locale]);
 
     const profile = usePublicResource<StudentProfile>('/student/auth/me', {
         errorMessage: t('common.error'),
@@ -43,6 +46,7 @@ export default function StudentProfilePage() {
                 name: profile.data.name,
                 phone: profile.data.phone ?? '',
                 program_id: profile.data.program_id ? String(profile.data.program_id) : '',
+                college_id: profile.data.college_id ? String(profile.data.college_id) : '',
                 password: '',
                 password_confirmation: '',
             });
@@ -73,6 +77,7 @@ export default function StudentProfilePage() {
                 name: data.name,
                 phone: data.phone || null,
                 program_id: data.program_id || null,
+                college_id: data.college_id ? Number(data.college_id) : null,
                 password: data.password || null,
                 password_confirmation: data.password_confirmation || null,
             });
@@ -143,6 +148,19 @@ export default function StudentProfilePage() {
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
                                 error={errors.phone}
+                            />
+
+                            <SearchableSelect
+                                label={t('account.college')}
+                                value={data.college_id}
+                                onChange={(value) =>
+                                    setData('college_id', value == null ? '' : String(value))
+                                }
+                                fetchUrl={collegeFetchUrl}
+                                placeholder={t('account.no_college')}
+                                searchPlaceholder={t('account.college_search')}
+                                error={errors.college_id}
+                                hint={t('account.set_college_hint')}
                             />
 
                             <SelectInput

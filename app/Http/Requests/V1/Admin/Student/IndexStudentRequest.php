@@ -23,6 +23,7 @@ class IndexStudentRequest extends IndexRequest
         return [
             'is_active' => ['nullable', 'boolean'],
             'program_id' => ['nullable', 'integer'],
+            'college_id' => ['nullable', 'integer'],
         ];
     }
 }

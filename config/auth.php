@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 
 return [
@@ -53,6 +54,11 @@ return [
             'driver' => 'session',
             'provider' => 'students',
         ],
+
+        'teacher' => [
+            'driver' => 'session',
+            'provider' => 'teachers',
+        ],
     ],
 
     /*
@@ -81,6 +87,11 @@ return [
         'students' => [
             'driver' => 'eloquent',
             'model' => Student::class,
+        ],
+
+        'teachers' => [
+            'driver' => 'eloquent',
+            'model' => Teacher::class,
         ],
 
         // 'users' => [
@@ -119,6 +130,13 @@ return [
         'students' => [
             'provider' => 'students',
             'table' => 'student_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'teachers' => [
+            'provider' => 'teachers',
+            'table' => 'teacher_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

@@ -1,9 +1,8 @@
-import { FormEvent, useState, type ReactNode } from 'react';
-import { usePage } from '@inertiajs/react';
+import { FormEvent, useMemo, useState, type ReactNode } from 'react';
 import PublicLayout from '@/components/public/PublicLayout';
 import AuthCard from '@/components/public/AuthCard';
 import AppLink from '@/components/public/AppLink';
-import { Button, SelectInput, TextInput } from '@/components/ui';
+import { Button, SearchableSelect, TextInput } from '@/components/ui';
 import api from '@/lib/api-client';
 import { errorMessage, flash, validationErrors } from '@/lib/flash';
 import useStudent from '@/hooks/useStudent';
@@ -13,21 +12,22 @@ interface RegisterForm {
     name: string;
     email: string;
     phone: string;
-    program_id: string;
+    college_id: string;
     password: string;
     password_confirmation: string;
 }
 
 export default function StudentRegister() {
-    const { t, tx } = useTranslation();
+    const { t, locale } = useTranslation();
     const { redirectAfterAuth } = useStudent();
-    const programs = usePage().props.programs ?? [];
+
+    const collegeFetchUrl = useMemo(() => `/v1/public/colleges?locale=${locale}`, [locale]);
 
     const [data, setDataState] = useState<RegisterForm>({
         name: '',
         email: '',
         phone: '',
-        program_id: '',
+        college_id: '',
         password: '',
         password_confirmation: '',
     });
@@ -47,7 +47,7 @@ export default function StudentRegister() {
             await api.post('/student/auth/register', {
                 ...data,
                 phone: data.phone || null,
-                program_id: data.program_id || null,
+                college_id: data.college_id ? Number(data.college_id) : null,
             });
             redirectAfterAuth();
         } catch (error) {
@@ -106,19 +106,16 @@ export default function StudentRegister() {
                     error={errors.phone}
                 />
 
-                <SelectInput
-                    label={t('account.program')}
-                    value={data.program_id}
-                    onChange={(e) => setData('program_id', e.target.value)}
-                    error={errors.program_id}
-                >
-                    <option value="">{t('account.no_program')}</option>
-                    {programs.map((program) => (
-                        <option key={program.slug} value={program.id}>
-                            {tx(program.name)}
-                        </option>
-                    ))}
-                </SelectInput>
+                <SearchableSelect
+                    label={t('account.college')}
+                    value={data.college_id}
+                    onChange={(value) => setData('college_id', value == null ? '' : String(value))}
+                    fetchUrl={collegeFetchUrl}
+                    placeholder={t('account.pick_college')}
+                    searchPlaceholder={t('account.college_search')}
+                    error={errors.college_id}
+                    required
+                />
 
                 <TextInput
                     label={t('account.password')}

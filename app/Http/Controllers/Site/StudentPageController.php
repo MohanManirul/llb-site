@@ -65,4 +65,26 @@ class StudentPageController extends Controller
             'attemptId' => $attempt,
         ]);
     }
+
+    public function collegeRoutine(): Response
+    {
+        return Inertia::render('public/account/college/routine/index/page');
+    }
+
+    public function collegeNotices(): Response
+    {
+        return Inertia::render('public/account/college/notices/index/page');
+    }
+
+    public function collegeNotice(string $locale, string $notice): Response
+    {
+        return Inertia::render('public/account/college/notices/show/page', [
+            'noticeId' => $notice,
+        ]);
+    }
+
+    public function collegeNotes(): Response
+    {
+        return Inertia::render('public/account/college/notes/index/page');
+    }
 }

@@ -255,6 +255,12 @@ export interface PracticeSession {
     created_at: string | null;
 }
 
+export interface CollegeRef {
+    id: number;
+    slug: string;
+    name: TranslatedField;
+}
+
 export interface StudentProfile {
     id: number;
     name: string;
@@ -262,6 +268,71 @@ export interface StudentProfile {
     phone: string | null;
     program_id: number | null;
     program?: ProgramRef | null;
+    college_id: number | null;
+    college?: CollegeRef | null;
+    last_login_at: string | null;
+    created_at: string | null;
+}
+
+export interface CollegeNoticeItem {
+    id: number;
+    title: TranslatedField;
+    excerpt: TranslatedField;
+    body: TranslatedField;
+    category: string;
+    is_pinned: boolean;
+    published_at: string | null;
+    expires_at: string | null;
+    has_attachment: boolean;
+    attachment_name: string | null;
+    attachment_size: number | null;
+    subject?: { id: number; name: TranslatedField } | null;
+    session?: { id: number; label: string } | null;
+    teacher?: string | null;
+}
+
+export interface CollegeRoutineItem {
+    id: number;
+    title: TranslatedField;
+    description: TranslatedField;
+    effective_from: string | null;
+    published_at: string | null;
+    has_attachment: boolean;
+    attachment_name: string | null;
+    attachment_size: number | null;
+    session?: { id: number; label: string } | null;
+    teacher?: string | null;
+}
+
+export interface CollegeNoteItem {
+    id: number;
+    title: TranslatedField;
+    description: TranslatedField;
+    published_at: string | null;
+    has_attachment: boolean;
+    attachment_name: string | null;
+    attachment_size: number | null;
+    subject?: { id: number; name: TranslatedField } | null;
+    session?: { id: number; label: string } | null;
+    teacher?: string | null;
+}
+
+export interface SubjectFilterOption {
+    value: number;
+    label: string;
+    label_bn: string;
+}
+
+export interface TeacherProfile {
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    designation_bn: string | null;
+    designation_en: string | null;
+    is_active: boolean;
+    college_id: number | null;
+    college?: CollegeRef | null;
     last_login_at: string | null;
     created_at: string | null;
 }

@@ -38,6 +38,8 @@ class UserSeeder extends Seeder
         'delete model tests',
         'publish model tests',
         'edit students',
+        'delete colleges',
+        'edit teachers',
     ];
 
     public const array PEOPLE = [

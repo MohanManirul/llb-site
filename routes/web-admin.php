@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AcademicSessionPageController;
 use App\Http\Controllers\Admin\ActivityLogPageController;
+use App\Http\Controllers\Admin\CollegePageController;
 use App\Http\Controllers\Admin\ModelTestPageController;
 use App\Http\Controllers\Admin\NoticePageController;
 use App\Http\Controllers\Admin\ProgramPageController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\RolePageController;
 use App\Http\Controllers\Admin\StudentPageController;
 use App\Http\Controllers\Admin\StudyMaterialPageController;
 use App\Http\Controllers\Admin\SubjectPageController;
+use App\Http\Controllers\Admin\TeacherPageController;
 use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ImpersonationController;
@@ -99,6 +101,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/students', [StudentPageController::class, 'index'])->name('students.index');
 
+    Route::get('/teachers', [TeacherPageController::class, 'index'])->name('teachers.index');
+
     Route::controller(NoticePageController::class)
         ->prefix('notices')
         ->name('notices.')
@@ -122,6 +126,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::get('/{subject}/edit', 'edit')->name('edit');
+        });
+
+    Route::controller(CollegePageController::class)
+        ->prefix('colleges')
+        ->name('colleges.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::get('/{college}/edit', 'edit')->name('edit');
         });
 
     // Settings — forwards to the first section the user may open.

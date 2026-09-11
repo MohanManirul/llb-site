@@ -20,17 +20,38 @@ export interface SharedProgramRef {
     has_exam_stages: boolean;
 }
 
+export interface SharedCollegeRef {
+    id: number;
+    slug: string;
+    name: {
+        bn: string | null;
+        en: string | null;
+    };
+}
+
 export interface StudentUser {
     id: number;
     name: string;
     email: string;
     phone: string | null;
+    college: SharedCollegeRef | null;
+}
+
+export interface TeacherUser {
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    designation: string | null;
+    is_active: boolean;
+    college: SharedCollegeRef | null;
 }
 
 export interface SharedPageProps {
     locale: 'bn' | 'en';
     programs: SharedProgramRef[];
     student: StudentUser | null;
+    teacher: TeacherUser | null;
     auth: {
         user: AuthUser | null;
     };

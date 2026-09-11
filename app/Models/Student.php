@@ -7,6 +7,7 @@ use App\Notifications\StudentResetPassword;
 use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,13 +15,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable([
-    'name', 'email', 'phone', 'password', 'program_id',
+    'name', 'email', 'phone', 'password', 'program_id', 'college_id',
     'email_verified_at', 'is_active', 'last_login_at',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class Student extends Authenticatable
 {
-    use CreatedBetween, HasApiTokens, Notifiable, Searchable;
+    use CreatedBetween, HasApiTokens, HasFactory, Notifiable, Searchable;
 
     protected $attributes = [
         'is_active' => true,
@@ -42,6 +43,14 @@ class Student extends Authenticatable
     public function program(): BelongsTo
     {
         return $this->belongsTo(Program::class);
+    }
+
+    /**
+     * @return BelongsTo<College, $this>
+     */
+    public function college(): BelongsTo
+    {
+        return $this->belongsTo(College::class);
     }
 
     /**

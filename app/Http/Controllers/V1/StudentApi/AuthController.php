@@ -53,7 +53,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return ApiResponse::respondWithResource(
-            new StudentProfileResource($request->user('student')->load('program')),
+            new StudentProfileResource($request->user('student')->load(['program', 'college'])),
         );
     }
 

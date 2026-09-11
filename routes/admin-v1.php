@@ -7,6 +7,7 @@ use App\Http\Controllers\V1\Admin\Academic\SubjectController;
 use App\Http\Controllers\V1\Admin\Access\AccessController;
 use App\Http\Controllers\V1\Admin\ActivityLog\ActivityLogController;
 use App\Http\Controllers\V1\Admin\Auth\AuthController;
+use App\Http\Controllers\V1\Admin\College\CollegeController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\V1\Admin\Dashboard\DashboardReportController;
 use App\Http\Controllers\V1\Admin\ModelTest\ModelTestController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\V1\Admin\Role\RoleController;
 use App\Http\Controllers\V1\Admin\Student\StudentController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\MaterialFileController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\StudyMaterialController;
+use App\Http\Controllers\V1\Admin\Teacher\TeacherController;
 use App\Http\Controllers\V1\Admin\User\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +90,11 @@ Route::middleware('auth:sanctum')
             ->name('subjects.options');
         Route::apiResource('subjects', SubjectController::class);
 
+        // Colleges — option list must stay above the apiResource.
+        Route::get('colleges/options', [CollegeController::class, 'options'])
+            ->name('colleges.options');
+        Route::apiResource('colleges', CollegeController::class);
+
         // Study materials — literal segments must stay above the apiResource.
         Route::get('study-materials/filters', [StudyMaterialController::class, 'filterOptions'])
             ->name('study-materials.filters');
@@ -154,6 +161,12 @@ Route::middleware('auth:sanctum')
         Route::patch('students/{student}/active', [StudentController::class, 'toggleActive'])
             ->name('students.active');
         Route::apiResource('students', StudentController::class)
+            ->only(['index', 'show']);
+
+        // Teachers.
+        Route::patch('teachers/{teacher}/active', [TeacherController::class, 'toggleActive'])
+            ->name('teachers.active');
+        Route::apiResource('teachers', TeacherController::class)
             ->only(['index', 'show']);
 
         // Select/autocomplete option lists — must stay above their apiResource.

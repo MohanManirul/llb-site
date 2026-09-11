@@ -32,6 +32,7 @@ class IndexNoticeRequest extends IndexRequest
             'category' => ['nullable', Rule::enum(NoticeCategory::class)],
             'status' => ['nullable', Rule::enum(ContentStatus::class)],
             'program_id' => ['nullable', 'integer', Rule::exists('programs', 'id')],
+            'college_id' => ['nullable', 'integer', Rule::exists('colleges', 'id')],
             'academic_session_id' => ['nullable', 'integer', Rule::exists('academic_sessions', 'id')],
         ];
     }

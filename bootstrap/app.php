@@ -49,6 +49,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/student-v1.php'));
 
             Route::middleware('web')
+                ->prefix('v1/teacher')
+                ->name('v1.teacher.')
+                ->group(base_path('routes/teacher-v1.php'));
+
+            Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
             // The staff side of the app: same `web` group as routes/web.php,
@@ -97,6 +102,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $locale = in_array($request->route()?->parameter('locale'), config('llb.locales'), true)
                 ? $request->route()->parameter('locale')
                 : config('llb.fallback_locale');
+
+            if ($request->is('*/teacher/*', '*/teacher')) {
+                return '/'.$locale.'/teacher/login?redirect='.urlencode('/'.$request->path());
+            }
 
             return '/'.$locale.'/account/login?redirect='.urlencode('/'.$request->path());
         });

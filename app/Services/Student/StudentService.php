@@ -14,10 +14,10 @@ final class StudentService
     public function paginate(FilterData $filters): Paginator
     {
         return Student::query()
-            ->with('program:id,name_bn,name_en,slug')
+            ->with(['program:id,name_bn,name_en,slug', 'college:id,name_bn,name_en,slug'])
             ->withCount(['attempts', 'practiceSessions'])
             ->searchable($filters->search, ['name', 'email', 'phone'])
-            ->filterable($filters->only(['is_active', 'program_id']))
+            ->filterable($filters->only(['is_active', 'program_id', 'college_id']))
             ->orderBy($filters->sortBy, $filters->sortDir)
             ->orderByDesc('id')
             ->simplePaginate($filters->perPage);
@@ -26,7 +26,7 @@ final class StudentService
     public function show(Student $student): Student
     {
         return $student
-            ->load('program:id,name_bn,name_en,slug')
+            ->load(['program:id,name_bn,name_en,slug', 'college:id,name_bn,name_en,slug'])
             ->loadCount(['attempts', 'practiceSessions']);
     }
 
