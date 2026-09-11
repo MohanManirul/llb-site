@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import useStudent from '@/hooks/useStudent';
 import useTranslation from '@/hooks/useTranslation';
@@ -11,7 +11,7 @@ interface MobileNavDrawerProps {
 
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
     const { t, tx } = useTranslation();
-    const { student, loginHref, currentHref, logout } = useStudent();
+    const { student, logout } = useStudent();
     const programs = usePage().props.programs ?? [];
 
     if (!open) return null;
@@ -114,17 +114,9 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                                 </button>
                             </>
                         ) : (
-                            <>
-                                <Link href={loginHref(currentHref())} onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
-                                    {t('nav.login')}
-                                </Link>
-                                <AppLink href="/account/register" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
-                                    {t('nav.register')}
-                                </AppLink>
-                                <AppLink href="/teacher/login" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink-muted hover:bg-gray-100">
-                                    {t('nav.teacher_login')}
-                                </AppLink>
-                            </>
+                            <AppLink href="/account/register" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
+                                {t('nav.register')}
+                            </AppLink>
                         )}
                     </div>
 

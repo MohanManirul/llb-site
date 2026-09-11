@@ -33,8 +33,8 @@ final class CollegeService
     {
         return College::query()
             ->where('is_active', true)
-            ->orderBy('sort_order')
             ->orderBy('name_en')
+            ->orderBy('name_bn')
             ->get()
             ->map(fn (College $college) => [
                 'value' => $college->id,

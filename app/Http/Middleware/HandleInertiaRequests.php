@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Program;
+use App\Models\User;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -160,7 +161,7 @@ class HandleInertiaRequests extends Middleware
     {
         $account = $request->user();
 
-        if (! $account) {
+        if (! $account instanceof User) {
             return null;
         }
 

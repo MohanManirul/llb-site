@@ -115,4 +115,46 @@ class ApiCollegeManagementTest extends TestCase
         $this->assertTrue($labels->contains('Active College'));
         $this->assertFalse($labels->contains('Hidden College'));
     }
+
+    public function test_the_public_college_list_labels_follow_the_requested_locale(): void
+    {
+        College::factory()->create([
+            'name_bn' => 'ঢাকা ল কলেজ',
+            'name_en' => 'Dhaka Law College',
+            'district_bn' => 'ঢাকা',
+            'district_en' => 'Dhaka',
+        ]);
+
+        $bn = $this->getJson('/v1/public/colleges?locale=bn')->assertOk();
+        $this->assertSame('ঢাকা ল কলেজ', $bn->json('result.0.label'));
+        $this->assertSame('ঢাকা', $bn->json('result.0.district.bn'));
+
+        $en = $this->getJson('/v1/public/colleges?locale=en')->assertOk();
+        $this->assertSame('Dhaka Law College', $en->json('result.0.label'));
+        $this->assertSame('Dhaka', $en->json('result.0.district.en'));
+    }
+
+    public function test_the_public_college_list_is_alphabetical_with_bengali_vowels_before_consonants(): void
+    {
+        College::factory()->create(['name_bn' => 'হবিগঞ্জ ল কলেজ', 'name_en' => 'Habiganj Law College', 'sort_order' => 1]);
+        College::factory()->create(['name_bn' => 'কুমিল্লা ল কলেজ', 'name_en' => 'Comilla Law College', 'sort_order' => 2]);
+        College::factory()->create(['name_bn' => 'আইডিয়াল ল কলেজ', 'name_en' => 'Ideal Law College', 'sort_order' => 3]);
+
+        $bn = collect($this->getJson('/v1/public/colleges?locale=bn')->assertOk()->json('result'))->pluck('label');
+
+        $this->assertSame(['আইডিয়াল ল কলেজ', 'কুমিল্লা ল কলেজ', 'হবিগঞ্জ ল কলেজ'], $bn->all());
+
+        $en = collect($this->getJson('/v1/public/colleges?locale=en')->assertOk()->json('result'))->pluck('label');
+
+        $this->assertSame(['Comilla Law College', 'Habiganj Law College', 'Ideal Law College'], $en->all());
+    }
+
+    public function test_the_public_college_list_falls_back_when_a_name_is_missing_for_the_locale(): void
+    {
+        College::factory()->create(['name_bn' => 'ঢাকা ল কলেজ', 'name_en' => null]);
+
+        $this->getJson('/v1/public/colleges?locale=en')
+            ->assertOk()
+            ->assertJsonPath('result.0.label', 'ঢাকা ল কলেজ');
+    }
 }

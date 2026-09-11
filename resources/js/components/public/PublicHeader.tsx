@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
+    AcademicCapIcon,
     Bars3Icon,
     BuildingLibraryIcon,
     ChevronDownIcon,
@@ -19,6 +20,8 @@ import MobileNavDrawer from './MobileNavDrawer';
 export default function PublicHeader() {
     const { t, tx, isBn, localeHref } = useTranslation();
     const programs = usePage().props.programs ?? [];
+    const { student } = useStudent();
+    const { teacher } = useTeacher();
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [search, setSearch] = useState('');
 
@@ -33,6 +36,9 @@ export default function PublicHeader() {
     return (
         <header className="sticky top-0 z-30 border-b border-hairline bg-white/95 backdrop-blur">
             <div className="h-1 bg-linear-to-r from-brand via-brass to-banyan" />
+
+            {!student && !teacher && <AuthTopBar />}
+
             <div className="mx-auto flex w-full max-w-300 items-center gap-3 px-4 py-3 md:px-6">
                 <button
                     type="button"
@@ -138,6 +144,34 @@ export default function PublicHeader() {
     );
 }
 
+function AuthTopBar() {
+    const { t } = useTranslation();
+    const { loginHref: studentLoginHref, currentHref } = useStudent();
+    const { loginHref: teacherLoginHref } = useTeacher();
+
+    return (
+        <div className="border-b border-hairline bg-gray-50">
+            <div className="mx-auto flex w-full max-w-300 items-center justify-end gap-1 px-4 py-1.5 md:px-6">
+                <Link
+                    href={teacherLoginHref(currentHref())}
+                    className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                >
+                    <AcademicCapIcon className="h-4 w-4" />
+                    {t('nav.teacher_login')}
+                </Link>
+                <span aria-hidden="true" className="h-3.5 w-px bg-hairline" />
+                <Link
+                    href={studentLoginHref(currentHref())}
+                    className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                >
+                    <UserCircleIcon className="h-4 w-4" />
+                    {t('nav.student_login')}
+                </Link>
+            </div>
+        </div>
+    );
+}
+
 function TeacherMenu() {
     const { t } = useTranslation();
     const { teacher, logout } = useTeacher();
@@ -209,22 +243,14 @@ function TeacherMenu() {
 
 function AccountMenu() {
     const { t } = useTranslation();
-    const { student, loginHref, currentHref, logout } = useStudent();
+    const { student, logout } = useStudent();
     const { teacher } = useTeacher();
     const [loggingOut, setLoggingOut] = useState(false);
 
     if (!student) {
         if (teacher) return <TeacherMenu />;
 
-        return (
-            <Link
-                href={loginHref(currentHref())}
-                className="hidden items-center gap-1.5 rounded-control border border-hairline px-3 py-1.5 text-sm font-medium text-ink hover:bg-gray-100 sm:inline-flex"
-            >
-                <UserCircleIcon className="h-4 w-4" />
-                {t('nav.login')}
-            </Link>
-        );
+        return null;
     }
 
     const signOut = async () => {
