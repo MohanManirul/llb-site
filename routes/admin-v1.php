@@ -27,6 +27,7 @@ use App\Http\Controllers\V1\Admin\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
+ 
 
 Route::middleware('auth:sanctum')
     ->prefix('admin')
