@@ -22,9 +22,10 @@ final class NoticeService
                 'program:id,name_bn,name_en',
                 'session:id,label',
                 'subject:id,name_bn,name_en',
+                'college:id,name_bn,name_en,slug',
             ])
             ->searchable($filters->search, ['title_bn', 'title_en', 'body_bn', 'body_en'])
-            ->filterable($filters->only(['category', 'status', 'program_id', 'academic_session_id']))
+            ->filterable($filters->only(['category', 'status', 'program_id', 'academic_session_id', 'college_id']))
             ->orderByDesc('is_pinned')
             ->orderBy($filters->sortBy, $filters->sortDir)
             ->simplePaginate($filters->perPage);

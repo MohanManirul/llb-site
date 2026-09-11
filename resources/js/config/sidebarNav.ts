@@ -17,6 +17,8 @@ import {
     QuestionMarkCircleIcon,
     ClipboardDocumentCheckIcon,
     UserGroupIcon,
+    BuildingLibraryIcon,
+    IdentificationIcon,
 } from '@heroicons/react/24/outline';
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -68,6 +70,18 @@ export const navItems: NavItem[] = [
         icon: UserGroupIcon,
         href: '/students',
         permission: 'view students',
+    },
+    {
+        label: 'Teachers',
+        icon: IdentificationIcon,
+        href: '/teachers',
+        permission: 'view teachers',
+    },
+    {
+        label: 'Colleges',
+        icon: BuildingLibraryIcon,
+        href: '/colleges',
+        permission: 'view colleges',
     },
     {
         label: 'Reports',

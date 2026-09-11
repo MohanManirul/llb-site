@@ -23,7 +23,7 @@ class RegisterStudentRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', 'unique:students,email'],
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'program_id' => ['nullable', 'integer', Rule::exists('programs', 'id')],
+            'college_id' => ['required', 'integer', Rule::exists('colleges', 'id')->where('is_active', true)],
         ];
     }
 }

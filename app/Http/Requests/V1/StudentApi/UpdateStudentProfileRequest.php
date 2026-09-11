@@ -22,6 +22,7 @@ class UpdateStudentProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:150'],
             'phone' => ['nullable', 'string', 'max:20'],
             'program_id' => ['nullable', 'integer', Rule::exists('programs', 'id')],
+            'college_id' => ['nullable', 'integer', Rule::exists('colleges', 'id')->where('is_active', true)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ];
     }

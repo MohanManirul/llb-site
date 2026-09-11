@@ -23,6 +23,12 @@ class StudentResource extends JsonResource
                 'name_bn' => $this->program->name_bn,
                 'name_en' => $this->program->name_en,
             ]),
+            'college' => $this->whenLoaded('college', fn () => $this->college === null ? null : [
+                'id' => $this->college->id,
+                'slug' => $this->college->slug,
+                'name_bn' => $this->college->name_bn,
+                'name_en' => $this->college->name_en,
+            ]),
             'is_active' => $this->is_active,
             'attempts_count' => $this->whenCounted('attempts'),
             'practice_sessions_count' => $this->whenCounted('practiceSessions'),

@@ -43,6 +43,13 @@ class NoticeResource extends JsonResource
             'subject' => $this->whenLoaded('subject', fn () => $this->subject
                 ? ['id' => $this->subject->id, 'name_en' => $this->subject->name_en]
                 : null),
+            'college_id' => $this->college_id,
+            'college' => $this->whenLoaded('college', fn () => $this->college
+                ? ['id' => $this->college->id, 'name_bn' => $this->college->name_bn, 'name_en' => $this->college->name_en]
+                : null),
+            'teacher' => $this->whenLoaded('teacher', fn () => $this->teacher
+                ? ['id' => $this->teacher->id, 'name' => $this->teacher->name]
+                : null),
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
     }

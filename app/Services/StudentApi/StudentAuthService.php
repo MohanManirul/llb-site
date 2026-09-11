@@ -61,7 +61,7 @@ final class StudentAuthService
 
         $student->update($data);
 
-        return $student->fresh(['program']);
+        return $student->fresh(['program', 'college']);
     }
 
     public function sendResetLink(string $email): void

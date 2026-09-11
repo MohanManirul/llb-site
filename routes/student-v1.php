@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\V1\StudentApi\AttemptController;
 use App\Http\Controllers\V1\StudentApi\AuthController;
+use App\Http\Controllers\V1\StudentApi\CollegeContentController;
 use App\Http\Controllers\V1\StudentApi\ModelTestController;
 use App\Http\Controllers\V1\StudentApi\PracticeController;
 use App\Http\Middleware\EnsureStudentIsActive;
@@ -35,6 +36,27 @@ Route::middleware(['auth:student', EnsureStudentIsActive::class])->group(functio
             Route::get('questions', 'questions')->name('questions');
             Route::get('sessions', 'history')->name('sessions.index');
             Route::post('sessions', 'store')->name('sessions.store');
+        });
+
+    Route::controller(CollegeContentController::class)
+        ->prefix('college')
+        ->name('college.')
+        ->group(function () {
+            Route::get('notices', 'notices')->name('notices.index');
+            Route::get('notices/{notice}', 'notice')->name('notices.show');
+            Route::get('notices/{notice}/attachment', 'noticeAttachment')
+                ->middleware('throttle:downloads')->name('notices.attachment');
+
+            Route::get('routines', 'routines')->name('routines.index');
+            Route::get('routines/{classRoutine}', 'routine')->name('routines.show');
+            Route::get('routines/{classRoutine}/attachment', 'routineAttachment')
+                ->middleware('throttle:downloads')->name('routines.attachment');
+
+            Route::get('notes/filters', 'noteFilters')->name('notes.filters');
+            Route::get('notes', 'notes')->name('notes.index');
+            Route::get('notes/{classNote}', 'note')->name('notes.show');
+            Route::get('notes/{classNote}/attachment', 'noteAttachment')
+                ->middleware('throttle:downloads')->name('notes.attachment');
         });
 
     Route::get('model-tests', [ModelTestController::class, 'index'])->name('model-tests.index');

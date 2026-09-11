@@ -65,5 +65,15 @@ return [
         // students permissions
         'view students',
         'edit students',
+
+        // colleges permissions
+        'view colleges',
+        'create colleges',
+        'edit colleges',
+        'delete colleges',
+
+        // teachers permissions
+        'view teachers',
+        'edit teachers',
     ],
 ];

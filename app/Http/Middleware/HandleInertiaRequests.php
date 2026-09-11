@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => fn () => app()->getLocale(),
             'programs' => fn () => $this->publicPrograms($request),
             'student' => fn () => $this->studentUser($request),
+            'teacher' => fn () => $this->teacherUser($request),
         ];
     }
 
@@ -61,7 +62,48 @@ class HandleInertiaRequests extends Middleware
             return null;
         }
 
-        return $student->only('id', 'name', 'email', 'phone');
+        $student->loadMissing('college:id,slug,name_bn,name_en');
+
+        return [
+            ...$student->only('id', 'name', 'email', 'phone'),
+            'college' => $student->college === null ? null : [
+                'id' => $student->college->id,
+                'slug' => $student->college->slug,
+                'name' => $student->college->translated('name'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function teacherUser(Request $request): ?array
+    {
+        if ($request->is('admin', 'admin/*')) {
+            return null;
+        }
+
+        $teacher = $request->user('teacher');
+
+        if (! $teacher) {
+            return null;
+        }
+
+        $teacher->loadMissing('college:id,slug,name_bn,name_en');
+
+        return [
+            'id' => $teacher->id,
+            'name' => $teacher->name,
+            'email' => $teacher->email,
+            'phone' => $teacher->phone,
+            'designation' => $teacher->designation_en ?? $teacher->designation_bn,
+            'is_active' => $teacher->is_active,
+            'college' => $teacher->college === null ? null : [
+                'id' => $teacher->college->id,
+                'slug' => $teacher->college->slug,
+                'name' => $teacher->college->translated('name'),
+            ],
+        ];
     }
 
     /**

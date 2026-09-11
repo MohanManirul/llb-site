@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Popover } from '@/components/ui';
 import useStudent from '@/hooks/useStudent';
+import useTeacher from '@/hooks/useTeacher';
 import useTranslation from '@/hooks/useTranslation';
 import { SITE_NAME_BN, SITE_NAME } from '@/config/site';
 import AppLink from './AppLink';
@@ -137,12 +138,84 @@ export default function PublicHeader() {
     );
 }
 
+function TeacherMenu() {
+    const { t } = useTranslation();
+    const { teacher, logout } = useTeacher();
+    const [loggingOut, setLoggingOut] = useState(false);
+
+    const signOut = async () => {
+        setLoggingOut(true);
+
+        try {
+            await logout();
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
+    if (!teacher) return null;
+
+    return (
+        <div className="hidden sm:block">
+            <Popover
+                label={teacher.name.split(' ')[0]}
+                icon={<UserCircleIcon className="h-4 w-4" />}
+                panelClassName="w-56 p-2"
+            >
+                {(close) => (
+                    <div className="flex flex-col">
+                        <AppLink
+                            href="/teacher/routines"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('teacher.nav_routines')}
+                        </AppLink>
+                        <AppLink
+                            href="/teacher/notices"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('teacher.nav_notices')}
+                        </AppLink>
+                        <AppLink
+                            href="/teacher/notes"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('teacher.nav_notes')}
+                        </AppLink>
+                        <AppLink
+                            href="/teacher/profile"
+                            onClick={() => close()}
+                            className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                        >
+                            {t('teacher.nav_profile')}
+                        </AppLink>
+                        <button
+                            type="button"
+                            onClick={signOut}
+                            disabled={loggingOut}
+                            className="rounded-control px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                            {t('nav.logout')}
+                        </button>
+                    </div>
+                )}
+            </Popover>
+        </div>
+    );
+}
+
 function AccountMenu() {
     const { t } = useTranslation();
     const { student, loginHref, currentHref, logout } = useStudent();
+    const { teacher } = useTeacher();
     const [loggingOut, setLoggingOut] = useState(false);
 
     if (!student) {
+        if (teacher) return <TeacherMenu />;
+
         return (
             <Link
                 href={loginHref(currentHref())}
@@ -180,6 +253,31 @@ function AccountMenu() {
                         >
                             {t('nav.profile')}
                         </AppLink>
+                        {student.college && (
+                            <>
+                                <AppLink
+                                    href="/account/college/routine"
+                                    onClick={() => close()}
+                                    className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                                >
+                                    {t('nav.college_routine')}
+                                </AppLink>
+                                <AppLink
+                                    href="/account/college/notices"
+                                    onClick={() => close()}
+                                    className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                                >
+                                    {t('nav.college_notices')}
+                                </AppLink>
+                                <AppLink
+                                    href="/account/college/notes"
+                                    onClick={() => close()}
+                                    className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100"
+                                >
+                                    {t('nav.college_notes')}
+                                </AppLink>
+                            </>
+                        )}
                         <AppLink
                             href="/account/attempts"
                             onClick={() => close()}

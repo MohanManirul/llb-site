@@ -86,6 +86,19 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                                 <AppLink href="/account/profile" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
                                     {t('nav.profile')}
                                 </AppLink>
+                                {student.college && (
+                                    <>
+                                        <AppLink href="/account/college/routine" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
+                                            {t('nav.college_routine')}
+                                        </AppLink>
+                                        <AppLink href="/account/college/notices" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
+                                            {t('nav.college_notices')}
+                                        </AppLink>
+                                        <AppLink href="/account/college/notes" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
+                                            {t('nav.college_notes')}
+                                        </AppLink>
+                                    </>
+                                )}
                                 <AppLink href="/account/attempts" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
                                     {t('nav.my_attempts')}
                                 </AppLink>
@@ -107,6 +120,9 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                                 </Link>
                                 <AppLink href="/account/register" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink hover:bg-gray-100">
                                     {t('nav.register')}
+                                </AppLink>
+                                <AppLink href="/teacher/login" onClick={onClose} className="rounded-control px-3 py-2 text-sm text-ink-muted hover:bg-gray-100">
+                                    {t('nav.teacher_login')}
                                 </AppLink>
                             </>
                         )}

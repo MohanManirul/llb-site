@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\College;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,6 +19,7 @@ class StudentAuthTest extends TestCase
             'email' => 'rahim@example.com',
             'password' => 'secret-password',
             'password_confirmation' => 'secret-password',
+            'college_id' => College::factory()->create()->id,
         ], $overrides);
     }
 

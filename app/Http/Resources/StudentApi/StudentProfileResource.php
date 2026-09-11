@@ -23,6 +23,12 @@ class StudentProfileResource extends JsonResource
                 'slug' => $this->program->slug,
                 'name' => $this->program->translated('name'),
             ]),
+            'college_id' => $this->college_id,
+            'college' => $this->whenLoaded('college', fn () => [
+                'id' => $this->college->id,
+                'slug' => $this->college->slug,
+                'name' => $this->college->translated('name'),
+            ]),
             'last_login_at' => $this->last_login_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString(),
         ];

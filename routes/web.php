@@ -3,6 +3,8 @@
 use App\Http\Controllers\Site\PublicPageController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Http\Controllers\Site\StudentPageController;
+use App\Http\Controllers\Site\TeacherPageController;
+use App\Http\Middleware\EnsureTeacherIsActive;
 use App\Http\Middleware\EnsureVisitorId;
 use App\Http\Middleware\SetPublicLocale;
 use Illuminate\Support\Facades\Route;
@@ -67,4 +69,39 @@ Route::middleware([SetPublicLocale::class, EnsureVisitorId::class])
                 Route::get('/model-tests/{modelTest}/attempts/{attempt}', 'attemptRunner')->name('model-tests.runner');
             });
         });
+
+        Route::controller(TeacherPageController::class)->group(function () {
+            Route::middleware('guest:teacher')->group(function () {
+                Route::get('/teacher/login', 'login')->name('teacher.login');
+                Route::get('/teacher/register', 'register')->name('teacher.register');
+                Route::get('/teacher/registered', 'registered')->name('teacher.registered');
+                Route::get('/teacher/forgot-password', 'forgotPassword')->name('teacher.forgot-password');
+                Route::get('/teacher/reset-password/{token}', 'resetPassword')->name('teacher.reset-password');
+            });
+
+            Route::middleware(['auth:teacher', EnsureTeacherIsActive::class])->group(function () {
+                Route::get('/teacher/profile', 'profile')->name('teacher.profile');
+
+                Route::get('/teacher/routines', 'routines')->name('teacher.routines.index');
+                Route::get('/teacher/routines/create', 'createRoutine')->name('teacher.routines.create');
+                Route::get('/teacher/routines/{routine}/edit', 'editRoutine')->name('teacher.routines.edit');
+
+                Route::get('/teacher/notices', 'notices')->name('teacher.notices.index');
+                Route::get('/teacher/notices/create', 'createNotice')->name('teacher.notices.create');
+                Route::get('/teacher/notices/{notice}/edit', 'editNotice')->name('teacher.notices.edit');
+
+                Route::get('/teacher/notes', 'notes')->name('teacher.notes.index');
+                Route::get('/teacher/notes/create', 'createNote')->name('teacher.notes.create');
+                Route::get('/teacher/notes/{note}/edit', 'editNote')->name('teacher.notes.edit');
+            });
+        });
+
+        Route::controller(StudentPageController::class)
+            ->middleware('auth:student')
+            ->group(function () {
+                Route::get('/account/college/routine', 'collegeRoutine')->name('account.college.routine');
+                Route::get('/account/college/notices', 'collegeNotices')->name('account.college.notices');
+                Route::get('/account/college/notices/{notice}', 'collegeNotice')->name('account.college.notices.show');
+                Route::get('/account/college/notes', 'collegeNotes')->name('account.college.notes');
+            });
     });
