@@ -16,7 +16,7 @@ import useSite from '@/hooks/useSite';
 import AppLink from './AppLink';
 import LanguageToggle from './LanguageToggle';
 import MobileNavDrawer from './MobileNavDrawer';
-import SuggestionTicker from './SuggestionTicker';
+import SuggestionTicker, { useSuggestionTickerItems } from './SuggestionTicker';
 
 export default function PublicHeader() {
     const { t, tx, localeHref } = useTranslation();
@@ -39,7 +39,7 @@ export default function PublicHeader() {
         <header className="sticky top-0 z-30 border-b border-hairline bg-white/95 backdrop-blur">
             <div className="h-1 bg-linear-to-r from-brand via-brass to-banyan" />
 
-            {!student && !teacher && <AuthTopBar />}
+            <TopBar showAuthLinks={!student && !teacher} />
 
             <div className="mx-auto flex w-full max-w-300 items-center gap-3 px-4 py-3 md:px-6">
                 <button
@@ -157,31 +157,42 @@ export default function PublicHeader() {
     );
 }
 
-function AuthTopBar() {
+interface TopBarProps {
+    showAuthLinks: boolean;
+}
+
+function TopBar({ showAuthLinks }: TopBarProps) {
     const { t } = useTranslation();
     const { loginHref: studentLoginHref, currentHref } = useStudent();
     const { loginHref: teacherLoginHref } = useTeacher();
+    const tickerItems = useSuggestionTickerItems();
+
+    if (tickerItems.length === 0 && !showAuthLinks) return null;
 
     return (
         <div className="border-b border-hairline bg-gray-50">
             <div className="mx-auto flex w-full max-w-300 items-center gap-1 px-4 py-1.5 md:px-6">
-                <SuggestionTicker />
+                <SuggestionTicker items={tickerItems} />
 
-                <Link
-                    href={teacherLoginHref(currentHref())}
-                    className="ml-auto inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
-                >
-                    <AcademicCapIcon className="h-4 w-4" />
-                    {t('nav.teacher_login')}
-                </Link>
-                <span aria-hidden="true" className="h-3.5 w-px bg-hairline" />
-                <Link
-                    href={studentLoginHref(currentHref())}
-                    className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
-                >
-                    <UserCircleIcon className="h-4 w-4" />
-                    {t('nav.student_login')}
-                </Link>
+                {showAuthLinks && (
+                    <>
+                        <Link
+                            href={teacherLoginHref(currentHref())}
+                            className="ml-auto inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                        >
+                            <AcademicCapIcon className="h-4 w-4" />
+                            {t('nav.teacher_login')}
+                        </Link>
+                        <span aria-hidden="true" className="h-3.5 w-px bg-hairline" />
+                        <Link
+                            href={studentLoginHref(currentHref())}
+                            className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                        >
+                            <UserCircleIcon className="h-4 w-4" />
+                            {t('nav.student_login')}
+                        </Link>
+                    </>
+                )}
             </div>
         </div>
     );

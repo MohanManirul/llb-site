@@ -32,6 +32,8 @@ let uploadKey = 0;
 
 const nextKey = () => `upload-${++uploadKey}`;
 
+const MAX_FILES = 10;
+
 export default function MaterialForm({ material }: MaterialFormProps) {
     const isEdit = Boolean(material);
 
@@ -124,11 +126,33 @@ export default function MaterialForm({ material }: MaterialFormProps) {
     }, [data.program_id, data.program_level_id]);
 
     const addUpload = () => {
-        setUploads((current) => [...current, { key: nextKey(), file: null as unknown as File, label_bn: '' }]);
+        setUploads((current) =>
+            current.length >= MAX_FILES
+                ? current
+                : [...current, { key: nextKey(), file: null as unknown as File, label_bn: '' }],
+        );
     };
 
     const submit = async (event: FormEvent) => {
         event.preventDefault();
+
+        if (!isEdit) {
+            const blank = uploads.filter((upload) => !upload.file);
+
+            if (blank.length > 0) {
+                setErrors(
+                    Object.fromEntries(
+                        blank.map((upload) => [
+                            `upload.${upload.key}`,
+                            'Choose a PDF for this row, or remove it.',
+                        ]),
+                    ),
+                );
+
+                return;
+            }
+        }
+
         setSaving(true);
         setErrors({});
 
@@ -161,9 +185,7 @@ export default function MaterialForm({ material }: MaterialFormProps) {
         }
 
         if (!isEdit) {
-            const usable = uploads.filter((upload) => upload.file);
-
-            usable.forEach((upload, index) => {
+            uploads.forEach((upload, index) => {
                 payload.append(`files[${index}][file]`, upload.file);
                 if (upload.label_bn) payload.append(`files[${index}][label_bn]`, upload.label_bn);
             });
@@ -450,10 +472,17 @@ export default function MaterialForm({ material }: MaterialFormProps) {
                         <div>
                             <h2 className="font-semibold text-ink">PDF files</h2>
                             <p className="mt-0.5 text-sm text-ink-muted">
-                                At least one PDF. Split books go in as part 1, part 2, …
+                                At least one PDF, up to {MAX_FILES}. Split books go in as part 1,
+                                part 2, …
                             </p>
                         </div>
-                        <Button type="button" variant="secondary" size="sm" onClick={addUpload}>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            disabled={uploads.length >= MAX_FILES}
+                            onClick={addUpload}
+                        >
                             <PlusIcon className="h-4 w-4" />
                             Add file
                         </Button>
@@ -471,8 +500,10 @@ export default function MaterialForm({ material }: MaterialFormProps) {
                                     <div className="flex-1 space-y-3">
                                         <FileUpload
                                             value={upload.file ?? null}
-                                            progress={upload.file ? uploadProgress : null}
-                                            error={errors[`files.${index}.file`]}
+                                            error={
+                                                errors[`upload.${upload.key}`] ??
+                                                errors[`files.${index}.file`]
+                                            }
                                             onChange={(file) =>
                                                 setUploads((current) =>
                                                     current.map((item) =>
@@ -530,6 +561,26 @@ export default function MaterialForm({ material }: MaterialFormProps) {
             )}
 
             <div className="mt-5 flex items-center justify-end gap-3">
+                {uploadProgress != null && (
+                    <div className="mr-auto flex min-w-0 flex-1 items-center gap-2">
+                        <div
+                            role="progressbar"
+                            aria-valuenow={uploadProgress}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-gray-200"
+                        >
+                            <div
+                                className="h-full rounded-full bg-brand-accent transition-all"
+                                style={{ width: `${uploadProgress}%` }}
+                            />
+                        </div>
+                        <span className="shrink-0 text-xs text-ink-muted">
+                            Uploading {uploadProgress}%
+                        </span>
+                    </div>
+                )}
+
                 <Link href="/admin/study-materials">
                     <Button type="button" variant="secondary">
                         Cancel
