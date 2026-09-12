@@ -12,14 +12,15 @@ import { Popover } from '@/components/ui';
 import useStudent from '@/hooks/useStudent';
 import useTeacher from '@/hooks/useTeacher';
 import useTranslation from '@/hooks/useTranslation';
-import { SITE_NAME_BN, SITE_NAME } from '@/config/site';
+import useSite from '@/hooks/useSite';
 import AppLink from './AppLink';
 import LanguageToggle from './LanguageToggle';
 import MobileNavDrawer from './MobileNavDrawer';
 import SuggestionTicker from './SuggestionTicker';
 
 export default function PublicHeader() {
-    const { t, tx, isBn, localeHref } = useTranslation();
+    const { t, tx, localeHref } = useTranslation();
+    const site = useSite();
     const programs = usePage().props.programs ?? [];
     const { student } = useStudent();
     const { teacher } = useTeacher();
@@ -51,9 +52,20 @@ export default function PublicHeader() {
                 </button>
 
                 <AppLink href="/" className="flex shrink-0 items-center gap-2">
-                    <img src="/llb.jpg" alt="" className="h-8 w-8 rounded-chip object-cover" />
-                    <span className="text-lg font-semibold text-brand">
-                        {isBn ? SITE_NAME_BN : SITE_NAME}
+                    {site.logo_url && (
+                        <img
+                            src={site.logo_url}
+                            alt=""
+                            className="h-8 w-8 rounded-chip object-cover"
+                        />
+                    )}
+                    <span className="flex min-w-0 flex-col leading-tight">
+                        <span className="text-lg font-semibold text-brand">{site.siteName}</span>
+                        {site.slogan && (
+                            <span className="hidden max-w-60 truncate text-[11px] text-ink-muted sm:block">
+                                {site.slogan}
+                            </span>
+                        )}
                     </span>
                 </AppLink>
 

@@ -12,7 +12,7 @@ export default function StudentLogin() {
     const { t } = useTranslation();
     const { redirectAfterAuth } = useStudent();
 
-    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(true);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -24,7 +24,7 @@ export default function StudentLogin() {
         setErrors({});
 
         try {
-            await api.post('/student/auth/login', { email, password, remember });
+            await api.post('/student/auth/login', { phone, password, remember });
             redirectAfterAuth();
         } catch (error) {
             const status = (error as { response?: { status?: number } })?.response?.status;
@@ -53,12 +53,14 @@ export default function StudentLogin() {
         >
             <form onSubmit={submit} className="space-y-4">
                 <TextInput
-                    label={t('account.email')}
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    error={errors.email}
+                    label={t('account.mobile')}
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    placeholder="01712345678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    error={errors.phone}
                     required
                     autoFocus
                 />

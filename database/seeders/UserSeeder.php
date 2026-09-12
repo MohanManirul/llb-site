@@ -21,6 +21,8 @@ class UserSeeder extends Seeder
     ];
 
     private const array STAFF_EXCLUDED = [
+        'view site settings',
+        'edit site settings',
         'manage access',
         'view activity logs',
         'delete activity logs',

@@ -26,6 +26,10 @@ return [
         'view activity logs',
         'delete activity logs',
 
+        // site settings permissions
+        'view site settings',
+        'edit site settings',
+
         // system monitoring permissions
         'view system monitoring',
         // academic structure permissions

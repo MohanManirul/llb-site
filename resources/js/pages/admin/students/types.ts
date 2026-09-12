@@ -3,7 +3,7 @@ import type { ProgramOption } from '../subjects/types';
 export interface Student {
     id: number;
     name: string;
-    email: string;
+    email: string | null;
     phone: string | null;
     program?: { id: number; slug: string; name_bn: string; name_en: string } | null;
     is_active: boolean;

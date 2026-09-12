@@ -2,6 +2,7 @@ import { usePage } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import useStudent from '@/hooks/useStudent';
 import useTranslation from '@/hooks/useTranslation';
+import useSite from '@/hooks/useSite';
 import AppLink from './AppLink';
 
 interface MobileNavDrawerProps {
@@ -12,6 +13,7 @@ interface MobileNavDrawerProps {
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
     const { t, tx } = useTranslation();
     const { student, logout } = useStudent();
+    const site = useSite();
     const programs = usePage().props.programs ?? [];
 
     if (!open) return null;
@@ -27,7 +29,16 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
 
             <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-                    <span className="font-semibold text-brand">{t('nav.menu')}</span>
+                    <span className="flex min-w-0 items-center gap-2 font-semibold text-brand">
+                        {site.logo_url && (
+                            <img
+                                src={site.logo_url}
+                                alt=""
+                                className="h-6 w-6 shrink-0 rounded-chip object-cover"
+                            />
+                        )}
+                        <span className="truncate">{site.siteName}</span>
+                    </span>
                     <button
                         type="button"
                         onClick={onClose}
@@ -137,6 +148,29 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                         ))}
                     </div>
                 </nav>
+
+                {(site.email || site.phone) && (
+                    <div className="border-t border-hairline p-3">
+                        <div className="flex flex-col gap-0.5">
+                            {site.email && (
+                                <a
+                                    href={`mailto:${site.email}`}
+                                    className="rounded-control px-3 py-2 text-xs text-ink-muted hover:bg-gray-100"
+                                >
+                                    {site.email}
+                                </a>
+                            )}
+                            {site.phone && (
+                                <a
+                                    href={`tel:${site.phone}`}
+                                    className="rounded-control px-3 py-2 text-xs text-ink-muted hover:bg-gray-100"
+                                >
+                                    {site.phone}
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -6,6 +6,7 @@ import {
     ArrowRightStartOnRectangleIcon,
     ArrowUturnLeftIcon,
 } from '@heroicons/react/24/outline';
+import useSite from '@/hooks/useSite';
 import NotificationBell from './NotificationBell';
 
 interface SiteHeaderProps {
@@ -16,6 +17,7 @@ export default function SiteHeader({
     onToggleDrawer,
 }: SiteHeaderProps) {
     const { auth, portal, impersonation } = usePage().props;
+    const site = useSite();
     const user = auth?.user;
     const base = portal?.base ?? '/admin';
 
@@ -42,11 +44,16 @@ export default function SiteHeader({
                 </button>
 
                 <Link href={`${base}/dashboard`} className="flex shrink-0 items-center">
-                    <img
-                        src="/llb.jpg"
-                        alt="LLB Logo"
-                        className="h-auto w-32 object-contain md:w-40"
-                    />
+                    {site.logo_url && (
+                        <img
+                            src={site.logo_url}
+                            alt=""
+                            className="mr-2 h-9 w-auto max-w-40 object-contain"
+                        />
+                    )}
+                    <span className="hidden text-lg font-semibold text-brand sm:block">
+                        {site.siteName}
+                    </span>
                 </Link>
 
                 <div className="ml-auto flex items-center gap-2 md:gap-3">

@@ -188,6 +188,17 @@ export default function MaterialsIndex() {
                 ),
             },
             {
+                key: 'sort_order',
+                header: 'Priority',
+                sortable: true,
+                render: (row) =>
+                    row.sort_order > 0 ? (
+                        <span className="font-medium text-ink">{row.sort_order}</span>
+                    ) : (
+                        <span className="text-gray-400">—</span>
+                    ),
+            },
+            {
                 key: 'status',
                 header: 'Status',
                 render: (row) => <StatusBadge status={row.status} />,

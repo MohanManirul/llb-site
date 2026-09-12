@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\NoticePageController;
 use App\Http\Controllers\Admin\ProgramPageController;
 use App\Http\Controllers\Admin\QuestionPageController;
 use App\Http\Controllers\Admin\RolePageController;
+use App\Http\Controllers\Admin\SiteSettingPageController;
 use App\Http\Controllers\Admin\StudentPageController;
 use App\Http\Controllers\Admin\StudyMaterialPageController;
 use App\Http\Controllers\Admin\SubjectPageController;
@@ -137,9 +138,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{college}/edit', 'edit')->name('edit');
         });
 
+    Route::get('/settings/site', [SiteSettingPageController::class, 'edit'])
+        ->name('settings.site');
+
     // Settings — forwards to the first section the user may open.
     Route::get('/settings', function () {
         $sections = [
+            'view site settings' => '/admin/settings/site',
             'view academic structure' => '/admin/academic/programs',
             'view activity logs' => '/admin/activity-logs',
         ];

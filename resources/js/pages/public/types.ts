@@ -264,7 +264,7 @@ export interface CollegeRef {
 export interface StudentProfile {
     id: number;
     name: string;
-    email: string;
+    email: string | null;
     phone: string | null;
     program_id: number | null;
     program?: ProgramRef | null;

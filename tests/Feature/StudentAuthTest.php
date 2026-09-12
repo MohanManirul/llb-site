@@ -16,43 +16,59 @@ class StudentAuthTest extends TestCase
     {
         return array_merge([
             'name' => 'Rahim Uddin',
-            'email' => 'rahim@example.com',
+            'phone' => '01712345678',
             'password' => 'secret-password',
             'password_confirmation' => 'secret-password',
             'college_id' => College::factory()->create()->id,
         ], $overrides);
     }
 
-    public function test_a_student_can_register_and_is_logged_in(): void
+    public function test_a_student_can_register_with_a_mobile_and_is_logged_in(): void
     {
         $response = $this->postJson('/v1/student/auth/register', $this->registerPayload());
 
-        $response->assertCreated()->assertJsonPath('result.email', 'rahim@example.com');
+        $response->assertCreated()
+            ->assertJsonPath('result.phone', '01712345678')
+            ->assertJsonPath('result.email', null);
 
-        $this->assertDatabaseHas('students', ['email' => 'rahim@example.com']);
+        $this->assertDatabaseHas('students', ['phone' => '01712345678', 'email' => null]);
 
         $this->getJson('/v1/student/auth/me')
             ->assertOk()
-            ->assertJsonPath('result.email', 'rahim@example.com');
+            ->assertJsonPath('result.phone', '01712345678');
     }
 
-    public function test_registration_rejects_a_duplicate_email(): void
+    public function test_registration_requires_a_mobile(): void
     {
-        Student::create(['name' => 'A', 'email' => 'rahim@example.com', 'password' => 'password-123']);
-
-        $this->postJson('/v1/student/auth/register', $this->registerPayload())
+        $this->postJson('/v1/student/auth/register', $this->registerPayload(['phone' => '']))
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['phone']);
     }
 
-    public function test_a_student_can_login_and_logout(): void
+    public function test_registration_rejects_a_malformed_mobile(): void
+    {
+        $this->postJson('/v1/student/auth/register', $this->registerPayload(['phone' => '12345']))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['phone']);
+    }
+
+    public function test_registration_rejects_a_duplicate_mobile_in_any_written_form(): void
+    {
+        Student::create(['name' => 'A', 'phone' => '01712345678', 'password' => 'password-123']);
+
+        $this->postJson('/v1/student/auth/register', $this->registerPayload(['phone' => '+88 01712-345678']))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['phone']);
+    }
+
+    public function test_a_student_can_login_with_their_mobile_and_logout(): void
     {
         $student = Student::create([
-            'name' => 'Karim', 'email' => 'karim@example.com', 'password' => 'secret-password',
+            'name' => 'Karim', 'phone' => '01812345678', 'password' => 'secret-password',
         ]);
 
         $this->postJson('/v1/student/auth/login', [
-            'email' => 'karim@example.com',
+            'phone' => '01812345678',
             'password' => 'secret-password',
         ])->assertOk()->assertJsonPath('result.id', $student->id);
 
@@ -63,33 +79,45 @@ class StudentAuthTest extends TestCase
         $this->getJson('/v1/student/auth/me')->assertUnauthorized();
     }
 
-    public function test_login_fails_with_a_wrong_password(): void
+    public function test_login_accepts_the_country_code_form_of_the_same_mobile(): void
     {
-        Student::create(['name' => 'K', 'email' => 'karim@example.com', 'password' => 'secret-password']);
+        Student::create([
+            'name' => 'Karim', 'phone' => '01812345678', 'password' => 'secret-password',
+        ]);
 
         $this->postJson('/v1/student/auth/login', [
-            'email' => 'karim@example.com',
+            'phone' => '+8801812345678',
+            'password' => 'secret-password',
+        ])->assertOk();
+    }
+
+    public function test_login_fails_with_a_wrong_password(): void
+    {
+        Student::create(['name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password']);
+
+        $this->postJson('/v1/student/auth/login', [
+            'phone' => '01812345678',
             'password' => 'wrong-password',
-        ])->assertStatus(422)->assertJsonValidationErrors(['email']);
+        ])->assertStatus(422)->assertJsonValidationErrors(['phone']);
     }
 
     public function test_a_deactivated_student_cannot_login(): void
     {
         Student::create([
-            'name' => 'K', 'email' => 'karim@example.com',
+            'name' => 'K', 'phone' => '01812345678',
             'password' => 'secret-password', 'is_active' => false,
         ]);
 
         $this->postJson('/v1/student/auth/login', [
-            'email' => 'karim@example.com',
+            'phone' => '01812345678',
             'password' => 'secret-password',
-        ])->assertStatus(422)->assertJsonValidationErrors(['email']);
+        ])->assertStatus(422)->assertJsonValidationErrors(['phone']);
     }
 
     public function test_a_deactivated_student_session_is_rejected(): void
     {
         $student = Student::create([
-            'name' => 'K', 'email' => 'karim@example.com', 'password' => 'secret-password',
+            'name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password',
         ]);
 
         $student->update(['is_active' => false]);
@@ -109,7 +137,7 @@ class StudentAuthTest extends TestCase
     public function test_a_student_can_update_their_profile(): void
     {
         $student = Student::create([
-            'name' => 'K', 'email' => 'karim@example.com', 'password' => 'secret-password',
+            'name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password',
         ]);
 
         $this->actingAs($student, 'student')
@@ -122,10 +150,27 @@ class StudentAuthTest extends TestCase
             ->assertJsonPath('result.phone', '01700000000');
     }
 
+    public function test_a_profile_cannot_take_another_students_mobile(): void
+    {
+        Student::create(['name' => 'A', 'phone' => '01700000000', 'password' => 'secret-password']);
+
+        $student = Student::create([
+            'name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password',
+        ]);
+
+        $this->actingAs($student, 'student')
+            ->patchJson('/v1/student/auth/profile', [
+                'name' => 'K',
+                'phone' => '01700000000',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['phone']);
+    }
+
     public function test_student_auth_does_not_grant_staff_api_access(): void
     {
         $student = Student::create([
-            'name' => 'K', 'email' => 'karim@example.com', 'password' => 'secret-password',
+            'name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password',
         ]);
 
         $this->actingAs($student, 'student')
@@ -143,7 +188,7 @@ class StudentAuthTest extends TestCase
     public function test_guest_student_pages_redirect_authenticated_students_to_exam_prep(): void
     {
         $student = Student::create([
-            'name' => 'K', 'email' => 'karim@example.com', 'password' => 'secret-password',
+            'name' => 'K', 'phone' => '01812345678', 'password' => 'secret-password',
         ]);
 
         $this->actingAs($student, 'student')

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Program;
 use App\Models\User;
 use App\Services\Auth\ImpersonationService;
+use App\Services\SiteSetting\SiteSettingService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -43,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'impersonation' => fn () => $this->impersonation($request),
             'locale' => fn () => app()->getLocale(),
             'programs' => fn () => $this->publicPrograms($request),
+            'site' => fn () => app(SiteSettingService::class)->shared(),
             'student' => fn () => $this->studentUser($request),
             'teacher' => fn () => $this->teacherUser($request),
         ];
