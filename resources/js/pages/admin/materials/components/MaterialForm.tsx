@@ -426,6 +426,16 @@ export default function MaterialForm({ material }: MaterialFormProps) {
                         />
                     </div>
 
+                    <TextInput
+                        label="Priority"
+                        type="number"
+                        min={0}
+                        value={String(data.sort_order)}
+                        onChange={(e) => setData('sort_order', Number(e.target.value) || 0)}
+                        error={errors.sort_order}
+                        hint="Higher number shows first in the topbar suggestion ticker. 0 keeps the default order."
+                    />
+
                     <Toggle
                         checked={data.is_featured}
                         onChange={(checked) => setData('is_featured', checked)}

@@ -216,6 +216,8 @@ const bn = {
     'nav.teacher_portal': 'শিক্ষক পোর্টাল',
     'nav.teacher_login': 'শিক্ষক লগইন',
 
+    'ticker.badge': 'এক্সক্লুসিভ সাজেশন',
+
     'college.routine_title': 'ক্লাস রুটিন',
     'college.routine_empty': 'এখনও কোনো রুটিন প্রকাশ করা হয়নি।',
     'college.effective_from': '{date} থেকে কার্যকর',
@@ -527,6 +529,8 @@ const en: Record<TranslationKey, string> = {
     'nav.college_notes': 'Class notes',
     'nav.teacher_portal': 'Teacher portal',
     'nav.teacher_login': 'Teacher login',
+
+    'ticker.badge': 'Exclusive Suggestions',
 
     'college.routine_title': 'Class routine',
     'college.routine_empty': 'No routine has been published yet.',

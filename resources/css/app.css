@@ -77,6 +77,19 @@
             transform: translateX(400%);
         }
     }
+
+    /* Topbar suggestion ticker — the track holds two copies of the list, so
+       sliding it half its width loops back to an identical frame. */
+    --animate-ticker: ticker 30s linear infinite;
+
+    @keyframes ticker {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
 }
 /*
  * react-date-range ships its own stylesheet; these pull the picker onto the

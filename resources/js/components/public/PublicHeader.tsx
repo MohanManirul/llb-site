@@ -16,6 +16,7 @@ import { SITE_NAME_BN, SITE_NAME } from '@/config/site';
 import AppLink from './AppLink';
 import LanguageToggle from './LanguageToggle';
 import MobileNavDrawer from './MobileNavDrawer';
+import SuggestionTicker from './SuggestionTicker';
 
 export default function PublicHeader() {
     const { t, tx, isBn, localeHref } = useTranslation();
@@ -151,10 +152,12 @@ function AuthTopBar() {
 
     return (
         <div className="border-b border-hairline bg-gray-50">
-            <div className="mx-auto flex w-full max-w-300 items-center justify-end gap-1 px-4 py-1.5 md:px-6">
+            <div className="mx-auto flex w-full max-w-300 items-center gap-1 px-4 py-1.5 md:px-6">
+                <SuggestionTicker />
+
                 <Link
                     href={teacherLoginHref(currentHref())}
-                    className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                    className="ml-auto inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
                 >
                     <AcademicCapIcon className="h-4 w-4" />
                     {t('nav.teacher_login')}
