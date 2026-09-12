@@ -16,7 +16,7 @@ class IndexPublicMaterialRequest extends IndexRequest
      */
     protected function allowedSorts(): array
     {
-        return ['published_at', 'download_count', 'view_count', 'exam_year'];
+        return ['published_at', 'download_count', 'view_count', 'exam_year', 'sort_order'];
     }
 
     protected function defaultSort(): string

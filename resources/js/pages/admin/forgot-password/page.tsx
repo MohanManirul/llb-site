@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { TextInput, Button } from '@/components/ui';
+import useSite from '@/hooks/useSite';
 
 interface ForgotPasswordForm {
     email: string;
@@ -16,6 +17,7 @@ export default function ForgotPassword({
     loginHref = '/admin/login',
 }: ForgotPasswordProps) {
     const { flash } = usePage().props;
+    const site = useSite();
     const { data, setData, post, processing, errors } = useForm<ForgotPasswordForm>({ email: '' });
 
     function submit(e: FormEvent<HTMLFormElement>) {
@@ -33,11 +35,11 @@ export default function ForgotPassword({
                         href="/"
                         className="flex items-center justify-center gap-2 mb-6"
                     >
-                        <img
-                            src="/llb.jpg"
-                            alt="LLB Logo Logo"
-                            className="h-auto w-45"
-                        />
+                        {site.logo_url ? (
+                            <img src={site.logo_url} alt={site.siteName} className="h-16 w-auto max-w-45 object-contain" />
+                        ) : (
+                            <span className="text-xl font-semibold text-[#002044]">{site.siteName}</span>
+                        )}
                     </Link>
 
                     <form

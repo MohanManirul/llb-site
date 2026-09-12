@@ -15,7 +15,7 @@ import { CourtSceneArt } from '@/components/public/motifs';
 import { CardGrid, SkeletonGrid } from '@/components/public/helpers';
 import usePublicList from '@/hooks/usePublicList';
 import useTranslation from '@/hooks/useTranslation';
-import { SITE_DESCRIPTION } from '@/config/site';
+import useSite from '@/hooks/useSite';
 import type { PublicMaterial } from '../types';
 
 const LATEST_PARAMS = { per_page: 6 };
@@ -34,6 +34,7 @@ function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode
 
 export default function PublicHome() {
     const { t, tx } = useTranslation();
+    const site = useSite();
     const programs = usePage().props.programs ?? [];
 
     const latest = usePublicList<PublicMaterial>({
@@ -49,7 +50,7 @@ export default function PublicHome() {
     return (
         <>
             <Head title={t('nav.home')}>
-                <meta name="description" content={SITE_DESCRIPTION} />
+                <meta name="description" content={site.slogan} />
             </Head>
 
             <section className="relative overflow-hidden rounded-card bg-brand px-5 py-10 text-white md:px-10 md:py-14">

@@ -17,9 +17,9 @@ const bn = {
     'nav.close': 'বন্ধ করুন',
     'nav.admin_login': 'অ্যাডমিন লগইন',
 
-    'home.eyebrow': 'বটতলা থেকে এজলাস',
+    'home.eyebrow': 'ল’ স্টুডেন্টদের জন্য',
     'home.tagline': 'আইন শিক্ষার্থীদের জন্য সাজেশন, বই ও ক্লাস নোট',
-    'home.subtitle': 'সেশন ও বিষয় অনুযায়ী সাজানো পড়ার উপকরণ — সম্পূর্ণ বিনামূল্যে, রেজিস্ট্রেশন ছাড়াই।',
+    'home.subtitle': 'সেশন ও বিষয় অনুযায়ী সাজানো পড়ার উপকরণ — সম্পূর্ণ বিনামূল্যে ।',
     'home.pick_program': 'আপনার প্রোগ্রাম বেছে নিন',
     'home.featured': 'নির্বাচিত কনটেন্ট',
     'home.latest': 'সাম্প্রতিক কনটেন্ট',
@@ -84,6 +84,8 @@ const bn = {
     'footer.about': 'আইন শিক্ষার্থীদের জন্য বিনামূল্যের স্টাডি পোর্টাল।',
     'footer.tagline': 'কোর্ট চত্বরের বটতলা থেকে এজলাসের যুক্তিতর্ক — আইন শেখার পথে আপনার সঙ্গী।',
     'footer.rights': 'সর্বস্বত্ব সংরক্ষিত।',
+    'footer.whatsapp': 'হোয়াটসঅ্যাপ গ্রুপে যোগ দিন',
+    'footer.facebook': 'ফেসবুক গ্রুপে যোগ দিন',
 
     'nav.exam_prep': 'পরীক্ষার প্রস্তুতি',
     'nav.question_archive': 'প্রশ্ন ব্যাংক',
@@ -91,6 +93,7 @@ const bn = {
     'nav.practice': 'প্র্যাকটিস',
     'nav.account': 'অ্যাকাউন্ট',
     'nav.login': 'লগইন',
+    'nav.student_login': 'শিক্ষার্থী লগইন',
     'nav.register': 'রেজিস্ট্রেশন',
     'nav.logout': 'লগআউট',
     'nav.profile': 'প্রোফাইল',
@@ -176,6 +179,8 @@ const bn = {
     'account.name': 'নাম',
     'account.email': 'ইমেইল',
     'account.phone': 'ফোন',
+    'account.mobile': 'মোবাইল নম্বর',
+    'account.mobile_hint': 'যেমন: 01712345678 — এই নম্বর দিয়েই লগইন করবেন।',
     'account.password': 'পাসওয়ার্ড',
     'account.password_confirm': 'পাসওয়ার্ড আবার লিখুন',
     'account.new_password': 'নতুন পাসওয়ার্ড',
@@ -214,6 +219,8 @@ const bn = {
     'nav.college_notes': 'ক্লাস নোট',
     'nav.teacher_portal': 'শিক্ষক পোর্টাল',
     'nav.teacher_login': 'শিক্ষক লগইন',
+
+    'ticker.badge': 'এক্সক্লুসিভ সাজেশন',
 
     'college.routine_title': 'ক্লাস রুটিন',
     'college.routine_empty': 'এখনও কোনো রুটিন প্রকাশ করা হয়নি।',
@@ -328,9 +335,9 @@ const en: Record<TranslationKey, string> = {
     'nav.close': 'Close',
     'nav.admin_login': 'Admin login',
 
-    'home.eyebrow': 'From the banyan courtyard to the ejlas',
+    'home.eyebrow': 'For law students',
     'home.tagline': 'Suggestions, books & class notes for LLB students',
-    'home.subtitle': 'Study materials organised by session and subject — completely free, no registration.',
+    'home.subtitle': 'Study materials organised by session and subject — completely free .',
     'home.pick_program': 'Pick your program',
     'home.featured': 'Featured materials',
     'home.latest': 'Latest materials',
@@ -395,6 +402,8 @@ const en: Record<TranslationKey, string> = {
     'footer.about': 'A free study portal for LLB students.',
     'footer.tagline': 'From the banyan shade of the court yard to the arguments of the ejlas — with you all through law school.',
     'footer.rights': 'All rights reserved.',
+    'footer.whatsapp': 'Join our WhatsApp group',
+    'footer.facebook': 'Join our Facebook group',
 
     'nav.exam_prep': 'Exam Prep',
     'nav.question_archive': 'Question Bank',
@@ -402,6 +411,7 @@ const en: Record<TranslationKey, string> = {
     'nav.practice': 'Practice',
     'nav.account': 'Account',
     'nav.login': 'Log in',
+    'nav.student_login': 'Student login',
     'nav.register': 'Register',
     'nav.logout': 'Log out',
     'nav.profile': 'Profile',
@@ -487,6 +497,8 @@ const en: Record<TranslationKey, string> = {
     'account.name': 'Name',
     'account.email': 'Email',
     'account.phone': 'Phone',
+    'account.mobile': 'Mobile number',
+    'account.mobile_hint': 'For example 01712345678 — you will log in with this number.',
     'account.password': 'Password',
     'account.password_confirm': 'Confirm password',
     'account.new_password': 'New password',
@@ -525,6 +537,8 @@ const en: Record<TranslationKey, string> = {
     'nav.college_notes': 'Class notes',
     'nav.teacher_portal': 'Teacher portal',
     'nav.teacher_login': 'Teacher login',
+
+    'ticker.badge': 'Exclusive Suggestions',
 
     'college.routine_title': 'Class routine',
     'college.routine_empty': 'No routine has been published yet.',

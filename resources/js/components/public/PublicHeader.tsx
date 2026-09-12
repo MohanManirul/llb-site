@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
+    AcademicCapIcon,
     Bars3Icon,
     BuildingLibraryIcon,
     ChevronDownIcon,
@@ -11,14 +12,18 @@ import { Popover } from '@/components/ui';
 import useStudent from '@/hooks/useStudent';
 import useTeacher from '@/hooks/useTeacher';
 import useTranslation from '@/hooks/useTranslation';
-import { SITE_NAME_BN, SITE_NAME } from '@/config/site';
+import useSite from '@/hooks/useSite';
 import AppLink from './AppLink';
 import LanguageToggle from './LanguageToggle';
 import MobileNavDrawer from './MobileNavDrawer';
+import SuggestionTicker, { useSuggestionTickerItems } from './SuggestionTicker';
 
 export default function PublicHeader() {
-    const { t, tx, isBn, localeHref } = useTranslation();
+    const { t, tx, localeHref } = useTranslation();
+    const site = useSite();
     const programs = usePage().props.programs ?? [];
+    const { student } = useStudent();
+    const { teacher } = useTeacher();
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [search, setSearch] = useState('');
 
@@ -33,6 +38,9 @@ export default function PublicHeader() {
     return (
         <header className="sticky top-0 z-30 border-b border-hairline bg-white/95 backdrop-blur">
             <div className="h-1 bg-linear-to-r from-brand via-brass to-banyan" />
+
+            <TopBar showAuthLinks={!student && !teacher} />
+
             <div className="mx-auto flex w-full max-w-300 items-center gap-3 px-4 py-3 md:px-6">
                 <button
                     type="button"
@@ -44,9 +52,20 @@ export default function PublicHeader() {
                 </button>
 
                 <AppLink href="/" className="flex shrink-0 items-center gap-2">
-                    <img src="/llb.jpg" alt="" className="h-8 w-8 rounded-chip object-cover" />
-                    <span className="text-lg font-semibold text-brand">
-                        {isBn ? SITE_NAME_BN : SITE_NAME}
+                    {site.logo_url && (
+                        <img
+                            src={site.logo_url}
+                            alt=""
+                            className="h-8 w-8 rounded-chip object-cover"
+                        />
+                    )}
+                    <span className="flex min-w-0 flex-col leading-tight">
+                        <span className="text-lg font-semibold text-brand">{site.siteName}</span>
+                        {site.slogan && (
+                            <span className="hidden max-w-60 truncate text-[11px] text-ink-muted sm:block">
+                                {site.slogan}
+                            </span>
+                        )}
                     </span>
                 </AppLink>
 
@@ -138,6 +157,47 @@ export default function PublicHeader() {
     );
 }
 
+interface TopBarProps {
+    showAuthLinks: boolean;
+}
+
+function TopBar({ showAuthLinks }: TopBarProps) {
+    const { t } = useTranslation();
+    const { loginHref: studentLoginHref, currentHref } = useStudent();
+    const { loginHref: teacherLoginHref } = useTeacher();
+    const tickerItems = useSuggestionTickerItems();
+
+    if (tickerItems.length === 0 && !showAuthLinks) return null;
+
+    return (
+        <div className="border-b border-hairline bg-gray-50">
+            <div className="mx-auto flex w-full max-w-300 items-center gap-1 px-4 py-1.5 md:px-6">
+                <SuggestionTicker items={tickerItems} />
+
+                {showAuthLinks && (
+                    <>
+                        <Link
+                            href={teacherLoginHref(currentHref())}
+                            className="ml-auto inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                        >
+                            <AcademicCapIcon className="h-4 w-4" />
+                            {t('nav.teacher_login')}
+                        </Link>
+                        <span aria-hidden="true" className="h-3.5 w-px bg-hairline" />
+                        <Link
+                            href={studentLoginHref(currentHref())}
+                            className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 hover:text-ink"
+                        >
+                            <UserCircleIcon className="h-4 w-4" />
+                            {t('nav.student_login')}
+                        </Link>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function TeacherMenu() {
     const { t } = useTranslation();
     const { teacher, logout } = useTeacher();
@@ -209,22 +269,14 @@ function TeacherMenu() {
 
 function AccountMenu() {
     const { t } = useTranslation();
-    const { student, loginHref, currentHref, logout } = useStudent();
+    const { student, logout } = useStudent();
     const { teacher } = useTeacher();
     const [loggingOut, setLoggingOut] = useState(false);
 
     if (!student) {
         if (teacher) return <TeacherMenu />;
 
-        return (
-            <Link
-                href={loginHref(currentHref())}
-                className="hidden items-center gap-1.5 rounded-control border border-hairline px-3 py-1.5 text-sm font-medium text-ink hover:bg-gray-100 sm:inline-flex"
-            >
-                <UserCircleIcon className="h-4 w-4" />
-                {t('nav.login')}
-            </Link>
-        );
+        return null;
     }
 
     const signOut = async () => {

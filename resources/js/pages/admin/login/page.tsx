@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { TextInput, Checkbox, Button } from '@/components/ui';
+import useSite from '@/hooks/useSite';
 
 interface LoginForm {
     email: string;
@@ -10,6 +11,7 @@ interface LoginForm {
 
 export default function Login({ action = '/admin/login' }) {
     const { flash } = usePage().props;
+    const site = useSite();
     const { data, setData, post, processing, errors } = useForm<LoginForm>({
         email: '',
         password: '',
@@ -31,11 +33,11 @@ export default function Login({ action = '/admin/login' }) {
                         href="/"
                         className="flex items-center justify-center gap-2 mb-6"
                     >
-                        <img
-                            src="/llb_favicon.png"
-                            alt="LLB Logo Logo"
-                            className="h-auto w-45"
-                        />
+                        {site.logo_url ? (
+                            <img src={site.logo_url} alt={site.siteName} className="h-16 w-auto max-w-45 object-contain" />
+                        ) : (
+                            <span className="text-xl font-semibold text-[#002044]">{site.siteName}</span>
+                        )}
                     </Link>
 
                     <form

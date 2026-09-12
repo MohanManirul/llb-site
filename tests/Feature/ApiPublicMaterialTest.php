@@ -79,6 +79,18 @@ class ApiPublicMaterialTest extends TestCase
         $this->assertSame($published->slug, $response->json('result.data.0.slug'));
     }
 
+    public function test_the_index_sorts_suggestions_by_priority_for_the_topbar_ticker(): void
+    {
+        $low = $this->createMaterial(['title_bn' => 'কম অগ্রাধিকার', 'sort_order' => 1]);
+        $high = $this->createMaterial(['title_bn' => 'বেশি অগ্রাধিকার', 'sort_order' => 9]);
+
+        $response = $this->getJson('/v1/public/materials?type=suggestion&sort=sort_order&direction=desc')
+            ->assertOk();
+
+        $this->assertSame($high->slug, $response->json('result.data.0.slug'));
+        $this->assertSame($low->slug, $response->json('result.data.1.slug'));
+    }
+
     public function test_the_index_is_length_aware(): void
     {
         $this->createMaterial();

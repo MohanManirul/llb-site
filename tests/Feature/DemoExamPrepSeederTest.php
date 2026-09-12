@@ -68,7 +68,7 @@ class DemoExamPrepSeederTest extends TestCase
         $this->assertGreaterThan(0, Student::where('is_active', false)->count());
 
         $this->postJson('/v1/student/auth/login', [
-            'email' => 'student1@example.com',
+            'phone' => $student->phone,
             'password' => DemoExamPrepSeeder::STUDENT_PASSWORD,
         ])->assertOk();
     }

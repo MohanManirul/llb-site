@@ -13,6 +13,20 @@ use Illuminate\Support\Facades\Route;
 // shared link always opens in the sender's language; bare / redirects to the
 // visitor's remembered locale.
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/clear', function () {
+    Artisan::call('optimize:clear');
+
+    Artisan::call('migrate');
+    
+    Artisan::call('db:seed');
+
+    Artisan::call('storage:link');
+
+    return 'Cache cleared, migration, seeder and storage link completed successfully!';
+});
+
 Route::get('/', function () {
     $locale = request()->cookie('locale');
 

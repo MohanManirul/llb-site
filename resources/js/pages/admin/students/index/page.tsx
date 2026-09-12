@@ -102,7 +102,7 @@ export default function StudentsIndex() {
                 render: (row) => (
                     <span className="flex flex-col">
                         <span>{row.name}</span>
-                        <span className="text-xs text-gray-500">{row.email}</span>
+                        <span className="text-xs text-gray-500">{row.email ?? displayPhone(row.phone)}</span>
                     </span>
                 ),
             },

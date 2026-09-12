@@ -23,13 +23,13 @@ final class StudentAuthService
     public function attemptLogin(array $credentials, bool $remember): Student
     {
         $attempted = Auth::guard('student')->attempt([
-            'email' => $credentials['email'],
+            'phone' => $credentials['phone'],
             'password' => $credentials['password'],
         ], $remember);
 
         if (! $attempted) {
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'phone' => __('auth.failed'),
             ]);
         }
 
@@ -39,7 +39,7 @@ final class StudentAuthService
             Auth::guard('student')->logout();
 
             throw ValidationException::withMessages([
-                'email' => 'This account has been deactivated.',
+                'phone' => 'This account has been deactivated.',
             ]);
         }
 

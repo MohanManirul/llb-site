@@ -17,7 +17,7 @@ class IndexStudyMaterialRequest extends IndexRequest
      */
     protected function allowedSorts(): array
     {
-        return ['id', 'title_bn', 'type', 'download_count', 'view_count', 'published_at', 'created_at'];
+        return ['id', 'title_bn', 'type', 'download_count', 'view_count', 'published_at', 'created_at', 'sort_order'];
     }
 
     protected function defaultSort(): string

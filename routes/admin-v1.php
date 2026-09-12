@@ -19,6 +19,7 @@ use App\Http\Controllers\V1\Admin\Question\QuestionController;
 use App\Http\Controllers\V1\Admin\Question\QuestionImportController;
 use App\Http\Controllers\V1\Admin\Report\AnalyticsReportController;
 use App\Http\Controllers\V1\Admin\Role\RoleController;
+use App\Http\Controllers\V1\Admin\SiteSetting\SiteSettingController;
 use App\Http\Controllers\V1\Admin\Student\StudentController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\MaterialFileController;
 use App\Http\Controllers\V1\Admin\StudyMaterial\StudyMaterialController;
@@ -157,6 +158,10 @@ Route::middleware('auth:sanctum')
             ->name('model-tests.questions.destroy');
         Route::apiResource('model-tests', ModelTestController::class)
             ->parameters(['model-tests' => 'modelTest']);
+
+        // Site settings — one row, so no apiResource.
+        Route::get('site-settings', [SiteSettingController::class, 'show'])->name('site-settings.show');
+        Route::post('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
 
         // Students.
         Route::patch('students/{student}/active', [StudentController::class, 'toggleActive'])

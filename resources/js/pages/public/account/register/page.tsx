@@ -10,7 +10,6 @@ import useTranslation from '@/hooks/useTranslation';
 
 interface RegisterForm {
     name: string;
-    email: string;
     phone: string;
     college_id: string;
     password: string;
@@ -25,7 +24,6 @@ export default function StudentRegister() {
 
     const [data, setDataState] = useState<RegisterForm>({
         name: '',
-        email: '',
         phone: '',
         college_id: '',
         password: '',
@@ -46,7 +44,6 @@ export default function StudentRegister() {
         try {
             await api.post('/student/auth/register', {
                 ...data,
-                phone: data.phone || null,
                 college_id: data.college_id ? Number(data.college_id) : null,
             });
             redirectAfterAuth();
@@ -88,22 +85,16 @@ export default function StudentRegister() {
                 />
 
                 <TextInput
-                    label={t('account.email')}
-                    type="email"
-                    autoComplete="email"
-                    value={data.email}
-                    onChange={(e) => setData('email', e.target.value)}
-                    error={errors.email}
-                    required
-                />
-
-                <TextInput
-                    label={t('account.phone')}
+                    label={t('account.mobile')}
                     type="tel"
+                    inputMode="numeric"
                     autoComplete="tel"
+                    placeholder="01712345678"
+                    hint={t('account.mobile_hint')}
                     value={data.phone}
                     onChange={(e) => setData('phone', e.target.value)}
                     error={errors.phone}
+                    required
                 />
 
                 <SearchableSelect

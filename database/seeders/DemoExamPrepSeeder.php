@@ -30,7 +30,7 @@ class DemoExamPrepSeeder extends Seeder
     private const array STUDENTS = [
         ['name' => 'রাকিব হাসান', 'email' => 'student1@example.com', 'phone' => '01711000001', 'program' => 'bar-council'],
         ['name' => 'ফারহানা আক্তার', 'email' => 'student2@example.com', 'phone' => '01711000002', 'program' => 'nu-llb-pass'],
-        ['name' => 'তানভীর আহমেদ', 'email' => 'student3@example.com', 'phone' => null, 'program' => null, 'is_active' => false],
+        ['name' => 'তানভীর আহমেদ', 'email' => 'student3@example.com', 'phone' => '01711000003', 'program' => null, 'is_active' => false],
     ];
 
     private const array QUESTIONS = [

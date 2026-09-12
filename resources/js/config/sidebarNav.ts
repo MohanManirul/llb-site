@@ -19,6 +19,7 @@ import {
     UserGroupIcon,
     BuildingLibraryIcon,
     IdentificationIcon,
+    PaintBrushIcon,
 } from '@heroicons/react/24/outline';
 
 export type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -98,6 +99,12 @@ export const settingsItem: NavItem = {
 };
 
 export const settingsSections: NavItem[] = [
+    {
+        label: 'Site Settings',
+        icon: PaintBrushIcon,
+        href: '/settings/site',
+        permission: 'view site settings',
+    },
     {
         label: 'Academic Structure',
         icon: AcademicCapIcon,

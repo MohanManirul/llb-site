@@ -23,7 +23,7 @@ class StudentFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->numerify('+88017########'),
+            'phone' => fake()->unique()->numerify('017########'),
             'password' => static::$password ??= Hash::make('password'),
             'college_id' => College::factory(),
             'is_active' => true,

@@ -121,7 +121,8 @@ export default function StudentProfilePage() {
             >
                 {profile.data && (
                     <p className="mt-1 text-sm text-ink-muted">
-                        {profile.data.email} · {t('account.member_since', { date: d(profile.data.created_at) })}
+                        {profile.data.phone ?? profile.data.email} ·{' '}
+                        {t('account.member_since', { date: d(profile.data.created_at) })}
                     </p>
                 )}
             </PublicPageHeader>
@@ -143,11 +144,29 @@ export default function StudentProfilePage() {
                             />
 
                             <TextInput
-                                label={t('account.phone')}
+                                label={t('account.mobile')}
                                 type="tel"
+                                inputMode="numeric"
+                                autoComplete="tel"
+                                placeholder="01712345678"
+                                hint={t('account.mobile_hint')}
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
                                 error={errors.phone}
+                                required
+                            />
+
+                            <SearchableSelect
+                                label={t('account.college')}
+                                value={data.college_id}
+                                onChange={(value) =>
+                                    setData('college_id', value == null ? '' : String(value))
+                                }
+                                fetchUrl={collegeFetchUrl}
+                                placeholder={t('account.no_college')}
+                                searchPlaceholder={t('account.college_search')}
+                                error={errors.college_id}
+                                hint={t('account.set_college_hint')}
                             />
 
                             <SearchableSelect
