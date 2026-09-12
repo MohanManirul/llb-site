@@ -169,6 +169,19 @@ export default function StudentProfilePage() {
                                 hint={t('account.set_college_hint')}
                             />
 
+                            <SearchableSelect
+                                label={t('account.college')}
+                                value={data.college_id}
+                                onChange={(value) =>
+                                    setData('college_id', value == null ? '' : String(value))
+                                }
+                                fetchUrl={collegeFetchUrl}
+                                placeholder={t('account.no_college')}
+                                searchPlaceholder={t('account.college_search')}
+                                error={errors.college_id}
+                                hint={t('account.set_college_hint')}
+                            />
+
                             <SelectInput
                                 label={t('account.program')}
                                 value={data.program_id}
