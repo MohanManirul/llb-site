@@ -165,11 +165,7 @@ abstract class CollegeContentService
     {
         $disk = (string) config('llb.material_disk');
 
-        $path = $attachment->storeAs(
-            '',
-            Asset::generateUploadPath($attachment->getClientOriginalName(), $this->uploadFolder()),
-            $disk,
-        );
+        $path = $attachment->store('uploads/'.$this->uploadFolder(), $disk);
 
         return [
             'attachment_disk' => $disk,

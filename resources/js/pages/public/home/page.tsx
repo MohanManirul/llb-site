@@ -20,6 +20,8 @@ import type { PublicMaterial } from '../types';
 
 const LATEST_PARAMS = { per_page: 6 };
 const FEATURED_PARAMS = { featured: 1, per_page: 6 };
+const ACTIVE_STUDENTS = 1673;
+const ACTIVE_COLLEGES = 53;
 
 function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode }) {
     return (
@@ -33,7 +35,7 @@ function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode
 }
 
 export default function PublicHome() {
-    const { t, tx } = useTranslation();
+    const { t, tx, n } = useTranslation();
     const site = useSite();
     const programs = usePage().props.programs ?? [];
 
@@ -75,7 +77,16 @@ export default function PublicHome() {
                         {t('home.subtitle')}
                     </p>
 
-                    <div className="mt-6 h-px w-24 bg-brass/70" />
+                    <div className="mt-6 flex flex-wrap items-center gap-4">
+                        <span className="h-px w-24 shrink-0 bg-brass/70" />
+                        <span className="inline-flex items-center gap-2 rounded-chip bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 md:text-sm">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                            </span>
+                            {t('home.live_stats', { students: n(ACTIVE_STUDENTS), colleges: n(ACTIVE_COLLEGES) })}
+                        </span>
+                    </div>
                 </div>
             </section>
 

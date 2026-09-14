@@ -27,13 +27,12 @@ trait HasFileUploadSupport
 
         if ($request->hasFile($name)) {
             $file = $request->file($name);
-            $fileName = $file->getClientOriginalName();
             $mimeType = $file->getMimeType();
             $uploadDirectory = Str::plural(Str::before($mimeType, '/'));
             Asset::removeFile($old);
             Asset::removeFile(getThumbnailPath($old));
 
-            $filePath = $file->storeAs('', Asset::generateUploadPath($fileName, $uploadDirectory));
+            $filePath = $file->store("uploads/{$uploadDirectory}");
 
             if (Str::startsWith($mimeType, 'image/')) {
                 $this->generateThumbnail($file, $filePath);

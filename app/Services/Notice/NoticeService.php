@@ -142,11 +142,7 @@ final class NoticeService
     {
         $disk = (string) config('llb.material_disk');
 
-        $path = $attachment->storeAs(
-            '',
-            Asset::generateUploadPath($attachment->getClientOriginalName(), 'notices'),
-            $disk,
-        );
+        $path = $attachment->store('uploads/notices', $disk);
 
         return [
             'attachment_disk' => $disk,

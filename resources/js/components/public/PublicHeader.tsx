@@ -46,9 +46,9 @@ export default function PublicHeader() {
                     type="button"
                     onClick={() => setDrawerOpen(true)}
                     aria-label={t('nav.menu')}
-                    className="rounded-control p-1.5 text-ink hover:bg-gray-100 lg:hidden"
+                    className="-ml-1 rounded-control p-2.5 text-ink hover:bg-gray-100 active:bg-gray-200 lg:hidden"
                 >
-                    <Bars3Icon className="h-6 w-6" />
+                    <Bars3Icon className="h-7 w-7" />
                 </button>
 
                 <AppLink href="/" className="flex shrink-0 items-center gap-2">

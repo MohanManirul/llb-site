@@ -8,27 +8,6 @@ use Illuminate\Support\Str;
 
 final class Asset
 {
-    public static function fileName(string $name): string
-    {
-        $extension = pathinfo($name, PATHINFO_EXTENSION);
-
-        return Str::random(10).($extension ? '.'.strtolower($extension) : '');
-    }
-
-    public static function generateUploadPath(string $fileName, string $directory = 'images'): string
-    {
-        $fileName = self::fileName($fileName);
-        $fileName = Str::lower($fileName);
-        $unique = bin2hex(random_bytes(8));
-
-        $datePath = implode('/', array_map(
-            fn ($part) => hash('crc32b', $part),
-            [date('Y'), date('m'), date('d')]
-        ));
-
-        return "uploads/{$directory}/{$datePath}/{$unique}{$fileName}";
-    }
-
     public static function removeFile(?string $path, ?string $diskName = null): bool
     {
         if (! $path) {

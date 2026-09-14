@@ -21,11 +21,7 @@ final class MaterialFileService
     {
         $disk = (string) config('llb.material_disk');
 
-        $path = $file->storeAs(
-            '',
-            Asset::generateUploadPath($file->getClientOriginalName(), 'materials'),
-            $disk,
-        );
+        $path = $file->store('uploads/materials', $disk);
 
         return [
             'disk' => $disk,

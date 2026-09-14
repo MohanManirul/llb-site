@@ -11,9 +11,9 @@ use App\Models\Subject;
 use App\Models\User;
 use App\Support\DemoPdf;
 use App\Support\Slug;
-use App\Utilities\Asset;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Sample study materials (with real PDF blobs on the material disk) and
@@ -263,7 +263,7 @@ class DemoContentSeeder extends Seeder
             'Pages in the real document: '.$pageCount,
         ]);
 
-        $path = Asset::generateUploadPath($fileName, 'materials');
+        $path = 'uploads/materials/'.Str::random(40).'.pdf';
 
         Storage::disk($disk)->put($path, $bytes);
 
@@ -313,7 +313,7 @@ class DemoContentSeeder extends Seeder
         if ($definition['attachment'] ?? false) {
             $disk = (string) config('llb.material_disk');
             $bytes = DemoPdf::generate($definition['title_en'], ['Demo attachment seeded for local development.']);
-            $path = Asset::generateUploadPath('attachment.pdf', 'notices');
+            $path = 'uploads/notices/'.Str::random(40).'.pdf';
 
             Storage::disk($disk)->put($path, $bytes);
 
